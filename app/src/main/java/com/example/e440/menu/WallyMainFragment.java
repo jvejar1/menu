@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,19 +49,27 @@ public class WallyMainFragment extends Fragment {
     boolean first_start=true;
     ImageView[] imageViews;
     WFeeling[] wFeelings;
+    int wfeeling_response;
+    int wreaction_response;
+    HashMap<String,Integer> wreaction_number_by_text;
+    HashMap <Integer,Integer> wfeeling_number_by_img_id;
+    HashMap<Integer,Integer> text_view_id_by_img_id;
     int innerQuestionPointer=0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         inflatedView = inflater.inflate(R.layout.wally_fragment, container, false);
         databaseManager= DatabaseManager.getInstance(getContext());
-
         ImageView imageView1=inflatedView.findViewById(R.id.wallyImage1);
         ImageView imageView2=inflatedView.findViewById(R.id.wallyImage2);
         ImageView imageView3=inflatedView.findViewById(R.id.wallyImage3);
         ImageView imageView4=inflatedView.findViewById(R.id.wallyImage4);
         imageViews=new ImageView[]{imageView1,imageView2,imageView3,imageView4};
-
+        text_view_id_by_img_id=new HashMap<>();
+        text_view_id_by_img_id.put(imageView1.getId(),R.id.textViewWallyImage1);
+        text_view_id_by_img_id.put(imageView2.getId(),R.id.textViewWallyImage2);
+        text_view_id_by_img_id.put(imageView3.getId(),R.id.textViewWallyImage3);
+        text_view_id_by_img_id.put(imageView4.getId(),R.id.textViewWallyImage4);
 
         Bundle args= getArguments();
         wsituation_id=args.getLong("wsituation_id");
@@ -68,6 +80,14 @@ public class WallyMainFragment extends Fragment {
             i.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if(innerQuestionPointer==1){
+                        wfeeling_response=wfeeling_number_by_img_id.get(view.getId());
+
+                    }
+                    else{
+                        TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(view.getId()));
+                        wreaction_response=wreaction_number_by_text.get(img_text_view.getText());
+                    }
                     displayNextQuestion();
                 }
             });
@@ -86,13 +106,18 @@ public class WallyMainFragment extends Fragment {
     void displayFeelingQuestion(){
 
         ((TextView)inflatedView.findViewById(R.id.wallyTopTextView)).setText("Cuando eso te pasa, ¿Cómo te sientes?");
+        Collections.shuffle(Arrays.asList(int_arr));
 
+        wfeeling_number_by_img_id=new HashMap<>();
         //TODO: Shuffle
         for (int  i: int_arr
              ) {
-
             imageViews[i].setImageBitmap(Utilities.convertBytesArrayToBitmap(wFeelings[i].getImage_bytes()));
-            imageViews[i].setId(wFeelings[i].getWfeeling());
+            wfeeling_number_by_img_id.put(imageViews[i].getId(),wFeelings[i].getWfeeling());
+            int img_id=imageViews[i].getId();
+            TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
+            img_text_view.setText(Wally.feelings_by_number.get(wFeelings[i].getWfeeling()));
+
         }
 
          innerQuestionPointer+=1;
@@ -102,11 +127,16 @@ public class WallyMainFragment extends Fragment {
         Collections.shuffle(Arrays.asList(int_arr));
         ((TextView)inflatedView.findViewById(R.id.wallyTopTextView)).setText("Cuando eso te pasa, ¿Qué haces tu?");
 
+        wreaction_number_by_text=new HashMap<>();
         for (int i:int_arr
              ) {
 
             WReaction wac=wreactions[i];
             imageViews[i].setImageBitmap(Utilities.convertBytesArrayToBitmap(wac.getImage_bytes()));
+            wreaction_number_by_text.put(wac.getDescription(),wac.getWreaction());
+            int img_id=imageViews[i].getId();
+            TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
+            img_text_view.setText(wac.getDescription());
 
         }
 
@@ -126,7 +156,18 @@ public class WallyMainFragment extends Fragment {
         else{
             //TODO: back with result
 
-            mCallback.backFromTest(null);
+
+            JSONObject jsonObject=new JSONObject();
+            try{
+                jsonObject.putOpt("wfeeling",wfeeling_response);
+                jsonObject.putOpt("wreaction",wreaction_response);
+                mCallback.backFromTest(jsonObject);
+            }
+            catch(JSONException e){
+
+
+                e.printStackTrace();
+            }
         }
     }
 

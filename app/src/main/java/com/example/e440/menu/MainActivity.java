@@ -2,13 +2,16 @@ package com.example.e440.menu;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,6 +25,21 @@ import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.e440.menu.fonotest.FGroup;
+import com.example.e440.menu.fonotest.FonoTest;
+import com.example.e440.menu.fonotest.Item;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.common.util.IOUtils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +59,6 @@ public class MainActivity extends AppCompatActivity
     String EXTRA_STUDENT = "student_id";
     int LOGIN_REQUEST = 1;
     String STUDENTS_FILENAME = "students.json";
-
     final int ACES =0;
     final int WALLY=1;
     final int CORSI=2;
@@ -59,7 +76,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void onStudentSelected(int studentId) {
-        CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers"};
+        CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","FonoTest"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Seleccione un test");
         builder.setItems(colors, new DialogInterface.OnClickListener(){
@@ -79,6 +96,10 @@ public class MainActivity extends AppCompatActivity
 
                     launchHnfActivity();
                 }
+                else{
+
+                    launchFonoTestActivity();
+                }
             }
         });
         builder.show();
@@ -86,8 +107,9 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-    @Override
+    private FusedLocationProviderClient mFusedLocationClient;
+    LocationRequest mLocationRequest = new LocationRequest();
+    private LocationCallback mLocationCallback;
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -119,15 +141,65 @@ public class MainActivity extends AppCompatActivity
             //  intent.putExtra(EXTRA_MESSAGE, message);
             startActivityForResult(intent, LOGIN_REQUEST);
         }*/
+        //databaseManager.sendAllResults(networkManager);
+
+    }
+
+    @Override
+    protected void onResume() {
+        if (credentialsManager.isFirstRun()){
+            requestInfoToServer();
+        }
+        super.onResume();
+    }
+
+    private void startLocationUpdates() {
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                mLocationCallback,
+                null /* Looper */);
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
 
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+                startLocationUpdates();
+            }
+        });
 
-
-
-
-        //getTest("corsi/get_current_data",CORSI);
-
-        requestInfoToServer();
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(MainActivity.this,
+                                0);
+                        PendingIntent a=resolvable.getResolution();
+                        int b=1;
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
 
     }
 
@@ -136,6 +208,12 @@ public class MainActivity extends AppCompatActivity
     void launchHnfActivity(){
 
         Intent intent = new Intent(this, HnfActivity.class);
+        startActivity(intent);
+
+    }
+    void launchFonoTestActivity(){
+
+        Intent intent = new Intent(this,FonoTestActivity.class);
         startActivity(intent);
 
     }
@@ -260,7 +338,6 @@ public class MainActivity extends AppCompatActivity
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
                 mProgressDialog.dismiss();
             }
         });
@@ -290,27 +367,79 @@ public class MainActivity extends AppCompatActivity
 
 
             JSONObject response = jsonObjects[0];
+
+            JSONObject fonotest_jo=response.optJSONObject("fonotest");
+
+            if (fonotest_jo!=null){
+               // databaseManager.testDatabase.daoAccess().cleanFonotest();
+                int fonotest_server_id=fonotest_jo.optInt("id");
+                float fonotest_version=(float)fonotest_jo.optDouble("version");
+                FonoTest fonoTest=new FonoTest(fonotest_server_id,false);
+                databaseManager.testDatabase.daoAccess().insertFonoTest(fonoTest);
+                JSONArray fgroups=fonotest_jo.optJSONArray("groups");
+                for (int i=0;i<fgroups.length();i++){
+                    JSONObject fgroup_jo=fgroups.optJSONObject(i);
+                    int fgroup_server_id=fgroup_jo.optInt("id");
+                    int fgroup_index=fgroup_jo.optInt("index");
+                    String fgroup_name=fgroup_jo.optString("name");
+
+                    String fgroup_description=fgroup_jo.optString("description");
+                    boolean fgroup_is_example=fgroup_jo.optBoolean("example");
+                    JSONArray items =fgroup_jo.optJSONArray("items");
+                    FGroup fGroup=new FGroup(fgroup_name,fgroup_description,fgroup_is_example,fgroup_index,fgroup_server_id);
+                    long fgroup_id=databaseManager.testDatabase.daoAccess().insertOneFGroup(fGroup);
+                    for (int j=0;j<items.length();j++){
+                        JSONObject item_jo=items.optJSONObject(j);
+                        String item_description=item_jo.optString("description");
+                        int item_index=item_jo.optInt("index",0);
+                        int item_server_id=item_jo.optInt("id");
+                        int audio_id=item_jo.optInt("audio_id",-1);
+                        byte[] audio_bytes=null;
+                        if(audio_id!=-1){
+                            audio_bytes=downloadAsByteArray(audio_id,NetworkManager.BASE_URL+"/audios");
+                        }
+                        String correct_sequence=item_jo.optString("correct_sequence");
+
+                        Item item=new Item(correct_sequence,(int)fgroup_id,audio_bytes,item_description,item_server_id,item_index);
+                        databaseManager.testDatabase.daoAccess().insertOneItem(item);
+                    }
+                }
+
+
+
+
+
+            }
+
             JSONObject hnf_jo=response.optJSONObject("hnf");
-            int hnf_server_id=hnf_jo.optInt("id");
-            JSONArray test_ja=hnf_jo.optJSONArray("set");
-            for (int i=0;i<test_ja.length();i++){
 
-                JSONObject test_jo=test_ja.optJSONObject(i);
-                int test_server_id=test_jo.optInt("id");
-                int test_type =test_jo.optInt("hnf_type");
-                JSONArray figures_ja=test_jo.optJSONArray("sequence");
-                HnfTest hnfTest=new HnfTest(test_server_id,test_type);
-                long hnf_test_id=databaseManager.testDatabase.daoAccess().insertOneHnfTest(hnfTest);
-                for(int j=0;j<figures_ja.length();j++){
+            if(hnf_jo!=null){
+           //     databaseManager.testDatabase.daoAccess().cleanHnf();
+                int hnf_server_id=hnf_jo.optInt("id");
+                float hnf_version=(float)hnf_jo.optDouble("version");
+                HnfSet hnfSet=new HnfSet(hnf_server_id,hnf_version);
+                databaseManager.testDatabase.daoAccess().insertHnfSet(hnfSet);
+                JSONArray test_ja=hnf_jo.optJSONArray("set");
+                for (int i=0;i<test_ja.length();i++){
 
-                    JSONObject figure_jo=figures_ja.optJSONObject(j);
-                    int figure_server_id=figure_jo.optInt("id");
-                    int figure_number=figure_jo.optInt("figure");
-                    int figure_position=figure_jo.optInt("position");
-                    int figure_index=figure_jo.optInt("index");
-                    HnfFigure hnfFigure=new HnfFigure(figure_number,(int)hnf_test_id,figure_server_id,figure_position,figure_index);
-                    long hnf_figure_id = databaseManager.testDatabase.daoAccess().insertOneHnfFigure(hnfFigure);
-                    int a =1;
+                    JSONObject test_jo=test_ja.optJSONObject(i);
+                    int test_server_id=test_jo.optInt("id");
+                    int test_type =test_jo.optInt("hnf_type");
+                    JSONArray figures_ja=test_jo.optJSONArray("sequence");
+                    HnfTest hnfTest=new HnfTest(test_server_id,test_type);
+                    long hnf_test_id=databaseManager.testDatabase.daoAccess().insertOneHnfTest(hnfTest);
+                    for(int j=0;j<figures_ja.length();j++){
+
+                        JSONObject figure_jo=figures_ja.optJSONObject(j);
+                        int figure_server_id=figure_jo.optInt("id");
+                        int figure_number=figure_jo.optInt("figure");
+                        int figure_position=figure_jo.optInt("position");
+                        int figure_index=figure_jo.optInt("index");
+                        HnfFigure hnfFigure=new HnfFigure(figure_number,(int)hnf_test_id,figure_server_id,figure_position,figure_index);
+                        long hnf_figure_id = databaseManager.testDatabase.daoAccess().insertOneHnfFigure(hnfFigure);
+                        int a =1;
+                    }
+
                 }
 
             }
@@ -321,7 +450,12 @@ public class MainActivity extends AppCompatActivity
 
             }
             else{
+
+          //      databaseManager.testDatabase.daoAccess().cleanCorsi();
                 int corsi_id = corsi_jo.optInt("id");
+                float version=(float)corsi_jo.optDouble("version");
+                Corsi corsi=new Corsi(corsi_id,version);
+                databaseManager.testDatabase.daoAccess().insertCorsi(corsi);
                 JSONArray set=corsi_jo.optJSONArray("set");
                 for (int i=0;i<set.length();i++){
                     JSONObject sequence_jo = set.optJSONObject(i);
@@ -345,98 +479,106 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-
-
             JSONObject aceJO = response.optJSONObject("ace");
-            JSONArray acasesJA = aceJO.optJSONArray("acases");
-            for (int i = 0; i < acasesJA.length(); i++) {
+            if(aceJO!=null){
+         //       databaseManager.testDatabase.daoAccess().cleanAce();
+                int ace_id=aceJO.optInt("id");
+                float ace_version=(float)aceJO.optDouble("version");
+                Ace ace=new Ace(ace_version,ace_id);
+                databaseManager.testDatabase.daoAccess().insertAce(ace);
+                JSONArray acasesJA = aceJO.optJSONArray("acases");
+                for (int i = 0; i < acasesJA.length(); i++) {
 
-                JSONObject acaseJO = acasesJA.optJSONObject(i);
-                int acase_server_id = acaseJO.optInt("id");
-                int acase_index = acaseJO.optInt("index");
-                int picture_id = acaseJO.optInt("picture_id");
+                    JSONObject acaseJO = acasesJA.optJSONObject(i);
+                    int acase_server_id = acaseJO.optInt("id");
+                    int acase_index = acaseJO.optInt("index");
+                    int picture_id = acaseJO.optInt("picture_id");
+                    //try to DL image
+                    byte[] image_bytes= downloadAsByteArray(picture_id,NetworkManager.BASE_URL+"/pictures");
+                    Acase acase = new Acase(acase_index, acase_server_id, image_bytes);
 
-                //try to DL image
-                byte[] image_bytes=downloadImageAsByteArray(picture_id);
+                    databaseManager.testDatabase.daoAccess().insertAcase(acase);
+                }
 
-                Acase acase = new Acase(acase_index, acase_server_id, image_bytes);
 
-                databaseManager.testDatabase.daoAccess().insertAcase(acase);
             }
-
 
             ///// WALLY
 
 
             JSONObject wally_jo = response.optJSONObject("wally");
-            int wally_server_id = wally_jo.optInt("id");
-            Wally w = new Wally(1, "", wally_server_id);
+            if(wally_jo!=null){
 
-            databaseManager.testDatabase.daoAccess().insertWally(w);
+          //      databaseManager.testDatabase.daoAccess().cleanWally();
+                int wally_server_id = wally_jo.optInt("id");
+                Wally w = new Wally(1, "", wally_server_id);
 
-            JSONArray feelings_ja = wally_jo.optJSONArray("feelings");
+                databaseManager.testDatabase.daoAccess().insertWally(w);
 
-            for (int j = 0; j < feelings_ja.length(); j++) {
-                JSONObject feeling_jo = feelings_ja.optJSONObject(j);
-                int feeling_server_id = feeling_jo.optInt("id");
-                int feeling_image_id = feeling_jo.optInt("picture_id");
+                JSONArray feelings_ja = wally_jo.optJSONArray("feelings");
 
-                int feeling_wfeeling=feeling_jo.optInt("wfeeling");
-                byte[] feeling_image_bytes =downloadImageAsByteArray(feeling_image_id);
+                for (int j = 0; j < feelings_ja.length(); j++) {
+                    JSONObject feeling_jo = feelings_ja.optJSONObject(j);
+                    int feeling_server_id = feeling_jo.optInt("id");
+                    int feeling_image_id = feeling_jo.optInt("picture_id");
 
-
-                WFeeling wf=new WFeeling(feeling_server_id,feeling_wfeeling,feeling_image_bytes);
-                databaseManager.testDatabase.daoAccess().insertWFeeling(wf);
-
-            }
+                    int feeling_wfeeling=feeling_jo.optInt("wfeeling");
+                    byte[] feeling_image_bytes = downloadAsByteArray(feeling_image_id,NetworkManager.BASE_URL+"/pictures");
 
 
+                    WFeeling wf=new WFeeling(feeling_server_id,feeling_wfeeling,feeling_image_bytes);
+                    databaseManager.testDatabase.daoAccess().insertWFeeling(wf);
 
-            JSONArray wsituations_ja = wally_jo.optJSONArray("wsituations");
-            for (int i = 0; i < wsituations_ja.length(); i++) {
-                JSONObject wsituation_jo = wsituations_ja.optJSONObject(i);
-                int wsituation_server_id = wsituation_jo.optInt("id");
-                int wsituation_image_id = wsituation_jo.optInt("picture_id");
-                byte[] wsituation_image_bytes = downloadImageAsByteArray(wsituation_image_id);
-                String wsituation_description = wsituation_jo.optString("description");
-                WSituation ws = new WSituation(wsituation_server_id,wsituation_description,wsituation_image_bytes);
-                long ws_id=databaseManager.testDatabase.daoAccess().insertWSituation(ws);
+                }
+                JSONArray wsituations_ja = wally_jo.optJSONArray("wsituations");
+                for (int i = 0; i < wsituations_ja.length(); i++) {
+                    JSONObject wsituation_jo = wsituations_ja.optJSONObject(i);
+                    int wsituation_server_id = wsituation_jo.optInt("id");
+                    int wsituation_image_id = wsituation_jo.optInt("picture_id");
+                    byte[] wsituation_image_bytes = downloadAsByteArray(wsituation_image_id,NetworkManager.BASE_URL+"/pictures");
+                    String wsituation_description = wsituation_jo.optString("description");
+                    WSituation ws = new WSituation(wsituation_server_id,wsituation_description,wsituation_image_bytes);
+                    long ws_id=databaseManager.testDatabase.daoAccess().insertWSituation(ws);
 
 
-                //parse Wreactions
+                    //parse Wreactions
 
-                JSONArray wreactions_ja = wsituation_jo.optJSONArray("wreactions");
+                    JSONArray wreactions_ja = wsituation_jo.optJSONArray("wreactions");
 
-                for (int j = 0; j < wreactions_ja.length(); j++) {
+                    for (int j = 0; j < wreactions_ja.length(); j++) {
 
-                    JSONObject wreaction_jo = wreactions_ja.optJSONObject(j);
-                    int wreaction_server_id = wreaction_jo.optInt("wreaction_id");
-                    int wreaction_image_id = wreaction_jo.optInt("picture_id");
-                    int wreaction_wreaction=wreaction_jo.optInt("wreaction");
-                    String wreaction_description =wreaction_jo.optString("description");
-                    byte[] wreaction_image_bytes = downloadImageAsByteArray(wreaction_image_id);
-                    WReaction wa = new WReaction(ws_id,wreaction_server_id,wreaction_wreaction,wreaction_description, wreaction_image_bytes);
-                    databaseManager.testDatabase.daoAccess().insertWAction(wa);
+                        JSONObject wreaction_jo = wreactions_ja.optJSONObject(j);
+                        int wreaction_server_id = wreaction_jo.optInt("wreaction_id");
+                        int wreaction_image_id = wreaction_jo.optInt("picture_id");
+                        int wreaction_wreaction=wreaction_jo.optInt("wreaction");
+                        String wreaction_description =wreaction_jo.optString("description");
+                        byte[] wreaction_image_bytes = downloadAsByteArray(wreaction_image_id,NetworkManager.BASE_URL+"/pictures");
+                        WReaction wa = new WReaction(ws_id,wreaction_server_id,wreaction_wreaction,wreaction_description, wreaction_image_bytes);
+                        databaseManager.testDatabase.daoAccess().insertWAction(wa);
+                    }
+
+
                 }
 
 
+
             }
+
+
+
+
             return 1;
 
         }
 
-            byte[] downloadImageAsByteArray ( int picture_id){
+            byte[] downloadAsByteArray(int resource_id,String base_url){
                 Bitmap bm = null;
                 byte[] byteArray;
                 try {
-                    URL aURL = new URL(NetworkManager.BASE_URL + "/pictures/download/" + picture_id);
+                    URL aURL = new URL(base_url + "/download/" + resource_id);
                     InputStream inputStream = aURL.openStream();
-                    bm = BitmapFactory.decodeStream(inputStream);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byteArray = stream.toByteArray();
-                    bm.recycle();
-                } catch (IOException e) {
+                    byteArray= IOUtils.toByteArray(inputStream);
+                  } catch (IOException e) {
                     Log.e("Hub", "Error getting the image from server : " + e.getMessage().toString());
                     byteArray = null;
                 }
@@ -542,4 +684,12 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+
+        public void sendResults(){
+
+            int a =1;
+            ResponseRequest[] responseRequests=databaseManager.testDatabase.daoAccess().fetchAllResponseRequest();
+
+
+       }
     }

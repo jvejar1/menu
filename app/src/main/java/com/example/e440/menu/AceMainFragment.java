@@ -62,7 +62,7 @@ public class AceMainFragment extends Fragment{
     }
 
     NetworkManager networkManager;
-    HashMap<Integer, Integer> result = new HashMap<>();
+    HashMap<String,Integer> result = new HashMap<>();
 
     int nextAcaseIndex= 0;
     ImageView caseImageView;
@@ -75,6 +75,7 @@ public class AceMainFragment extends Fragment{
     Acase current_acase;
     Acase[] acases;
 
+    Ace ace;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,7 +99,7 @@ public class AceMainFragment extends Fragment{
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (result.containsKey(nextAcaseIndex)) {
+                if (result.containsKey(Integer.toString(current_acase.getServer_id()))) {
                     LoadAceData lad=new LoadAceData();
                     lad.execute();
 
@@ -140,7 +141,10 @@ public class AceMainFragment extends Fragment{
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            result.put(nextAcaseIndex,view.getId());
+                            Button button=(Button) view;
+                            int feeling_number=Ace.feelings_by_name.get(button.getText());
+
+                            result.put(Integer.toString(current_acase.getServer_id()),feeling_number);
                             //change color
                         }
                     });
@@ -154,8 +158,21 @@ public class AceMainFragment extends Fragment{
     void displayNextCase(){
 
         if(nextAcaseIndex==acases_ids.length){
+            JSONObject payload=new JSONObject();
+            try{
+                payload.putOpt("test_name","ace");
+                payload.putOpt("test_id",ace.getServer_id());
+                payload.putOpt("response",new JSONObject(result));
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+            ResponseRequest responseRequest=new ResponseRequest(payload.toString(),"ace");
+            databaseManager.insertRequest(responseRequest);
             mCallback.backFromTest(null);
             return;
+
+
         }
 
         else {
@@ -175,8 +192,6 @@ public class AceMainFragment extends Fragment{
         }
     }
 
-
-
     private class LoadAceData extends AsyncTask<Void,Void,Void> {
 
         @Override
@@ -192,12 +207,11 @@ public class AceMainFragment extends Fragment{
 
 
             if(acases_ids==null){
+                ace=databaseManager.testDatabase.daoAccess().fetchFirstAce();
                 acases_ids=databaseManager.testDatabase.daoAccess().fetchAcacesIds();
             }
 
             if(nextAcaseIndex==acases_ids.length){
-
-                mCallback.backFromTest(null);
                 return null;
             }
             current_acase = databaseManager.testDatabase.daoAccess().fetchAcaseById(acases_ids[nextAcaseIndex]);

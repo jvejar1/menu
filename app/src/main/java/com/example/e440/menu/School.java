@@ -4,16 +4,20 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
- * Created by e440 on 20-05-18.
+ * Created by e440 on 09-06-18.
  */
 @Entity
-public class HnfSet {
-    @PrimaryKey (autoGenerate = true)
-    private int id;
+public class School {
+    @PrimaryKey(autoGenerate = true)
+    int id;
+    int server_id;
 
-    public HnfSet(int server_id, float version) {
+    public School(int server_id, String name) {
         this.server_id = server_id;
-        this.version = version;
+        this.name = name;
+    }
+
+    public School() {
     }
 
     public int getId() {
@@ -32,15 +36,14 @@ public class HnfSet {
         this.server_id = server_id;
     }
 
-    public float getVersion() {
-        return version;
+    public String getName() {
+        return name;
     }
 
-    public void setVersion(float version) {
-        this.version = version;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    private int server_id;
-    private float version;
+    String name;
 
 }

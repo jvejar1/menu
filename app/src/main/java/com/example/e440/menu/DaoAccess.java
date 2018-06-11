@@ -1,8 +1,15 @@
 package com.example.e440.menu;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
+import android.database.Cursor;
+
+import com.example.e440.menu.fonotest.FGroup;
+import com.example.e440.menu.fonotest.FonoTest;
+import com.example.e440.menu.fonotest.Item;
 
 /**
  * Created by e440 on 09-04-18.
@@ -12,17 +19,89 @@ import android.arch.persistence.room.Query;
 public interface DaoAccess {
 
 
+    //School
+    @Query("SELECT * FROM School")
+    School[] fetchAllSchools();
+
+    @Query("SELECT * FROM School where server_id=:server_id LIMIT 1")
+    School fetchSchoolByServerId(int server_id);
+
+    @Query("DELETE FROM School where server_id=:server_id")
+    int deleteSchoolByServerId(int server_id);
+
+    @Query("DELETE FROM Student where school_id=:school_id")
+    int deleteSchoolBySchoolId(int school_id);
+
+    @Delete
+    int deleteSchool(School school);
+
+    @Update
+    int updateSchool(School school);
+    @Insert
+    void insertSchool(School school);
+
+    @Insert
+    void insertResponseRequest(ResponseRequest responseRequest);
+
+    @Query("SELECT * FROM ResponseRequest")
+    ResponseRequest[] fetchAllResponseRequest();
     //Students
     @Insert
     long insertOneStudent(Student student);
 
-    @Query("SELECT * FROM Student")
+    @Update
+    int updateStudent(Student student);
+
+    @Query("Delete from Student")
+    int deleteAllStudents();
+
+    @Query("SELECT * FROM Student order by last_name ASC")
     Student[] fetchAllStudents();
+
+    @Query("SELECT * FROM Student where server_id=:server_id limit 1")
+    Student fetchStudentByServerId(int server_id);
+
+    @Query("DELETE FROM Student where server_id=:server_id")
+    int deleteStudentByServerId(int server_id);
+
+    //Fonotest
+    @Insert
+    long insertFonoTest(FonoTest fonoTest);
+
+
+    @Insert
+    long insertOneFGroup(FGroup fGroup);
+
+    @Insert
+    long insertOneItem(Item item);
+
+    @Query("SELECT id FROM FGroup")
+    int[] fetchFgroupsIds();
+
+    @Query("SELECT * FROM FonoTest LIMIT 1")
+    FonoTest fetchFonotest();
+
+    @Query("SELECT * FROM FGroup")
+    FGroup[] fetchAllFgroups();
+
+
+
+    @Query("SELECT * From Item where fgroup_id=:id")
+    Item[] fetchItemsByFGroupId(int id);
+
+    @Query("SELECT * From Item where id=:id")
+    Item fetchItemById(int id);
 
 
     //HNF
+
+
     @Insert
     long insertOneHnfTest(HnfTest hnfTest);
+    @Insert
+    long insertHnfSet(HnfSet hnfSet);
+    @Query("SELECT * FROM HnfSet LIMIT 1")
+    HnfSet fetchHnfSet();
     @Insert
     long insertOneHnfFigure(HnfFigure hnfFigure);
 
@@ -33,10 +112,15 @@ public interface DaoAccess {
     HnfFigure[] fetchAllHnfFiguresByHnfTestId(int hnf_test_id);
 
 
-
-
-
     //CORSI
+
+     @Insert
+    long insertCorsi(Corsi corsi);
+
+    @Query("Select * from Corsi LIMIT 1")
+    Corsi fetchCorsi();
+
+
     @Insert
     long insertCSequence(Csequence csequence);
     @Insert
@@ -56,6 +140,9 @@ public interface DaoAccess {
 
 
     //WALLY
+    @Query("SELECT * FROM Wally LIMIT 1")
+    Wally fetchFirstWally();
+
     @Insert
     void insertWally(Wally wally);
 
@@ -79,13 +166,13 @@ public interface DaoAccess {
     @Query("SELECT * FROM WFeeling")
     WFeeling[] fetchAllWFeelings();
 
-
     @Query("SELECT * FROM WReaction where wsituation_id=:id")
     WReaction[] fetchWActionsByWSituationId(long id);
 
 
 
     //ACE
+
     @Insert
     void insertAce(Ace ace);
 

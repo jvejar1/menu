@@ -11,5 +11,5 @@ import org.json.JSONObject;
 
 public interface MainFragmentListener {
     void backFromPractice();
-    void backFromTest(Bundle b);
+    void backFromTest(JSONObject jo);
 }

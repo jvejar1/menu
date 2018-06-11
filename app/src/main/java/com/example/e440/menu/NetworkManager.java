@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpRetryException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -40,7 +41,7 @@ public class NetworkManager implements Executor{
     private RequestQueue mRequestQueue;
     private static Context mCtx;
 
-    public static final String BASE_URL = "http://192.168.0.102:3000/";
+    public static final String BASE_URL = "http://18.222.87.0:80/";
 
     private static String token =  "";
 
@@ -70,8 +71,10 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-
-
+    void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
+        String url = BASE_URL + "evaluations";
+        makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
+    }
 
 
 
@@ -122,7 +125,6 @@ public class NetworkManager implements Executor{
 
     public void getForms(Response.Listener<JSONObject> listener,
                          Response.ErrorListener  errorListener){
-
         String url = BASE_URL + "forms/";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
@@ -141,6 +143,15 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
+    public void fetchSchools(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
+        String url =  BASE_URL + "/schools/get_all";
+        makeApiCall(Request.Method.GET, url, null,listener, errorListener);
+    }
+
+    public void fetchStudentsBySchoolId(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener,int school_id){
+        String url =  BASE_URL + "/schools/"+school_id+"/students";
+        makeApiCall(Request.Method.GET, url, null,listener, errorListener);
+    }
 
     public void getAcesInfo(Response.Listener<JSONObject> listener,
                          Response.ErrorListener  errorListener){
@@ -151,7 +162,6 @@ public class NetworkManager implements Executor{
 
     private void makeApiCall(int method, String url, JSONObject payload, Response.Listener<JSONObject> listener,
                              Response.ErrorListener errorListener){
-
         JsonObjectArrayRequest jsonObjectRequest = new JsonObjectArrayRequest
                 (method, url, payload, listener, errorListener){
             @Override

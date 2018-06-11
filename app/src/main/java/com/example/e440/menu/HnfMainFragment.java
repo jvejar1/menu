@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -50,7 +52,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
     private final static int TIME_EXCEDEED=2;
 
     private int mode;
-    private final static long FIGURE_TIME=1000;
+    private final static long FIGURE_TIME=1500;
     private final static int BLANK_TIME=700;
 
     private long start_time;
@@ -109,13 +111,13 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
     HnfFigure[] hnfFigure_array;
     HnfTest hnfTest;
     int current_hf_index;
+    int score=0;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.hnf_main_fragment, container, false);
         mode=getArguments().getInt("mode",-1);
         current_hf_index=0;
-
         Button left_button=inflatedView.findViewById(R.id.hnfLeftButton);
         Button right_button=inflatedView.findViewById(R.id.hnfRightButton);
         left_button.setOnClickListener(this);
@@ -134,15 +136,12 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
 
         @Override
         protected Void doInBackground(Void... voids) {
-
             if(isInTestMode()){
-
                 answer_time_by_index = new HashMap<>();
                 reentrantLock=new ReentrantLock();
                 answered_on_time_by_index=new HashMap<>();
                 databaseManager= DatabaseManager.getInstance(getContext());
             }
-
             if(mode==HnfTest.HEARTS_PRACTICE_MODE){
                 hnfFigure_array=new HnfFigure[6];
                 hnfFigure_array[0]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.RIGHT,0);
@@ -151,12 +150,9 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                 hnfFigure_array[3]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.RIGHT,3);
                 hnfFigure_array[4]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.LEFT,4);
                 hnfFigure_array[5]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.LEFT,5);
-
-
             }
 
             else if(mode==HnfTest.FLOWERS_PRACTICE_MODE){
-
                 hnfFigure_array=new HnfFigure[6];
                 hnfFigure_array[0]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.RIGHT,0);
                 hnfFigure_array[1]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.LEFT,1);
@@ -164,7 +160,6 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                 hnfFigure_array[3]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.LEFT,3);
                 hnfFigure_array[4]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.RIGHT,4);
                 hnfFigure_array[5]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.RIGHT,5);
-
             }
 
             else if(mode==HnfTest.HEARTS_AND_FLOWERS_PRACTICE_MODE){
@@ -183,8 +178,6 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
             else if (mode==HnfTest.HEARTS_TEST_MODE || mode==HnfTest.FLOWERS_TEST_MODE ||mode==HnfTest.HEARTS_AND_FLOWERS_TEST_MODE){
                 int test_type=(mode==HnfTest.HEARTS_TEST_MODE )?HnfTest.HEARTS_TEST_TYPE:(mode==HnfTest.FLOWERS_TEST_MODE)?HnfTest.FLOWERS_TEST_TYPE:
                         HnfTest.HEARTS_AND_FLOWERS_TEST_TYPE;
-
-
                 hnfTest=databaseManager.testDatabase.daoAccess().fetchHnfTestByType(test_type);
                 hnfFigure_array=databaseManager.testDatabase.daoAccess().fetchAllHnfFiguresByHnfTestId(hnfTest.getId());
 
@@ -218,6 +211,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                     uiHandler.removeMessages(TIME_EXCEDEED);
                     correct_by_index.put(current_hf_index,correct);
                     answered_on_time_by_index.put(current_hf_index,true);
+                    score++;
                     answer_time_by_index.put(current_hf_index, (System.currentTimeMillis() - start_time));
                     current_hf_index++;
                     display_hnfFigure();
@@ -252,7 +246,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
             if(isInTestMode()){
                 JSONArray results=new JSONArray();
                 int index=0;
-                for (HnfFigure figure:hnfFigure_array
+                /*for (HnfFigure figure:hnfFigure_array
                      ) {
 
                     JsonObject result=new JsonObject();
@@ -262,9 +256,17 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                     result.addProperty("answered_on_time",answered_on_time_by_index.get(index));
                     results.put(result);
                     index++;
+                }*/
+                JSONObject jsonObject=new JSONObject();
+                try {
+                    jsonObject.put("score", score);
                 }
 
-                mCallback.backFromTest(null);
+                catch (JSONException e ){
+                    e.printStackTrace();
+                }
+
+                mCallback.backFromTest(jsonObject);
             }
 
             else{

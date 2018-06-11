@@ -14,12 +14,8 @@ public class CredentialsManager {
     public CredentialsManager(Context context){
         this.preferences = context.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
     }
-
     static synchronized CredentialsManager getInstance(Context context){
-
-
         if (credentialsManager==null){
-
             credentialsManager =new CredentialsManager(context);
         }
         return credentialsManager;
@@ -34,6 +30,19 @@ public class CredentialsManager {
         return user_name;
     }
 
+    boolean isFirstRun(){
+        boolean first_run=this.preferences.getBoolean("firstrun",true);
+        if(first_run){
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("firstrun",false );
+            editor.commit();
+
+        }
+
+        return first_run;
+
+    }
+
     String getUserPassword(){
         String user_password = this.preferences.getString("password", null);
         return user_password;
@@ -41,16 +50,15 @@ public class CredentialsManager {
 
     }
     String getToken(){
-
         String token = this.preferences.getString("token", null);
         return token;
-
     }
 
     void saveToken(String token){
 
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("token", token);
+        editor.commit();
 
     }
 

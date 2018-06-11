@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/SituationImageView"
-        android:layout_width="443dp"
-        android:layout_height="499dp"
+        android:layout_width="584dp"
+        android:layout_height="744dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"

@@ -14,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,8 +40,8 @@ public class CorsiMainFragment extends Fragment{
     public interface CorsiMainFragmentListener{
 
         void backFromPracticeListener();
-        void backFromOrderedTestListener(int db_request_id);
-        void finalBack();
+        void backFromTestListener(JSONArray jsonArray);
+
 
     }
 
@@ -123,6 +126,8 @@ public class CorsiMainFragment extends Fragment{
     DatabaseManager databaseManager;
     ReentrantLock lock = new ReentrantLock();
     private NextSequenceDisplayer dns;
+    int score;
+    JSONArray results;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -130,17 +135,7 @@ public class CorsiMainFragment extends Fragment{
         databaseManager=DatabaseManager.getInstance(getContext());
         mode = getArguments().getInt("mode");
 
-
-
         //Initialize buttons Hash, should be done in background
-
-
-
-
-
-
-
-
 
         try{result.putOpt("responses",new JSONArray());}
 
@@ -150,6 +145,7 @@ public class CorsiMainFragment extends Fragment{
 
         }
 
+        results=new JSONArray();
         inflatedView = inflater.inflate(R.layout.corsi_main_fragment, container, false);
         dns=new NextSequenceDisplayer();
         new DataLoader().execute();
@@ -202,8 +198,6 @@ public class CorsiMainFragment extends Fragment{
             }
             ButtonIdByIndex.put(1,R.id.corsiButton1);
             ButtonIndexById.put(R.id.corsiButton1,1);
-
-
             ButtonIdByIndex.put(2,R.id.corsiButton2);
             ButtonIndexById.put(R.id.corsiButton2,2);
 
@@ -231,15 +225,11 @@ public class CorsiMainFragment extends Fragment{
             ButtonIdByIndex.put(10,R.id.corsiButton10);
             ButtonIndexById.put(R.id.corsiButton10,10);
 
-
             for (int i=0;i<csequences.length;i++){
                 corrects_by_index.put(i,0);
                 incorrects_by_index.put(i,0);
                 timeCompletionByIndex.put(i,(long)0);
             }
-
-
-
             return null;
         }
 
@@ -280,10 +270,14 @@ public class CorsiMainFragment extends Fragment{
             Csequence current_csequence=csequences[current_sequence_index];
             int button_index=ButtonIndexById.get(button_id);
             boolean correct=false;
+            int csquares_lenght=csquares.length;
             if(mode==CorsiActivity.ORDERED_TEST || mode==CorsiActivity.ORDERED_PRACTICE) {
                 if (button_index == getNumberSquareAtPosition(current_index_in_sequence)) {
                     corrects_by_index.put(current_sequence_index, corrects_by_index.get(current_sequence_index) + 1);
                     correct=true;
+
+                    int pot=csquares_lenght-current_index_in_sequence-1;
+                    score+=Math.pow(2,pot);
                     Log.d("myTag", "CORRECT");
                 } else {
 
@@ -297,12 +291,12 @@ public class CorsiMainFragment extends Fragment{
                 if (button_index == getNumberAtPositionInStrRevSeq(current_index_in_sequence)) {
                     corrects_by_index.put(current_sequence_index, corrects_by_index.get(current_sequence_index) + 1);
                     correct=true;
-
+                    int pot=csquares_lenght-current_index_in_sequence-1;
+                    score+=Math.pow(2,pot);
                     Log.d("myTag", "CORRECT");
-                } else {
-
+                }
+                 else {
                     incorrects_by_index.put(current_sequence_index, incorrects_by_index.get(current_sequence_index) + 1);
-
                 }
 
 
@@ -325,6 +319,20 @@ public class CorsiMainFragment extends Fragment{
 
             if (current_index_in_sequence==csquares.length){
 
+
+
+
+                JSONObject jsonObject=new JSONObject();
+                try {
+                    jsonObject.put("csequence_id", current_csequence.getServer_id());
+
+                    jsonObject.put("score", score);
+                    results.put(jsonObject);
+                }
+
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
                 current_sequence_index++;
                 dns = new NextSequenceDisplayer();
                 dns.execute();
@@ -393,20 +401,14 @@ public class CorsiMainFragment extends Fragment{
                 //save and finnish
                 if (mode==CorsiActivity.ORDERED_PRACTICE || mode==CorsiActivity.REVERSED_PRACTICE){
 
-
                     mCallback.backFromPracticeListener();
 
                 }
 
-                else if (mode==CorsiActivity.ORDERED_TEST){
+                else if (mode==CorsiActivity.ORDERED_TEST || mode==CorsiActivity.REVERSED_TEST){
 
                     //TODO: save result and send integer to activity
-                    mCallback.backFromOrderedTestListener(1);
-                }
-                else {
-
-                    mCallback.finalBack();
-
+                    mCallback.backFromTestListener(results);
                 }
 
 
@@ -417,6 +419,11 @@ public class CorsiMainFragment extends Fragment{
 
             current_index_in_sequence=0;
 
+            try{Thread.sleep(1000);}
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            score=0;
             csquares=databaseManager.testDatabase.daoAccess().fetchCsquareByCsequenceId(csequences[current_sequence_index].getId());
             Bundle b;
             int counter=1;
@@ -437,7 +444,6 @@ public class CorsiMainFragment extends Fragment{
                 msg.what=REMOVE_BUTTON_PAINT;
                 myHandler.sendMessageDelayed(msg,700*counter);
                 counter+=1;
-
             }
 
 

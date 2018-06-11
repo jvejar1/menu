@@ -11,7 +11,7 @@
     <TextView
         android:id="@+id/studentRutTextView"
         android:layout_width="106dp"
-        android:layout_height="22dp"
+        android:layout_height="21dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -29,19 +29,19 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-
         android:id="@+id/studentNameTextView"
-        android:layout_width="166dp"
-        android:layout_height="22dp"
+        android:layout_width="478dp"
+        android:layout_height="21dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:focusable="false"
-
         android:inputType="textPersonName"
+
         android:text="Name"
+        android:textColor="#000000"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

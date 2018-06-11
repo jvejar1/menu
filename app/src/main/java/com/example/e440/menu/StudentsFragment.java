@@ -10,9 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,6 +53,8 @@ public class StudentsFragment extends Fragment {
                     + " must implement OnHeadlineSelectedListener");
         }
     }
+
+    List<Student> studentList=new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,25 +63,21 @@ public class StudentsFragment extends Fragment {
         studentsListView=inflatedView.findViewById(R.id.studentsListView);
         databaseManager= DatabaseManager.getInstance(getContext());
 
-        studentsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Object o = adapterView.getItemAtPosition(i);
-                Student std = (Student) o; //As you are using Default String Adapter
-                Toast.makeText(getContext(),std.getName(),Toast.LENGTH_SHORT).show();
-            }
-        });
 
         studentsListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                Student item = (Student)studentsListView.getItemAtPosition(position);
-                Toast.makeText(getContext(),"You selected : " + item.toString(),Toast.LENGTH_SHORT).show();
                 mCallback.onStudentSelected(position);
             }
         });
+        Student s1 = new Student("01 Alumno prueba","01 Alumno prueba","0",0);
+        studentList.add(s1);
+        ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, studentList);
+        studentsListView.setAdapter(customAdapter);
+        studentsListView.setClickable(true);
         StudentsLoader studentsLoader=new StudentsLoader();
         studentsLoader.execute();
+
         return inflatedView;
     }
 
@@ -84,25 +87,19 @@ public class StudentsFragment extends Fragment {
         @Override
         protected Student[] doInBackground(Void... voids) {
 
-            Student s1 = new Student("juan", "vejar", "1", 1);
-            Student s2 = new Student("javier", "osores", "2", 2);
-            Student s3 = new Student("camilo", "henriquez", "2", 3);
-
-            databaseManager.testDatabase.daoAccess().insertOneStudent(s1);
-            databaseManager.testDatabase.daoAccess().insertOneStudent(s2);
-            databaseManager.testDatabase.daoAccess().insertOneStudent(s3);
             Student[] students=databaseManager.testDatabase.daoAccess().fetchAllStudents();
-            return students;
 
+
+            for (Student student:students){
+                studentList.add(student);
+
+            }
+            return null;
         }
 
         @Override
         protected void onPostExecute(Student[] students) {
-
-            ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, Arrays.asList(students));
-            studentsListView.setAdapter(customAdapter);
-            studentsListView.setClickable(true);
-
+            ((BaseAdapter) studentsListView.getAdapter()).notifyDataSetChanged();
 
         }
     }

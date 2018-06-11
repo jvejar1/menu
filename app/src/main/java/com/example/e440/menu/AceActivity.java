@@ -10,7 +10,7 @@ public class AceActivity extends AppCompatActivity implements InstructionFragmen
 
 
     @Override
-    public void backFromTest(Bundle b) {
+    public void backFromTest(JSONObject jo) {
         finish();
     }
 

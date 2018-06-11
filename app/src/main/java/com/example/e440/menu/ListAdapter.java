@@ -42,11 +42,11 @@ public class ListAdapter extends ArrayAdapter {
             TextView tt2 = (TextView) v.findViewById(R.id.studentRutTextView);
 
             if (tt1 != null) {
-                tt1.setText(s.getName()+" "+s.getLast_name());
+                tt1.setText(s.getLast_name()+" "+s.getName());
             }
 
             if (tt2 != null) {
-                tt2.setText(s.getRut());
+                tt2.setText("RUT: "+ s.getRut());
             }
 
         }
