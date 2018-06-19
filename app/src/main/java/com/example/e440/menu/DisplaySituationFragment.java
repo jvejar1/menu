@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * Created by e440 on 08-05-18.
@@ -86,6 +87,8 @@ public class DisplaySituationFragment extends Fragment {
             byte[] image_bytes = wSituation.getImage_bytes();
             Bitmap bm =Utilities.convertBytesArrayToBitmap(image_bytes);
             ImageView imageView=inflatedView.findViewById(R.id.SituationImageView);
+            TextView textView=inflatedView.findViewById(R.id.SituationTextView);
+            textView.setText(wSituation.getDescription());
             imageView.setImageBitmap(bm);
         }
     }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +15,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.e440.menu.fonotest.FGroup;
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +55,6 @@ public class FonoTestMainFragment extends Fragment{
     View inflatedView;
     int[] fgroup_ids;
     MediaPlayer mediaPlayer;
-    FGroup[] fGroups;
     Item[] items;
     LinearLayout optionsLinearLayout;
     LinearLayout responsesLinearLayout;
@@ -88,6 +88,10 @@ public class FonoTestMainFragment extends Fragment{
                 playAudio();
             }
         });
+
+        TextView remindTextView=inflatedView.findViewById(R.id.remindTextView);
+        final String text_to_remind="Si responde con el dígito primero califique el item de 0 y diga 'recuerda que debes decirme primer la palabra,luego el número'";
+        remindTextView.setText(text_to_remind);
 
         Button nextButton=inflatedView.findViewById(R.id.nextButton);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -129,14 +133,14 @@ public class FonoTestMainFragment extends Fragment{
         AsyncTask loader=new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                fGroups=databaseManager.testDatabase.daoAccess().fetchAllFgroups();
+                items=databaseManager.testDatabase.daoAccess().fetchAllItems();
                 fonoTest=databaseManager.testDatabase.daoAccess().fetchFonotest();
                 return null;
             }
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
-                if(fGroups.length==0 || fonoTest==null){
+                if(items.length==0 || fonoTest==null){
                     finish();
                 }
                 displayNextItem();
@@ -146,6 +150,18 @@ public class FonoTestMainFragment extends Fragment{
     }
     void finish(){
         //TODO:finish
+
+        JSONObject payload=new JSONObject();
+        try{payload.put("responses",response_by_item_server_id);
+            payload.put("scores",scores_douples);
+            payload.put("test_id",fonoTest.getServer_id());
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        mCallback.backFromTest(payload);
+
     }
 
     void resetVariablesForItem(){
@@ -220,49 +236,9 @@ public class FonoTestMainFragment extends Fragment{
     }
 
     void displayNextItem(){
-        if (items==null){
-            //load Items async
-            AsyncTask asyncTask=new AsyncTask() {
-                @Override
-                protected Object doInBackground(Object[] objects) {
-                    FGroup fGroup=fGroups[current_fgroup_index];
-                    items=databaseManager.testDatabase.daoAccess().fetchItemsByFGroupId(fGroup.getId());
-                    return fGroup;
-                }
 
-                @Override
-                protected void onPostExecute(Object o) {
-                    super.onPostExecute(o);
-                    displayNextItem();
-                }
-            }.execute();
-
-        }
-
-        else if(current_item_index==items.length){
-            current_fgroup_index++;
-            if(current_fgroup_index==fGroups.length){
-                //TODO: finish
-
-                JSONObject payload=new JSONObject();
-                try{payload.put("responses",response_by_item_server_id);
-                    payload.put("scores",scores_douples);
-                    payload.put("test_id",fonoTest.getServer_id());
-                }
-                catch(JSONException e){
-                    e.printStackTrace();
-                }
-
-                mCallback.backFromTest(payload);
-
-
-            }
-            else {
-                items=null;
-                current_item_index=0;
-                displayNextItem();
-
-            }
+        if(current_item_index==items.length){
+            finish();
 
         }
 
@@ -275,13 +251,7 @@ public class FonoTestMainFragment extends Fragment{
             TextView audioDescription=inflatedView.findViewById(R.id.audioDescriptionTextView);
             audioDescription.setText(item.getDescription());
 
-            TextView remindTextView=inflatedView.findViewById(R.id.remindTextView);
-            if(item.getIndex()==0){
-                remindTextView.setText("Si responde con el dígito primero califique el item de 0 y diga 'recuerda que debes decirme primer la palabra,luego el número. Repita el ejemplo'");
-            }
-            else{
-                remindTextView.setText("Si responde con el dígito primero califique el item de 0 y diga 'recuerda que debes decirme primer la palabra,luego el número'");
-            }
+
 
             String[] audio_desc=item.getDescription().split("\\.\\.");
             for (int i=0;i<audio_desc.length;i++){
@@ -302,8 +272,27 @@ public class FonoTestMainFragment extends Fragment{
                         moveButton((Button)view);
                     }
                 });
+
+
                 optionsLinearLayout.addView(b);
             }
+
+
+            TextView itemNameTextView=inflatedView.findViewById(R.id.itemNameTextView);
+            if(item.isExample()){
+                itemNameTextView.setTextColor(ContextCompat.getColor(getContext(),R.color.colorWarning));
+                itemNameTextView.setText(item.getName());
+
+            }
+            else{
+
+                itemNameTextView.setTextColor(ContextCompat.getColor(getContext(),R.color.defaultBlack));
+                itemNameTextView.setText("Item "+item.getName());
+
+            }
+            TextView instructionTextView=inflatedView.findViewById(R.id.fonotestInstructionTextView);
+            instructionTextView.setText(item.getInstruction());
+
             correct_seq_str=TextUtils.join("..",correct_numbers)+".."+TextUtils.join("..",correct_words);
         }
         return;

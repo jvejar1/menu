@@ -48,12 +48,23 @@ public class Acase {
     int index;
     @NonNull
     int server_id;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    String description;
     byte[] image_bytes;
     @PrimaryKey(autoGenerate = true)
     private int id;
-    public Acase(@NonNull int index, @NonNull int server_id, byte[] image_bytes) {
+    public Acase(@NonNull int index, @NonNull int server_id, byte[] image_bytes,String description) {
         this.index = index;
         this.server_id = server_id;
         this.image_bytes = image_bytes;
+        this.description=description;
     }
 }

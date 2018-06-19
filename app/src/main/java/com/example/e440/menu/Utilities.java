@@ -3,6 +3,7 @@ package com.example.e440.menu;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -14,7 +15,6 @@ import java.io.ByteArrayOutputStream;
  */
 
 class Utilities {
-
     static boolean isParseableToInt(String s){
             try {
                 Integer.parseInt(s);
@@ -24,6 +24,7 @@ class Utilities {
             }
 
     }
+
     static Bitmap convertBytesArrayToBitmap(byte[] ba){
         Bitmap bm = BitmapFactory.decodeByteArray(ba, 0, ba.length);
         return bm;

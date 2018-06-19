@@ -6,12 +6,18 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class WallyActivity extends AppCompatActivity implements DisplaySituationFragment.ReturnToWallyTestListener,MainFragmentListener{
+public class WallyActivity extends AppCompatActivity implements InstructionFragment.backFromInstructionListener,DisplaySituationFragment.ReturnToWallyTestListener,MainFragmentListener{
+
+    @Override
+    public void backFromInstruction() {
+        startWsituation();
+    }
 
     @Override
     public void backFromTest(final JSONObject jsonObject) {
@@ -53,36 +59,20 @@ public class WallyActivity extends AppCompatActivity implements DisplaySituation
 
         if (wsituation_ids.length==current_wsituation_id_index){
 
-            //TODO: save result and finish
-                AsyncTask asyncTask=new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
-                        JSONObject payload=new JSONObject();
-                        try {
-                        payload.putOpt("test_name", "wally");
-                        payload.putOpt("test_id", wally.getServer_id());
-                        payload.putOpt("response",responses);
-                        ResponseRequest responseRequest=new ResponseRequest(payload.toString(),"wally");
-                        databaseManager.testDatabase.daoAccess().insertResponseRequest(responseRequest);
-                        ResponseRequest[] responseRequests=databaseManager.testDatabase.daoAccess().fetchAllResponseRequest();
-                        }
 
-                        catch (JSONException e){
+            JSONObject payload=new JSONObject();
+            try {
+                payload.putOpt("test_id", wally.getServer_id());
+                payload.putOpt("responses",responses);
+                databaseManager.insertRequest(payload,student_server_id,"wally",0);
+            }
 
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
+            catch (JSONException e){
 
-                    @Override
-                    protected void onPostExecute(Object o) {
+                e.printStackTrace();
+            }
 
-                        super.onPostExecute(o);
-
-                        finish();
-                    }
-                }.execute();
-
+            finish();
 
             return;
         }
@@ -115,11 +105,14 @@ public class WallyActivity extends AppCompatActivity implements DisplaySituation
     int current_wsituation_id_index =0;
     JSONArray responses;
     DatabaseManager databaseManager;
+    int student_server_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         databaseManager= DatabaseManager.getInstance(getApplicationContext());
         setContentView(R.layout.activity_wally);
+        Bundle extras=getIntent().getExtras();
+        student_server_id=extras.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         fragmentManager=getFragmentManager();
         responses=new JSONArray();
         DataLoader dl = new DataLoader();
@@ -143,7 +136,19 @@ public class WallyActivity extends AppCompatActivity implements DisplaySituation
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            startWsituation();
+            if(wally==null || wsituation_ids.length==0){
+
+                Toast.makeText(getApplicationContext(),"No hay datos, intente actualizar",Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            InstructionFragment corsiInstructionFragment= new InstructionFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("text","“Ahora vamos a hacer un juego donde yo te cuento algunas historias sobre unos niños de tu edad. Voy a utilizar unas tarjetas con imágenes para ayudar a contarte mi historia. Puedes usar las tarjetas para decirme lo que piensas de la historia”. ¿Lo has entendido?... (espere la respuesta del niño) Comencemos..");
+
+            corsiInstructionFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.fragment_place,corsiInstructionFragment);
+            fragmentTransaction.commit();
         }
     }
 }

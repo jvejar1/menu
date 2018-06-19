@@ -12,8 +12,7 @@ public class HnfTest {
     final static int HEARTS_TEST_MODE=1;
     final static int FLOWERS_PRACTICE_MODE=2;
     final static int FLOWERS_TEST_MODE=3;
-    final static int HEARTS_AND_FLOWERS_PRACTICE_MODE=4;
-    final static int HEARTS_AND_FLOWERS_TEST_MODE=5;
+    final static int HEARTS_AND_FLOWERS_TEST_MODE=4;
 
     final static int HEARTS_TEST_TYPE=1;
     final static int FLOWERS_TEST_TYPE=2;

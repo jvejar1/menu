@@ -8,7 +8,6 @@
             android:id="@+id/nav_my_students"
             android:icon="@drawable/ic_menu_camera"
             android:title="Mis alumnos" />
-
         <item
             android:id="@+id/nav_add_student"
             android:icon="@drawable/ic_menu_camera"
@@ -18,21 +17,18 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="Test" />
         <item
-            android:id="@+id/nav_saved"
+            android:id="@+id/nav_results_and_updates"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Guardado" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Resultados/Actualizar" />
+
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Otros">
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Compartir" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"

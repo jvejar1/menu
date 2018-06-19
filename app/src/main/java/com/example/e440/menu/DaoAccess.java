@@ -7,7 +7,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 import android.database.Cursor;
 
-import com.example.e440.menu.fonotest.FGroup;
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
 
@@ -42,9 +41,12 @@ public interface DaoAccess {
 
     @Insert
     void insertResponseRequest(ResponseRequest responseRequest);
-
+    @Delete
+    int deleteResponseRequest(ResponseRequest responseRequest);
     @Query("SELECT * FROM ResponseRequest")
     ResponseRequest[] fetchAllResponseRequest();
+    @Query("DELETE FROM ResponseRequest where id=:id_to_delete")
+    int deleteRequestById(int id_to_delete);
     //Students
     @Insert
     long insertOneStudent(Student student);
@@ -69,25 +71,17 @@ public interface DaoAccess {
     long insertFonoTest(FonoTest fonoTest);
 
 
-    @Insert
-    long insertOneFGroup(FGroup fGroup);
 
     @Insert
     long insertOneItem(Item item);
 
-    @Query("SELECT id FROM FGroup")
-    int[] fetchFgroupsIds();
-
     @Query("SELECT * FROM FonoTest LIMIT 1")
     FonoTest fetchFonotest();
 
-    @Query("SELECT * FROM FGroup")
-    FGroup[] fetchAllFgroups();
 
 
-
-    @Query("SELECT * From Item where fgroup_id=:id")
-    Item[] fetchItemsByFGroupId(int id);
+    @Query("SELECT * From Item")
+    Item[] fetchAllItems();
 
     @Query("SELECT * From Item where id=:id")
     Item fetchItemById(int id);
@@ -114,11 +108,17 @@ public interface DaoAccess {
 
     //CORSI
 
+
      @Insert
     long insertCorsi(Corsi corsi);
 
     @Query("Select * from Corsi LIMIT 1")
     Corsi fetchCorsi();
+
+    @Query("Delete from Csquare where server_id=0")
+    int deleteFakeSquares();
+    @Query("Delete from Csequence where server_id=0")
+    int deleteFakeCsequences();
 
 
     @Insert

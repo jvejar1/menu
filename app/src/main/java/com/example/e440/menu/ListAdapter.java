@@ -40,13 +40,17 @@ public class ListAdapter extends ArrayAdapter {
         if (s != null) {
             TextView tt1 = (TextView) v.findViewById(R.id.studentNameTextView);
             TextView tt2 = (TextView) v.findViewById(R.id.studentRutTextView);
-
+            TextView server_id= v.findViewById(R.id.studentServerIdTextView);
             if (tt1 != null) {
                 tt1.setText(s.getLast_name()+" "+s.getName());
             }
 
             if (tt2 != null) {
                 tt2.setText("RUT: "+ s.getRut());
+            }
+            if(server_id!=null){
+
+                server_id.setText(""+s.getServer_id());
             }
 
         }

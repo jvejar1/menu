@@ -186,11 +186,18 @@ public class CorsiMainFragment extends Fragment{
 
             else if(mode==CorsiActivity.ORDERED_TEST){
 
+                databaseManager.testDatabase.daoAccess().deleteFakeSquares();
+                databaseManager.testDatabase.daoAccess().deleteFakeCsequences();
+
                 csequences=databaseManager.testDatabase.daoAccess().fetchOrderedCsequences();
 
             }
 
             else if(mode==CorsiActivity.REVERSED_TEST){
+
+
+                databaseManager.testDatabase.daoAccess().deleteFakeSquares();
+                databaseManager.testDatabase.daoAccess().deleteFakeCsequences();
 
                 csequences=databaseManager.testDatabase.daoAccess().fetchReversedCsequences();
 

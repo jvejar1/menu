@@ -162,18 +162,6 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                 hnfFigure_array[5]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.RIGHT,5);
             }
 
-            else if(mode==HnfTest.HEARTS_AND_FLOWERS_PRACTICE_MODE){
-
-                hnfFigure_array=new HnfFigure[7];
-                hnfFigure_array[0]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.RIGHT,0);
-                hnfFigure_array[1]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.LEFT,1);
-                hnfFigure_array[2]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.LEFT,2);
-                hnfFigure_array[3]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.RIGHT,3);
-                hnfFigure_array[4]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.LEFT,4);
-                hnfFigure_array[5]=new HnfFigure(HnfFigure.FLOWER,0,0,HnfFigure.LEFT,5);
-                hnfFigure_array[6]=new HnfFigure(HnfFigure.HEART,0,0,HnfFigure.RIGHT,6);
-
-            }
 
             else if (mode==HnfTest.HEARTS_TEST_MODE || mode==HnfTest.FLOWERS_TEST_MODE ||mode==HnfTest.HEARTS_AND_FLOWERS_TEST_MODE){
                 int test_type=(mode==HnfTest.HEARTS_TEST_MODE )?HnfTest.HEARTS_TEST_TYPE:(mode==HnfTest.FLOWERS_TEST_MODE)?HnfTest.FLOWERS_TEST_TYPE:

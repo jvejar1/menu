@@ -16,6 +16,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         childColumns = "school_id",
         onDelete = CASCADE))
 public class Student {
+
+    public static final String EXTRA_STUDENT_SERVER_ID="student_server_id";
+
     public int getId() {
         return id;
     }

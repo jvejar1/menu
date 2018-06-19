@@ -2,6 +2,7 @@ package com.example.e440.menu;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -49,30 +50,23 @@ public class CorsiActivity extends AppCompatActivity implements InstructionFragm
             AsyncTask asyncTask =new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] objects) {
-                    JSONObject payload=new JSONObject();
-                    try {
-
-                        DatabaseManager databaseManager= DatabaseManager.getInstance(getApplicationContext());
-                        payload.put("test_name", "corsi");
-
-                        payload.put("ordered_score", ordered_score);
-
-                        payload.put("reversed_score", reversed_score);
-                        payload.put("results", results);
-                        Corsi corsi= databaseManager.testDatabase.daoAccess().fetchCorsi();
-                        payload.put("id",corsi.getServer_id());
-                        ResponseRequest responseRequest=new ResponseRequest(payload.toString(),"corsi");
-                        databaseManager.insertRequest(responseRequest);
-
-                         }
-                    catch(JSONException e){
-                        e.printStackTrace();
-                    }
+                    DatabaseManager databaseManager= DatabaseManager.getInstance(getApplicationContext());
+                    corsi= databaseManager.testDatabase.daoAccess().fetchCorsi();
                     return null;
                 }
 
                 @Override
                 protected void onPostExecute(Object o) {
+                    JSONObject payload=new JSONObject();
+                    try{
+                    payload.put("ordered_score", ordered_score);
+                    payload.put("reversed_score", reversed_score);
+                    payload.put("responses", results);
+                    payload.put("test_id",corsi.getServer_id());}
+                    catch(JSONException e ){
+                        e.printStackTrace();
+                    }
+                    DatabaseManager.getInstance(getApplicationContext()).insertRequest(payload,student_server_id,"corsi",0);
                     super.onPostExecute(o);
                     finish();
                 }
@@ -105,12 +99,15 @@ public class CorsiActivity extends AppCompatActivity implements InstructionFragm
     JSONArray results;
     int ordered_score=0;
     int reversed_score=0;
+    int student_server_id;
+    Corsi corsi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_corsi);
+        Bundle b=getIntent().getExtras();
+        student_server_id=b.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         fragmentManager = getFragmentManager();
-
         results=new JSONArray();
         startInstructions(next_instruction);
 
@@ -123,16 +120,16 @@ public class CorsiActivity extends AppCompatActivity implements InstructionFragm
         Bundle bundle = new Bundle();
         if (next_instruction==ORDERED_PRACTICE){
 
-            bundle.putString("text","A continuación van aparecer un conjunto de cuadrados en al pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en recordar el orden en que se activaron. \n\n\tLos dos primeros son de práctica. Presiona Comenzar si lo has entendido.");
+            bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en recordar el orden en que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño).... Comencemos.");
         }
         else if (next_instruction==ORDERED_TEST || next_instruction==REVERSED_TEST){
-            bundle.putString("text","Si lo has entendido, presiona Comenzar y comenzamos...");
+            bundle.putString("text","Recuerda, ese fue el ensayo, ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
 
         }
 
         else{
 
-            bundle.putString("text","A continuación van aparecer un conjunto de cuadrados en al pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en señalar el ORDEN INVERSO en que se activaron. \n\n\tLos dos primeros son de práctica. Presiona enter si lo has entendido.");
+            bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en señalar el ORDEN CONTRARIO al que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
 
         }
 

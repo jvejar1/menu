@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -38,14 +39,23 @@ public class InstructionFragment extends Fragment {
 
     View inflatedView;
 
-
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.instruction_fragment, container, false);
 
-        String text= getArguments().getString("text");
+        Bundle args=getArguments();
+        String text= args.getString("text");
+        int drawable_id1=args.getInt("drawable1",-1);
+        int drawable_id2=args.getInt("drawable2",-1);
+        if (drawable_id1!=-1){
+            ImageView imageView=inflatedView.findViewById(R.id.instructionImageView1);
+            imageView.setImageResource(drawable_id1);
+        }
+        if(drawable_id2!=-1){
+            ImageView imageView=inflatedView.findViewById(R.id.instructionImageView2);
+            imageView.setImageResource(drawable_id2);
+        }
         TextView corsiInstructionTextView=inflatedView.findViewById(R.id.instructionTextView);
         corsiInstructionTextView.setText(text);
         Button corsiStartButton = inflatedView.findViewById(R.id.startButton);

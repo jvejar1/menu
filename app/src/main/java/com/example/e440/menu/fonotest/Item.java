@@ -13,10 +13,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 /**
  * Created by e440 on 30-05-18.
  */
-@Entity(foreignKeys = @ForeignKey(entity =FGroup.class,
-        parentColumns = "id",
-        childColumns = "fgroup_id",
-        onDelete = CASCADE))
+@Entity
 public class Item {
     @PrimaryKey (autoGenerate = true)
     int id;
@@ -29,15 +26,6 @@ public class Item {
     public void setId(int id) {
         this.id = id;
     }
-
-    public int getFgroup_id() {
-        return fgroup_id;
-    }
-
-    public void setFgroup_id(int fgroup_id) {
-        this.fgroup_id = fgroup_id;
-    }
-
     public byte[] getAudio() {
         return audio;
     }
@@ -71,13 +59,15 @@ public class Item {
     }
 
 
-    public Item(String correct_sequence, int fgroup_id, byte[] audio, String description, int sever_id, int index) {
+    public Item(String correct_sequence, byte[] audio, String description, int sever_id, int index, String instruction,boolean example,String name) {
         this.correct_sequence = correct_sequence;
-        this.fgroup_id = fgroup_id;
         this.audio = audio;
+        this.instruction=instruction;
         this.description = description;
         this.sever_id = sever_id;
         this.index = index;
+        this.example=example;
+        this.name=name;
     }
 
     public String getCorrect_sequence() {
@@ -89,9 +79,36 @@ public class Item {
     }
 
     String correct_sequence;
-    int fgroup_id;
     byte[] audio;
     String description;
     int sever_id;
+    String instruction;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    String name;
+    public String getInstruction() {
+        return instruction;
+    }
+
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
+
+    public boolean isExample() {
+        return example;
+    }
+
+    public void setExample(boolean example) {
+        this.example = example;
+    }
+
+    boolean example;
     int index;
 }

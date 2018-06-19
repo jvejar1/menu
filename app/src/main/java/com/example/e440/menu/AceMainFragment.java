@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -160,16 +161,16 @@ public class AceMainFragment extends Fragment{
         if(nextAcaseIndex==acases_ids.length){
             JSONObject payload=new JSONObject();
             try{
-                payload.putOpt("test_name","ace");
+                payload.putOpt("responses",new JSONObject(result));
                 payload.putOpt("test_id",ace.getServer_id());
-                payload.putOpt("response",new JSONObject(result));
+
+
+                mCallback.backFromTest(payload);
             }
             catch (JSONException e){
                 e.printStackTrace();
             }
-            ResponseRequest responseRequest=new ResponseRequest(payload.toString(),"ace");
-            databaseManager.insertRequest(responseRequest);
-            mCallback.backFromTest(null);
+
             return;
 
 
@@ -181,12 +182,12 @@ public class AceMainFragment extends Fragment{
             byte[] byteArray=current_acase.getImage_bytes();
             ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(byteArray);
             Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
-
             caseImageView.setImageBitmap(bitmap);
-
             reorderFeelings();
 
 
+            TextView descriptionTextView=inflatedView.findViewById(R.id.aceDescriptionTextView);
+            descriptionTextView.setText(current_acase.getDescription());
             nextAcaseIndex += 1;
             inflatedView.setVisibility(View.VISIBLE);
         }
@@ -224,105 +225,6 @@ public class AceMainFragment extends Fragment{
             displayNextCase();
 
         }
-
-    }
-
-    void get_data(){
-
-
-        networkManager.getAcesInfo(new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-
-                    JSONObject ace_jo=response.optJSONObject("aces");
-                    float ace_version=(float)ace_jo.optDouble("version");
-                    int ace_server_id=ace_jo.optInt("id");
-                    final Ace ace =new Ace(1,1);
-                    ace.setServer_id(ace_server_id);
-                    ace.setVersion(ace_version);
-
-                    final ArrayList<Acase> acaseArrayList=new ArrayList<>();
-                    JSONArray acases_ja = response.getJSONArray("acases");
-                    for (int p=0;p<acases_ja.length();p++){
-                        JSONObject acase_jo=acases_ja.optJSONObject(p);
-                        int acase_server_id=acase_jo.optInt("id");
-                        int acase_index=acase_jo.optInt("index");
-                        String image_path=acase_jo.optString("image_path");
-
-
-                        JSONArray afeelings=acase_jo.optJSONArray("feelings");
-
-
-                        Bitmap m=null;
-                        try{
-                            DownloadImage di=new DownloadImage();
-                            m=di.execute("/aces/download/"+acase_server_id).get();
-                            int j=0;
-                        }
-                        catch (ExecutionException|InterruptedException e){
-
-
-
-                        }
-                        byte[] imageBytes=Utilities.convertBitmapToBytesArray(m);
-                        Acase acase=new Acase(acase_index,acase_server_id,imageBytes);
-                        acaseArrayList.add(acase);
-
-
-                    }
-
-                    Thread t =new Thread() {
-                        @Override
-                        public void run() {
-                            databaseManager.testDatabase.daoAccess().insertAce(ace);
-
-                            for (Acase a :acaseArrayList
-                                    ) {
-                                databaseManager.testDatabase.daoAccess().insertAcase(a);
-
-                            }
-
-                            int id = ace.getId();
-
-                        }
-                    };
-                    t.start();
-
-
-
-                    //DatabaseManager.getInstance(getContext()).testDatabase.daoAccess().insertAce(ace);
-
-
-                }
-
-                catch (JSONException e){
-
-                    System.out.println(e.getMessage());
-                }
-            }
-
-
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO: Handle error
-
-
-                if (error.networkResponse==null){
-
-                    System.out.println("CONNECTION ERROR");
-
-                }
-                else{
-
-                    System.out.println("UNKNOWN ERROR");
-
-                }
-            }
-        });
 
     }
 

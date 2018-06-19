@@ -215,6 +215,7 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
 
                         }
                     },school_db_id);
+                    break;
                 }
             }
 

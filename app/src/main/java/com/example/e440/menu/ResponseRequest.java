@@ -4,11 +4,21 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.AsyncTask;
 
+import java.sql.Timestamp;
+
 /**
  * Created by e440 on 03-06-18.
  */
 @Entity
 public class ResponseRequest {
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @PrimaryKey(autoGenerate = true)
     int id;
@@ -33,6 +43,7 @@ public class ResponseRequest {
         this.payload = payload;
         this.test_name = test_name;
     }
+
 
     String payload;
     String test_name;

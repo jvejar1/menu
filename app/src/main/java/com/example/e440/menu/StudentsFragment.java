@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
@@ -67,10 +68,12 @@ public class StudentsFragment extends Fragment {
         studentsListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                mCallback.onStudentSelected(position);
+                TextView studentIdTextView=view.findViewById(R.id.studentServerIdTextView);
+                int student_server_id=Integer.parseInt(studentIdTextView.getText().toString());
+                mCallback.onStudentSelected(student_server_id);
             }
         });
-        Student s1 = new Student("01 Alumno prueba","01 Alumno prueba","0",0);
+        Student s1 = new Student("","01 Alumno prueba","0",0);
         studentList.add(s1);
         ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, studentList);
         studentsListView.setAdapter(customAdapter);

@@ -54,27 +54,30 @@
     <ImageView
         android:id="@+id/wallyImage4"
         android:layout_width="241dp"
-        android:layout_height="178dp"
+        android:layout_height="180dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.979"
+        app:layout_constraintHorizontal_bias="0.978"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.367" />
+        app:layout_constraintVertical_bias="0.388" />
 
     <TextView
-        android:textColor="@color/defaultBlack"
+
         android:id="@+id/textViewWallyImage1"
         android:layout_width="202dp"
-        android:layout_height="52dp"
+        android:layout_height="62dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textColor="@color/defaultBlack"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.034"
@@ -84,14 +87,16 @@
 
     <TextView
 
-        android:textColor="@color/defaultBlack"
         android:id="@+id/textViewWallyImage2"
         android:layout_width="213dp"
-        android:layout_height="46dp"
+        android:layout_height="61dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/defaultBlack"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.341"
@@ -101,14 +106,16 @@
 
     <TextView
 
-        android:textColor="@color/defaultBlack"
         android:id="@+id/textViewWallyImage3"
         android:layout_width="233dp"
-        android:layout_height="54dp"
+        android:layout_height="65dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/defaultBlack"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.646"
@@ -118,14 +125,16 @@
 
     <TextView
 
-        android:textColor="@color/defaultBlack"
         android:id="@+id/textViewWallyImage4"
         android:layout_width="210dp"
-        android:layout_height="54dp"
+        android:layout_height="62dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/defaultBlack"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.97"
@@ -137,11 +146,12 @@
 
         android:id="@+id/wallyTopTextView"
         android:layout_width="519dp"
-        android:layout_height="66dp"
+        android:layout_height="107dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textAlignment="center"
         android:textColor="@color/defaultBlack"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"

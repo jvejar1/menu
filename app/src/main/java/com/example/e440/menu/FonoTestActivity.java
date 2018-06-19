@@ -2,6 +2,7 @@ package com.example.e440.menu;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,16 +14,7 @@ public class FonoTestActivity extends AppCompatActivity implements MainFragmentL
     @Override
     public void backFromTest(JSONObject jo) {
         getSupportFragmentManager().popBackStack();
-        try{
-            jo.put("student_id",student_id);
-            jo.put("evaluator_id",null);
-            jo.put("test_name","fonotest");
-        }
-        catch (JSONException e ){
-            e.printStackTrace();
-        }
-        ResponseRequest responseRequest=new ResponseRequest(jo.toString(),"fonotest");
-        DatabaseManager.getInstance(getApplicationContext()).insertRequest(responseRequest);
+        DatabaseManager.getInstance(getApplicationContext()).insertRequest(jo,student_id,"fonotest",0);
         finish();
     }
     @Override
@@ -38,6 +30,9 @@ public class FonoTestActivity extends AppCompatActivity implements MainFragmentL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fono_test);
+        Intent intent=getIntent();
+        Bundle b=intent.getExtras();
+        student_id=b.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         start_main_fragment();
     }
     void start_main_fragment(){
