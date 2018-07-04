@@ -40,24 +40,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener {
 
-    AsyncTask fonotest_request_resolver=new AsyncTask() {
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            DatabaseManager db_instance=(DatabaseManager)objects[0];
-            ResponseRequest[] fonotest_rrs=db_instance.testDatabase.daoAccess().fetchFonotestResponseRequests();
-            for(int i=0;i<fonotest_rrs.length;i++){
-                ResponseRequest responseRequest=fonotest_rrs[i];
-                int a =1;
 
-            }
-            return null;
-        }
-    };
 
     CredentialsManager credentialsManager;
     int LOGIN_REQUEST = 1;
@@ -125,7 +114,6 @@ public class MainActivity extends AppCompatActivity
         networkManager = NetworkManager.getInstance(this);
         databaseManager = DatabaseManager.getInstance(this);
 
-        fonotest_request_resolver.execute(databaseManager);
 
         imgview = findViewById(R.id.imageView);
 
@@ -152,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         resultsSender.execute();
 
         JobInfo.Builder builder=new JobInfo.Builder(1,new ComponentName(this,ResultSendJobService.class));
-        JobInfo jobInfo=builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(1000*60*15).setPersisted(true).build();
+        JobInfo jobInfo=builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(1000*60*60*24).setPersisted(true).build();
         JobScheduler jobScheduler = this.getSystemService(JobScheduler.class);
         jobScheduler.schedule(jobInfo);
 
@@ -277,7 +265,13 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private class InsertAll extends AsyncTask<JSONObject, Void, Integer> {
+    private class InsertAll extends AsyncTask<JSONObject, Integer, Integer> {
+
+        protected void onProgressUpdate(Integer... progress){
+            super.onProgressUpdate(progress);
+            mProgressDialog.setMessage(progress[0]+" % completado");
+        }
+
 
         @Override
         protected void onPreExecute() {
@@ -337,6 +331,7 @@ public class MainActivity extends AppCompatActivity
 
 
             }
+            publishProgress(20);
 
             JSONObject hnf_jo=response.optJSONObject("hnf");
 
@@ -371,6 +366,7 @@ public class MainActivity extends AppCompatActivity
 
             }
 
+            publishProgress(40);
             JSONObject corsi_jo=response.optJSONObject("corsi");
             if (corsi_jo==null){
                 //handle
@@ -406,6 +402,7 @@ public class MainActivity extends AppCompatActivity
             }
 
 
+            publishProgress(60);
             JSONObject aceJO = response.optJSONObject("ace");
             if(aceJO!=null){
          //       databaseManager.testDatabase.daoAccess().cleanAce();
@@ -432,6 +429,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             ///// WALLY
+            publishProgress(80);
 
 
             JSONObject wally_jo = response.optJSONObject("wally");
@@ -495,6 +493,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
+            publishProgress(100);
             return 1;
 
         }

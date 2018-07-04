@@ -42,7 +42,7 @@ public class NetworkManager implements Executor{
     private RequestQueue mRequestQueue;
     private static Context mCtx;
 
-    public static final String BASE_URL = "http://192.168.0.101:3000/";
+    public static final String BASE_URL = "http://18.222.87.0:80/";
 
     private static String token =  "";
 
