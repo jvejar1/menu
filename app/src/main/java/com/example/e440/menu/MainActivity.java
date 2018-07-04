@@ -4,6 +4,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +44,20 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener {
+
+    AsyncTask fonotest_request_resolver=new AsyncTask() {
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            DatabaseManager db_instance=(DatabaseManager)objects[0];
+            ResponseRequest[] fonotest_rrs=db_instance.testDatabase.daoAccess().fetchFonotestResponseRequests();
+            for(int i=0;i<fonotest_rrs.length;i++){
+                ResponseRequest responseRequest=fonotest_rrs[i];
+                int a =1;
+
+            }
+            return null;
+        }
+    };
 
     CredentialsManager credentialsManager;
     int LOGIN_REQUEST = 1;
@@ -108,6 +125,8 @@ public class MainActivity extends AppCompatActivity
         networkManager = NetworkManager.getInstance(this);
         databaseManager = DatabaseManager.getInstance(this);
 
+        fonotest_request_resolver.execute(databaseManager);
+
         imgview = findViewById(R.id.imageView);
 
         fragmentManager = getFragmentManager();
@@ -131,6 +150,13 @@ public class MainActivity extends AppCompatActivity
 
         ResultsSender resultsSender=new ResultsSender(this);
         resultsSender.execute();
+
+        JobInfo.Builder builder=new JobInfo.Builder(1,new ComponentName(this,ResultSendJobService.class));
+        JobInfo jobInfo=builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(1000*60*15).setPersisted(true).build();
+        JobScheduler jobScheduler = this.getSystemService(JobScheduler.class);
+        jobScheduler.schedule(jobInfo);
+
+
 
     }
 

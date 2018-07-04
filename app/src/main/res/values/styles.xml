@@ -28,5 +28,14 @@
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>
+    <style name="ErrorButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorWarning</item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="SuccessButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorSuccess</item>
+        <item name="android:textColor">@color/defaultBlack</item>
+    </style>
 
 </resources>

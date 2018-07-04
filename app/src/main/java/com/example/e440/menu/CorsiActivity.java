@@ -12,12 +12,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CorsiActivity extends AppCompatActivity implements InstructionFragment.backFromInstructionListener, CorsiMainFragment.CorsiMainFragmentListener{
+public class CorsiActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener, CorsiMainFragment.CorsiMainFragmentListener{
 
     final static int ORDERED_PRACTICE=0;
     final static int ORDERED_TEST=1;
     final static int REVERSED_PRACTICE=2;
     final static int REVERSED_TEST=3;
+
+    public int getNext_instruction() {
+        return next_instruction;
+    }
+
+    public void setNext_instruction(int next_instruction) {
+        this.next_instruction = next_instruction;
+    }
+
     int next_instruction=ORDERED_PRACTICE;
 
     @Override
@@ -28,7 +37,6 @@ public class CorsiActivity extends AppCompatActivity implements InstructionFragm
 
     @Override
     public void backFromTestListener(JSONArray jsonArray) {
-
 
         for(int i=0;i<jsonArray.length();i++){
             JSONObject response=jsonArray.optJSONObject(i);
@@ -79,6 +87,7 @@ public class CorsiActivity extends AppCompatActivity implements InstructionFragm
             startInstructions(next_instruction);
         }
     }
+
 
 
 

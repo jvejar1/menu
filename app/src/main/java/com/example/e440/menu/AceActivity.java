@@ -8,7 +8,7 @@ import android.os.Bundle;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class AceActivity extends AppCompatActivity implements InstructionFragment.backFromInstructionListener,MainFragmentListener{
+public class AceActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener,MainFragmentListener{
 
 
     @Override

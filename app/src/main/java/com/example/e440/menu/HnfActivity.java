@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HnfActivity extends AppCompatActivity implements MainFragmentListener,InstructionFragment.backFromInstructionListener {
+public class HnfActivity extends BaseActivity implements MainFragmentListener,InstructionFragment.backFromInstructionListener {
 
     @Override
     public void backFromInstruction() {

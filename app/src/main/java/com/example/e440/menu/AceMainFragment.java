@@ -12,6 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,6 +75,8 @@ public class AceMainFragment extends Fragment{
     View inflatedView;
     DatabaseManager databaseManager;
 
+    HashMap<Integer,Integer> button_id_by_feeling_number=new HashMap<>();
+    Button highlighted_feeling_button=null;
     int[] acases_ids;
     Acase current_acase;
     Acase[] acases;
@@ -112,7 +117,6 @@ public class AceMainFragment extends Fragment{
             }
         });
 
-
         LoadAceData lad=new LoadAceData();
         lad.execute();
         return inflatedView;
@@ -133,19 +137,19 @@ public class AceMainFragment extends Fragment{
         {
                 Button b = (Button) feelingsButtonsLinearLayout.getChildAt(index);
 
-                int new_id=v[index];
-                String new_text=Ace.feelings_by_number.get(v[index]);
-                b.setId(new_id);
+                int feeling_number=v[index];
+                String new_text=Ace.feelings_by_number.get(feeling_number);
                 b.setText(new_text);
 
+                button_id_by_feeling_number.put(feeling_number,b.getId());
                 if(nextAcaseIndex==0){
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Button button=(Button) view;
                             int feeling_number=Ace.feelings_by_name.get(button.getText());
-
                             result.put(Integer.toString(current_acase.getServer_id()),feeling_number);
+                            change_highlighted_feeling_button((Button)view);
                             //change color
                         }
                     });
@@ -154,6 +158,19 @@ public class AceMainFragment extends Fragment{
 
             }
 
+    }
+
+    void change_highlighted_feeling_button(Button new_highlighted_button){
+        if(new_highlighted_button==highlighted_feeling_button){
+
+            return;
+        }
+        new_highlighted_button.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
+        if (highlighted_feeling_button!=null){
+            highlighted_feeling_button.setBackgroundResource(R.drawable.ace_default_feeling_button);
+
+        }
+        highlighted_feeling_button=new_highlighted_button;
     }
 
     void displayNextCase(){
@@ -178,7 +195,6 @@ public class AceMainFragment extends Fragment{
 
         else {
 
-            inflatedView.setVisibility(View.GONE);
             byte[] byteArray=current_acase.getImage_bytes();
             ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(byteArray);
             Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
@@ -188,8 +204,21 @@ public class AceMainFragment extends Fragment{
 
             TextView descriptionTextView=inflatedView.findViewById(R.id.aceDescriptionTextView);
             descriptionTextView.setText(current_acase.getDescription());
+            if(result.containsKey(Integer.toString(current_acase.getServer_id()))){
+                int feeling_number_to_restore=result.get(Integer.toString(current_acase.getServer_id()));
+                //find the button with the feeling text
+                Button selected_button=inflatedView.findViewById(button_id_by_feeling_number.get(feeling_number_to_restore));
+                change_highlighted_feeling_button(selected_button);
+            }
+            else{
+
+                if(highlighted_feeling_button!=null){
+
+                    highlighted_feeling_button.setBackgroundResource(R.drawable.ace_default_feeling_button);
+                }
+            }
             nextAcaseIndex += 1;
-            inflatedView.setVisibility(View.VISIBLE);
+
         }
     }
 

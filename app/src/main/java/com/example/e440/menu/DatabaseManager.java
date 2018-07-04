@@ -1,15 +1,13 @@
 package com.example.e440.menu;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.health.TimerStat;
-import android.provider.ContactsContract;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.JsonParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +36,13 @@ public class DatabaseManager {
         return databaseManager;
 
     }
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Csequence "
+                    + " ADD COLUMN csequence_string STRING default ''");
+        }
+    };
 
     public void insertRequest(JSONObject payload,int student_server_id,String test_name,int evaluator_server_id){
 

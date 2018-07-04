@@ -39,6 +39,8 @@ public interface DaoAccess {
     @Insert
     void insertSchool(School school);
 
+    @Query("SELECT * FROM ResponseRequest where test_name='fonotest'")
+    ResponseRequest[] fetchFonotestResponseRequests();
     @Insert
     void insertResponseRequest(ResponseRequest responseRequest);
     @Delete
@@ -77,6 +79,9 @@ public interface DaoAccess {
 
     @Query("SELECT * FROM FonoTest LIMIT 1")
     FonoTest fetchFonotest();
+
+    @Query("SELECT * FROM ITEM WHERE example=1")
+    Item[] fetchStartingPointsItems();
 
 
 

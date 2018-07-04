@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class WallyActivity extends AppCompatActivity implements InstructionFragment.backFromInstructionListener,DisplaySituationFragment.ReturnToWallyTestListener,MainFragmentListener{
+public class WallyActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener,DisplaySituationFragment.ReturnToWallyTestListener,MainFragmentListener{
 
     @Override
     public void backFromInstruction() {

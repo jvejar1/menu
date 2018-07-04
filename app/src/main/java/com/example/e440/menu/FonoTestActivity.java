@@ -10,7 +10,7 @@ import android.os.Bundle;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FonoTestActivity extends AppCompatActivity implements MainFragmentListener{
+public class FonoTestActivity extends BaseActivity implements MainFragmentListener{
     @Override
     public void backFromTest(JSONObject jo) {
         getSupportFragmentManager().popBackStack();

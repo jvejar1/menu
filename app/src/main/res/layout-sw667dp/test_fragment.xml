@@ -81,6 +81,7 @@
 
 
         <Button
+            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button1"
             android:layout_width="132dp"
 
@@ -96,6 +97,7 @@
 
         <Button
 
+            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button2"
             android:layout_width="136dp"
             android:layout_height="match_parent"
@@ -108,6 +110,8 @@
 
 
         <Button
+
+            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button4"
             android:layout_width="146dp"
             android:layout_height="match_parent"
@@ -120,6 +124,8 @@
             tools:layout_editor_absoluteY="509dp" />
 
         <Button
+
+            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button3"
             android:layout_width="146dp"
             android:layout_height="match_parent"
