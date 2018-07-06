@@ -63,7 +63,6 @@ public class CorsiMainFragment extends Fragment{
         }
     }
 
-
     private final Handler myHandler = new Handler() {
         public void handleMessage(Message msg) {
             final int what = msg.what;
@@ -99,13 +98,10 @@ public class CorsiMainFragment extends Fragment{
 
     }
 
-
     MediaPlayer mediaPlayer;
-
     Csequence[] csequences;
     HashMap<Integer,Integer> corrects_by_index=new HashMap<>();
     HashMap<Integer,Integer> incorrects_by_index=new HashMap<>();
-
     ButtonClickProcessor buttonClickProcessor;
     int current_sequence_index=0;
     int current_index_in_sequence=0;
@@ -328,11 +324,9 @@ public class CorsiMainFragment extends Fragment{
             if (current_index_in_sequence==csquares.length){
 
 
-
-
-                //get the delta time
+                //get the delta time of the sequence
                 long current_time=System.nanoTime();
-                float delta_time=(float)(((current_time-last_time)/(float)1000000)/1000);
+                float delta_time=(((current_time-last_time)/(float)1000000)/1000);
                 JSONObject jsonObject=new JSONObject();
                 try {
                     jsonObject.put("time",delta_time);
@@ -382,7 +376,6 @@ public class CorsiMainFragment extends Fragment{
     Integer getNumberSquareAtPosition(int position){
         Csquare csquare=csquares[position];
         if(position>= csquares.length){
-
             return null;
         }
 
@@ -502,7 +495,6 @@ public class CorsiMainFragment extends Fragment{
                 public void run() {
                     mediaPlayer.start();
                     last_time=System.nanoTime();
-                    int a =1;
                 }
             },700*counter);
 
@@ -529,7 +521,6 @@ public class CorsiMainFragment extends Fragment{
     private void removeButtonPaint(int button_id){
 
         inflatedView.findViewById(button_id).setBackgroundResource(R.drawable.corsi_default_button_bg);
-
 
     }
 

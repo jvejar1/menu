@@ -102,7 +102,6 @@ public class WallyMainFragment extends Fragment {
     }
 
 
-
     void displayFeelingQuestion(){
 
         ((TextView)inflatedView.findViewById(R.id.wallyTopTextView)).setText("Cuando eso te pasa, ¿Cómo te sientes?");
@@ -172,15 +171,12 @@ public class WallyMainFragment extends Fragment {
     }
 
 
-
-
     private class LoadWallyData extends LoadData {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Create a progressdialog
-
         }
 
         @Override
@@ -190,13 +186,11 @@ public class WallyMainFragment extends Fragment {
             return null;
         }
 
-
         @Override
         protected void onPostExecute(ArrayList<Object[]> result) {
             first_start=false;
            displayNextQuestion();
         }
     }
-
 
 }
