@@ -12,12 +12,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CorsiActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener, CorsiMainFragment.CorsiMainFragmentListener{
+public class CorsiActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener, CorsiMainFragment.CorsiMainFragmentListener {
 
-    final static int ORDERED_PRACTICE=0;
-    final static int ORDERED_TEST=1;
-    final static int REVERSED_PRACTICE=2;
-    final static int REVERSED_TEST=3;
+    final static int ORDERED_PRACTICE = 0;
+    final static int ORDERED_TEST = 1;
+    final static int REVERSED_PRACTICE = 2;
+    final static int REVERSED_TEST = 3;
 
     public int getNext_instruction() {
         return next_instruction;
@@ -27,13 +27,37 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
         this.next_instruction = next_instruction;
     }
 
+    @Override
+    public void backToRepeatPractice(JSONArray results) {
+        if(next_instruction==ORDERED_PRACTICE){
+            if(ordered_practice_tries==3){
+                next_instruction++;
+            }
+
+        }
+        else{
+
+            if(reversed_practice_tries==3){
+
+                next_instruction++;
+            }
+        }
+        startInstructions(next_instruction);
+    }
+
+    @Override
+    public void prepareInTheMiddleFinalization() {
+        finished_in_the_middle=true;
+    }
+
     int next_instruction=ORDERED_PRACTICE;
 
     @Override
-    public void backFromPracticeListener() {
+    public void backFromPracticeListener(JSONArray results) {
         next_instruction++;
         startInstructions(next_instruction);
     }
+
 
     @Override
     public void backFromTestListener(JSONArray jsonArray) {
@@ -53,7 +77,7 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
             results.put(jsonArray.opt(i));
         }
 
-        if(next_instruction==REVERSED_TEST){
+        if(next_instruction==REVERSED_TEST || finished_in_the_middle){
 
             AsyncTask asyncTask =new AsyncTask() {
                 @Override
@@ -108,7 +132,10 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
     JSONArray results;
     int ordered_score=0;
     int reversed_score=0;
+    int ordered_practice_tries=0;
+    int reversed_practice_tries=0;
     int student_server_id;
+    boolean finished_in_the_middle=false;
     Corsi corsi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +155,15 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
         InstructionFragment corsiInstructionFragment= new InstructionFragment();
         Bundle bundle = new Bundle();
         if (next_instruction==ORDERED_PRACTICE){
+            if(ordered_practice_tries==0){
+                bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en recordar el orden en que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño).... Comencemos.");
 
-            bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en recordar el orden en que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño).... Comencemos.");
+            }
+            else{
+                bundle.putString("text","Vamos a intentarlo una vez más.... Comencemos.");
+
+            }
+            ordered_practice_tries++;
         }
         else if (next_instruction==ORDERED_TEST || next_instruction==REVERSED_TEST){
             bundle.putString("text","Recuerda, ese fue el ensayo, ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
@@ -138,8 +172,16 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
 
         else{
 
-            bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en señalar el ORDEN CONTRARIO al que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
+            if(reversed_practice_tries==0) {
+                bundle.putString("text", "A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en señalar el ORDEN CONTRARIO al que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
+            }
 
+            else{
+                bundle.putString("text","Vamos a intentarlo una vez más.... Comencemos.");
+
+
+            }
+            reversed_practice_tries++;
         }
 
 

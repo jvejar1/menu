@@ -385,17 +385,10 @@ public class MainActivity extends AppCompatActivity
                     int sequence_server_id = sequence_jo.optInt("id");
                     int sequence_index= sequence_jo.optInt("index");
                     boolean sequence_ordered=sequence_jo.optBoolean("ordered");
-                    Csequence csequence = new Csequence(sequence_server_id,sequence_index,sequence_ordered);
+                    String csequence_str=sequence_jo.optString("csequence");
+                    boolean example=sequence_jo.optBoolean("example");
+                    Csequence csequence = new Csequence(sequence_server_id,sequence_index,sequence_ordered,example,csequence_str);
                     long csequence_id = databaseManager.testDatabase.daoAccess().insertCSequence(csequence);
-                    JSONArray squares=sequence_jo.optJSONArray("squares");
-                    for(int j=0;j<squares.length();j++){
-                        JSONObject square_jo = squares.optJSONObject(j);
-                        int square_id=square_jo.optInt("id");
-                        int square_number=square_jo.optInt("square");
-                        int square_index= square_jo.optInt("index");
-                        Csquare csquare=new Csquare(square_id,square_index,(int)csequence_id,square_number);
-                        databaseManager.testDatabase.daoAccess().insertCSquare(csquare);
-                    }
                 }
 
 
