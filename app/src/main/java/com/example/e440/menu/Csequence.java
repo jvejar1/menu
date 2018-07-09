@@ -47,9 +47,30 @@ public class Csequence {
     private int index;
     private boolean ordered;
 
-    public Csequence(int server_id, int index, boolean ordered) {
+    public boolean isExample() {
+        return example;
+    }
+
+    public void setExample(boolean example) {
+        this.example = example;
+    }
+
+    public String getCsequence() {
+        return csequence;
+    }
+
+    public void setCsequence(String csequence) {
+        this.csequence = csequence;
+    }
+
+    private boolean example;
+    private String csequence;
+
+    public Csequence(int server_id, int index, boolean ordered,boolean example, String csequence) {
         this.server_id = server_id;
         this.index = index;
         this.ordered = ordered;
+        this.example=example;
+        this.csequence=csequence;
     }
 }

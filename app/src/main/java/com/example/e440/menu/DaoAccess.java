@@ -120,28 +120,18 @@ public interface DaoAccess {
     @Query("Select * from Corsi LIMIT 1")
     Corsi fetchCorsi();
 
-    @Query("Delete from Csquare where server_id=0")
-    int deleteFakeSquares();
-    @Query("Delete from Csequence where server_id=0")
-    int deleteFakeCsequences();
-
 
     @Insert
     long insertCSequence(Csequence csequence);
-    @Insert
-    long insertCSquare(Csquare csquare);
 
-    @Query("SELECT * FROM CSEQUENCE where ordered=1")
+    @Query("SELECT * FROM CSEQUENCE where ordered=1 and example=0")
     Csequence[] fetchOrderedCsequences();
 
-    @Query("SELECT * FROM CSEQUENCE where ordered=0")
+    @Query("SELECT * FROM CSEQUENCE where ordered=0 and example=0")
     Csequence[] fetchReversedCsequences();
 
-    @Query("SELECT * FROM CSEQUENCE where ordered=:ordered_or_not and server_id=0")
+    @Query("SELECT * FROM CSEQUENCE where ordered=:ordered_or_not and example=1")
     Csequence[] fetchPracticeCsequences(int ordered_or_not);
-
-    @Query("SELECT * FROM csquare where csequence_id=:csequence_id")
-    Csquare[] fetchCsquareByCsequenceId(int csequence_id);
 
 
     //WALLY

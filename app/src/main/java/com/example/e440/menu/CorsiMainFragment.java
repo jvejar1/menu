@@ -3,7 +3,6 @@ package com.example.e440.menu;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,23 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by e440 on 12-05-18.
@@ -41,10 +29,10 @@ public class CorsiMainFragment extends Fragment{
     private CorsiMainFragmentListener mCallback;
     public interface CorsiMainFragmentListener{
 
-        void backFromPracticeListener();
-        void backFromTestListener(JSONArray jsonArray);
-
-
+        void backFromPracticeListener(JSONArray results);
+        void backFromTestListener(JSONArray results);
+        void prepareInTheMiddleFinalization();
+        void backToRepeatPractice(JSONArray results);
     }
 
     @Override
@@ -106,8 +94,7 @@ public class CorsiMainFragment extends Fragment{
     int current_sequence_index=0;
     int current_index_in_sequence=0;
     View inflatedView;
-    HashMap<Integer,HashMap> all_of_csequence_server_id=new HashMap<>(); //{1:{score:0,response_string:"}}
-    int PRACTICE;
+
     private final static int PAINT_BUTTON = 0;
     private final static int REMOVE_BUTTON_PAINT = 1;
     private final static int DISABLE_BUTTON=2;
@@ -116,7 +103,7 @@ public class CorsiMainFragment extends Fragment{
     private HashMap<Integer,Long> timeCompletionByIndex=new HashMap<>();
     private HashMap<Integer,Integer> button_index_by_button_id=new HashMap<>();
     private HashMap<Integer,String> response_string_by_cequence_server_id=new HashMap<>(); //{1:'1-2-4-2'}
-    private Csquare[] csquares;
+    private ArrayList<Integer> csquares=new ArrayList<>();
     int mode;
     long last_time;
     DatabaseManager databaseManager;
@@ -138,6 +125,7 @@ public class CorsiMainFragment extends Fragment{
         dns=new NextSequenceDisplayer();
         new DataLoader().execute();
         mediaPlayer=MediaPlayer.create(getContext(),R.raw.go);
+        mediaPlayer=MediaPlayer.create(getContext(),R.raw.go);
 
         return inflatedView;
     }
@@ -147,33 +135,11 @@ public class CorsiMainFragment extends Fragment{
         @Override
         protected Integer doInBackground(Integer... integers) {
 
-            databaseManager.testDatabase.daoAccess().deleteFakeSquares();
-            databaseManager.testDatabase.daoAccess().deleteFakeCsequences();
             if (mode==CorsiActivity.ORDERED_PRACTICE || mode==CorsiActivity.REVERSED_PRACTICE){
 
                 int ordered_int=(mode==CorsiActivity.ORDERED_PRACTICE)?1:0;
-
                 boolean ordered_bool=(mode==CorsiActivity.ORDERED_PRACTICE)?true:false;
                 csequences=databaseManager.testDatabase.daoAccess().fetchPracticeCsequences(ordered_int);
-                if (csequences.length==0){
-
-                    for (int i=1;i<3;i++){
-
-                        Csequence c=new Csequence(0,i,ordered_bool);
-                        long c_id=databaseManager.testDatabase.daoAccess().insertCSequence(c);
-                        Csquare cs1=new Csquare(0,1,(int)c_id,1+i);
-                        databaseManager.testDatabase.daoAccess().insertCSquare(cs1);
-                        Csquare cs2=new Csquare(0,1,(int)c_id,4+i);
-                        databaseManager.testDatabase.daoAccess().insertCSquare(cs2);
-
-
-                    }
-
-                }
-
-                csequences=databaseManager.testDatabase.daoAccess().fetchPracticeCsequences(ordered_int);
-
-
             }
 
             else if(mode==CorsiActivity.ORDERED_TEST){
@@ -273,7 +239,7 @@ public class CorsiMainFragment extends Fragment{
             Csequence current_csequence=csequences[current_sequence_index];
             int button_index=button_index_by_button_id.get(button_id);
             boolean correct=false;
-            int csquares_lenght=csquares.length;
+            int csquares_lenght=csquares.size();
             if(mode==CorsiActivity.ORDERED_TEST || mode==CorsiActivity.ORDERED_PRACTICE) {
                 if (button_index == getNumberSquareAtPosition(current_index_in_sequence)) {
                     corrects_by_index.put(current_sequence_index, corrects_by_index.get(current_sequence_index) + 1);
@@ -306,22 +272,12 @@ public class CorsiMainFragment extends Fragment{
 
             }
 
-            if(correct==true && (mode==CorsiActivity.ORDERED_PRACTICE || mode==CorsiActivity.REVERSED_PRACTICE )){
 
-                sendMessageToHandler(button_id,0);
-                current_index_in_sequence++;
-
-            }
-
-            else if(mode==CorsiActivity.REVERSED_TEST || mode==CorsiActivity.ORDERED_TEST){
+            sendMessageToHandler(button_id,0);
+            current_index_in_sequence++;
 
 
-                sendMessageToHandler(button_id,0);
-                current_index_in_sequence++;
-
-            }
-
-            if (current_index_in_sequence==csquares.length){
+            if (current_index_in_sequence==csquares.size()){
 
 
                 //get the delta time of the sequence
@@ -347,7 +303,7 @@ public class CorsiMainFragment extends Fragment{
 
                 }
 
-                if(total_incorrects==2){
+                if(total_incorrects==2 && !isInPracticeMode()){
 
                     myHandler.post(new Runnable() {
                         @Override
@@ -357,8 +313,6 @@ public class CorsiMainFragment extends Fragment{
                         }
                     });
 
-
-                    ((CorsiActivity) mCallback).setNext_instruction(CorsiActivity.REVERSED_TEST);
                     finish();
                 }
                 else {
@@ -374,18 +328,19 @@ public class CorsiMainFragment extends Fragment{
     }
 
     Integer getNumberSquareAtPosition(int position){
-        Csquare csquare=csquares[position];
-        if(position>= csquares.length){
+        if(position>= csquares.size()){
             return null;
         }
+        int csquare=csquares.get(position);
 
-        return (csquare.getSquare());
+
+        return csquare;
 
     }
 
     Integer getNumberAtPositionInStrRevSeq(int position){
-        Csquare csquare=csquares[csquares.length-1-position];
-        return (csquare.getSquare());
+        int csquare=csquares.get(csquares.size()-1-position);
+        return csquare;
 
     }
 
@@ -410,16 +365,19 @@ public class CorsiMainFragment extends Fragment{
 
     void finish(){
         if (mode==CorsiActivity.ORDERED_PRACTICE || mode==CorsiActivity.REVERSED_PRACTICE){
+            if(total_incorrects>0){
+                mCallback.backToRepeatPractice(results);
 
-            mCallback.backFromPracticeListener();
+            }
+            else{
+
+                mCallback.backFromPracticeListener(results);
+            }
 
         }
 
         else if (mode==CorsiActivity.ORDERED_TEST || mode==CorsiActivity.REVERSED_TEST){
-
             //TODO: save result and send integer to activity
-
-
             mCallback.backFromTestListener(results);
         }
     }
@@ -431,7 +389,6 @@ public class CorsiMainFragment extends Fragment{
         protected Integer doInBackground(Integer... integers) {
 
             //disable buttons
-
 
             for (int id:button_index_by_button_id.keySet()
                  ) {
@@ -459,13 +416,20 @@ public class CorsiMainFragment extends Fragment{
             current_index_in_sequence=0;
 
             score=1;
-            csquares=databaseManager.testDatabase.daoAccess().fetchCsquareByCsequenceId(csequences[current_sequence_index].getId());
+            Csequence current_csequence=csequences[current_sequence_index];
+
+            String[] csequence_str_arr=current_csequence.getCsequence().split("-");
+            csquares.clear();
+            for (String str_square:csequence_str_arr){
+                csquares.add(Integer.parseInt(str_square));
+            }
+
             Bundle b;
             int counter=1;
-            for (Csquare csquare:csquares
+            for (Integer csquare:csquares
                  ) {
 
-                int sequence_instruction=csquare.getSquare();
+                int sequence_instruction=csquare;
                 int button_id=ButtonIdByIndex.get(sequence_instruction);
                 b=new Bundle();
                 b.putInt("button_id",button_id);
@@ -519,21 +483,22 @@ public class CorsiMainFragment extends Fragment{
     }
 
     private void removeButtonPaint(int button_id){
-
         inflatedView.findViewById(button_id).setBackgroundResource(R.drawable.corsi_default_button_bg);
+    }
 
+    private boolean isInPracticeMode(){
+     return (mode==CorsiActivity.ORDERED_PRACTICE || mode==CorsiActivity.REVERSED_PRACTICE);
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        if(dns!=null){
+
+        if(dns!=null && dns.getStatus()!=AsyncTask.Status.FINISHED){
             dns.cancel(true);
-
         }
-        if(buttonClickProcessor!=null){
+        if(buttonClickProcessor!=null && buttonClickProcessor.getStatus()!=AsyncTask.Status.FINISHED){
             buttonClickProcessor.cancel(true);
-
         }
+        super.onDestroy();
     }
 }

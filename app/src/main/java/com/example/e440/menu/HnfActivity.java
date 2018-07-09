@@ -18,6 +18,9 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
         startMainFragment();
         return;
     }
+
+
+
     @Override
     public void backFromPractice() {
         current_mode+=1;
