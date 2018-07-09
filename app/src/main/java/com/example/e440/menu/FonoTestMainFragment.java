@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,28 +58,31 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if (view.getId()==R.id.evaluateWithZeroButton){
-            Button zero_button=inflatedView.findViewById(R.id.evaluateWithZeroButton);
-            if(evaluated_with_zero) {
-                zero_button.setText("Evaluar con 0");
-                evaluated_with_zero=false;
-            }
-            else{
-                zero_button.setText("Revertir");
-                evaluated_with_zero=true;
-                Toast.makeText(getContext(),"Item evaluado con 0",Toast.LENGTH_SHORT).show();
-            }
+            evaluateWithZero();
 
         }
     }
 
+    void evaluateWithZero(){
+        Button zero_button=inflatedView.findViewById(R.id.evaluateWithZeroButton);
+        if(evaluated_with_zero) {
+            zero_button.setText("Evaluar con 0");
+            evaluated_with_zero=false;
+        }
+        else{
+            zero_button.setText("Revertir");
+            evaluated_with_zero=true;
+            Toast.makeText(getContext(),"Item evaluado con 0",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     View inflatedView;
-    int[] fgroup_ids;
     MediaPlayer mediaPlayer;
     Item[] items;
     int errors=0;
     LinearLayout AnswersVerticalLinearLayout;
     int current_item_index=0;
-    int current_fgroup_index=0;
     List<String> response_list=new ArrayList<>();
     DatabaseManager databaseManager= DatabaseManager.getInstance(getContext());
     Button playButton;
@@ -86,10 +90,12 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     List<String> correct_words=new ArrayList<>();
     HashMap<Integer,String> response_by_item_server_id=new HashMap<>();
     HashMap<Integer,Boolean> success_buttons_hash=new HashMap<>();
-    HashMap<Integer,Integer> index_elem_by_button_id=new HashMap<>();
+    HashMap<Button,Integer> index_elem_by_button =new HashMap<>();
     HashMap<Button,Boolean> pressed_by_button=new HashMap<>();
 
     static int SEQ_ITEM_TEXT_VIEW_WIDTH_IN_DP;
+
+    static int ANSWER_HORIZONTAL_LL_HEIGHT_IN_DP;
 
     int extra_elements_count=0;
 
@@ -111,6 +117,8 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
         AnswersVerticalLinearLayout =inflatedView.findViewById(R.id.optionsLinearLayout);
 
         SEQ_ITEM_TEXT_VIEW_WIDTH_IN_DP=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 65, getResources().getDisplayMetrics());
+        ANSWER_HORIZONTAL_LL_HEIGHT_IN_DP=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
+
         playButton=inflatedView.findViewById(R.id.playAudioButton);
         playButton.setEnabled(false);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +139,11 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 //TODO:SAVE RESULT
 
 
+
+                if(current_item_index>=items.length){
+
+                    return;
+                }
                 AnswersVerticalLinearLayout.removeAllViews();
                 inflatedView.setVisibility(View.VISIBLE);
 
@@ -142,7 +155,6 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                     if(response_list.size()>=correct_words.size()){
                         part_to_analize=response_list.subList(0,correct_words.size());
                         if(part_to_analize.equals(correct_words)){
-
                             score+=1;
                         }
                     }
@@ -166,7 +178,8 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 }
                 if(errors==3){
 
-                    finish();
+      //              finish();
+                    //TODO: remove the above //, only the //
                 }
                 current_item_index++;
                 resetVariablesForItem();
@@ -258,12 +271,18 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     }
 
     void resetVariablesForItem(){
+        //reset zero button
+        Button zero_button=inflatedView.findViewById(R.id.evaluateWithZeroButton);
+        zero_button.setText("Evaluar con 0");
+        evaluated_with_zero=false;
+
+
         correct_words.clear();
         correct_numbers.clear();
         pressed_boolean_touples.clear();
         correct_sequence_list.clear();
         original_sequence_list.clear();
-
+        index_elem_by_button.clear();
         extra_elements_count=0;
     }
 
@@ -339,7 +358,8 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
 
             String[] audio_desc=item.getDescription().split("\\.\\.");
             LinearLayout.LayoutParams responseButtonLayoutParams=new LinearLayout.LayoutParams(AnswersVerticalLinearLayout.getLayoutParams().width/3, LinearLayout.LayoutParams.MATCH_PARENT);
-            LinearLayout.LayoutParams answers_ll_params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            LinearLayout.LayoutParams answers_ll_params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,ANSWER_HORIZONTAL_LL_HEIGHT_IN_DP);
 
             for (int i=0;i<audio_desc.length;i++){
                 String audio_desc_item=audio_desc[i];
@@ -354,6 +374,9 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 //create the textview to display the word or number
 
                 TextView seq_elem_text_view=new TextView(getContext());
+                seq_elem_text_view.setTextColor(getResources().getColor(R.color.defaultBlack));
+                seq_elem_text_view.setTextSize(18);
+                seq_elem_text_view.setGravity(Gravity.CENTER);
                 seq_elem_text_view.setText(audio_desc_item);
                 seq_elem_text_view.setLayoutParams(seq_element_layout_params);
 
@@ -374,20 +397,20 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                         if (pressed_by_button.containsKey(clicked_button)){
                             //do stuff
                             pressed_by_button.remove(clicked_button);
-                            response_list.remove(original_sequence_list.get(index_elem_by_button_id.get(clicked_button.getId())));
+                            response_list.remove(original_sequence_list.get(index_elem_by_button.get(clicked_button)));
                             clicked_button.setBackgroundResource(android.R.drawable.btn_default);
 
                         }
                         else{
 
                             pressed_by_button.put(clicked_button,true);
-                            response_list.add(original_sequence_list.get(index_elem_by_button_id.get(clicked_button.getId())));
+                            response_list.add(original_sequence_list.get(index_elem_by_button.get(clicked_button)));
                             clicked_button.setBackgroundResource(R.drawable.success_button_bg);
                         }
 
                     }
                 });
-                index_elem_by_button_id.put(b.getId(),i);
+                index_elem_by_button.put(b,i);
                 success_buttons_hash.put(b.getId(),true);
                 b.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_ticket,0,0);
                 horizontal_linear_layout.addView(b);
@@ -417,7 +440,7 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                     }
                 });
                 error_button.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_close,0,0);
-                horizontal_linear_layout.addView(error_button);
+               // horizontal_linear_layout.addView(error_button);
 
                 AnswersVerticalLinearLayout.addView(horizontal_linear_layout);
             }

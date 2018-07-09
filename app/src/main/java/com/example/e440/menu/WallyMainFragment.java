@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,10 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by e440 on 07-05-18.
@@ -36,14 +40,15 @@ public class WallyMainFragment extends Fragment {
                     + " must implement Listener");
         }
     }
+    Handler ui_handler=new Handler();
     MainFragmentListener mCallback;
     NetworkManager networkManager;
     HashMap<Integer, Integer> result = new HashMap<>();
     int nextSituationIndex= 0;
-
+    private static Random random;
     View inflatedView;
     DatabaseManager databaseManager;
-    int[] int_arr=new int[]{0,1,2,3};
+    ArrayList<Integer> int_arr=new ArrayList<Integer>(Arrays.asList(0,1,2,3));
     WReaction[] wreactions;
     long wsituation_id;
     boolean first_start=true;
@@ -106,16 +111,19 @@ public class WallyMainFragment extends Fragment {
     void displayFeelingQuestion(){
 
         ((TextView)inflatedView.findViewById(R.id.wallyTopTextView)).setText("Cuando eso te pasa, ¿Cómo te sientes?");
-        Collections.shuffle(Arrays.asList(int_arr));
+
 
         wfeeling_number_by_img_id=new HashMap<>();
         //TODO: Shuffle
         for (int  i: int_arr
              ) {
-            imageViews[i].setImageBitmap(Utilities.convertBytesArrayToBitmap(wFeelings[i].getImage_bytes()));
-            wfeeling_number_by_img_id.put(imageViews[i].getId(),wFeelings[i].getWfeeling());
-            int img_id=imageViews[i].getId();
-            TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
+
+            int i_index=int_arr.indexOf(i);
+            final ImageView image_view=imageViews[i_index];
+            image_view.setImageBitmap(Utilities.convertBytesArrayToBitmap(wFeelings[i].getImage_bytes()));
+            wfeeling_number_by_img_id.put(image_view.getId(),wFeelings[i].getWfeeling());
+            int img_id=image_view.getId();
+            final TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
             img_text_view.setText(Wally.feelings_by_number.get(wFeelings[i].getWfeeling()));
 
         }
@@ -124,7 +132,8 @@ public class WallyMainFragment extends Fragment {
     }
 
     void displayActionQuestion(){
-        Collections.shuffle(Arrays.asList(int_arr));
+
+
         ((TextView)inflatedView.findViewById(R.id.wallyTopTextView)).setText("Cuando eso te pasa, ¿Qué haces tu?");
 
         wreaction_number_by_text=new HashMap<>();
@@ -132,10 +141,11 @@ public class WallyMainFragment extends Fragment {
              ) {
 
             WReaction wac=wreactions[i];
+            final ImageView image_view=imageViews[i];
             imageViews[i].setImageBitmap(Utilities.convertBytesArrayToBitmap(wac.getImage_bytes()));
             wreaction_number_by_text.put(wac.getDescription(),wac.getWreaction());
             int img_id=imageViews[i].getId();
-            TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
+            final TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
             img_text_view.setText(wac.getDescription());
 
         }
@@ -146,7 +156,21 @@ public class WallyMainFragment extends Fragment {
     }
 
     void displayNextQuestion(){
-
+        Collections.shuffle(int_arr);
+        int i=1;
+        for (final View img_view:imageViews){
+            img_view.setVisibility(View.INVISIBLE);
+            final TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_view.getId()));
+            img_text_view.setVisibility(View.INVISIBLE);
+            ui_handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    img_text_view.setVisibility(View.VISIBLE);
+                    img_view.setVisibility(View.VISIBLE);
+                }
+            },i*2000);
+            i++;
+        }
         if (innerQuestionPointer==0) {
             displayFeelingQuestion();
         }
