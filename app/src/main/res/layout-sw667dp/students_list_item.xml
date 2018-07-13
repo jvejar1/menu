@@ -76,7 +76,6 @@
         android:layout_width="94dp"
         android:layout_height="21dp"
         android:layout_marginStart="36dp"
-        android:text="KINDER"
         android:textColor="@color/futuristic_blue"
         app:layout_constraintStart_toEndOf="@+id/studentRutTextView"
         app:layout_constraintTop_toTopOf="@+id/studentRutTextView" />

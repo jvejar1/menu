@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +64,8 @@ public class AceMainFragment extends Fragment{
     int[] acases_ids;
     Acase current_acase;
     Acase[] acases;
-
+    Button back_button;
+    Handler handler=new Handler();
     Ace ace;
 
     @Override
@@ -74,15 +76,15 @@ public class AceMainFragment extends Fragment{
         caseImageView = inflatedView.findViewById(R.id.caseImageView);
         feelingsButtonsLinearLayout=inflatedView.findViewById(R.id.feelingsButtonsLinearLayout);
 
-        Button backButton = inflatedView.findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
+        back_button = inflatedView.findViewById(R.id.backButton);
+        back_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                nextAcaseIndex-=2;
+                LoadAceData lad=new LoadAceData();
+                lad.execute();
+            }});
 
-
-
-            }
-        });
 
         Button nextButton = inflatedView.findViewById(R.id.nextButton);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +96,21 @@ public class AceMainFragment extends Fragment{
 
                 } else {
 
+                    for(final Button b:feelingsButtons){
+
+                        b.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
+                        b.setEnabled(false);
+                        back_button.setEnabled(false);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                b.setBackgroundResource(R.drawable.ace_default_feeling_button);
+                                b.setEnabled(true);
+                                back_button.setEnabled(true);
+                            }
+                        },250);
+                    }
                     //restrict
 
                 }
@@ -120,6 +137,10 @@ public class AceMainFragment extends Fragment{
         {
                 Button b = (Button) feelingsButtonsLinearLayout.getChildAt(index);
 
+                if(!feelingsButtons.contains(b)){
+
+                    feelingsButtons.add(b);
+                }
                 int feeling_number=v[index];
                 String new_text="";
                 if(current_acase.getSex()== Acase.MALE_CHAR){
@@ -140,7 +161,8 @@ public class AceMainFragment extends Fragment{
                             Button button=(Button) view;
                             int feeling_number=Ace.feelings_by_name.get(button.getText());
                             result.put(Integer.toString(current_acase.getServer_id()),feeling_number);
-                            change_highlighted_feeling_button((Button)view);
+                            reset_feelings_buttons_to_default_bg();
+                            view.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
                             //change color
                         }
                     });
@@ -151,22 +173,22 @@ public class AceMainFragment extends Fragment{
 
     }
 
-    void change_highlighted_feeling_button(Button new_highlighted_button){
-        if(new_highlighted_button==highlighted_feeling_button){
+    void reset_feelings_buttons_to_default_bg(){
 
-            return;
-        }
-        if (highlighted_feeling_button!=null){
-            highlighted_feeling_button.setBackgroundResource(R.drawable.ace_default_feeling_button);
+        for (Button b:feelingsButtons){
+            b.setBackgroundResource(R.drawable.ace_default_feeling_button);
 
         }
-        new_highlighted_button.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
-
-        highlighted_feeling_button=new_highlighted_button;
     }
 
     void displayNextCase(){
 
+        if(nextAcaseIndex==0){
+            back_button.setVisibility(View.INVISIBLE);
+        }
+        else{
+            back_button.setVisibility(View.VISIBLE);
+        }
         if(nextAcaseIndex==acases_ids.length){
             JSONObject payload=new JSONObject();
             try{
@@ -186,17 +208,14 @@ public class AceMainFragment extends Fragment{
         }
 
         else {
-
             byte[] byteArray=current_acase.getImage_bytes();
             ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(byteArray);
             Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
             caseImageView.setImageBitmap(bitmap);
             reorderFeelings();
 
-
             TextView descriptionTextView=inflatedView.findViewById(R.id.aceDescriptionTextView);
             if(current_acase.getSex()==Acase.MALE_CHAR){
-
                 descriptionTextView.setText("¿Él se siente...?");
 
             }else{
@@ -204,19 +223,15 @@ public class AceMainFragment extends Fragment{
                 descriptionTextView.setText("¿Ella se siente...?");
 
             }
+            reset_feelings_buttons_to_default_bg();
             if(result.containsKey(Integer.toString(current_acase.getServer_id()))){
                 int feeling_number_to_restore=result.get(Integer.toString(current_acase.getServer_id()));
                 //find the button with the feeling text
                 Button selected_button=inflatedView.findViewById(button_id_by_feeling_number.get(feeling_number_to_restore));
-                change_highlighted_feeling_button(selected_button);
-            }
-            else{
 
-                if(highlighted_feeling_button!=null){
-
-                    highlighted_feeling_button.setBackgroundResource(R.drawable.ace_default_feeling_button);
-                }
+                selected_button.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
             }
+
             nextAcaseIndex += 1;
 
         }

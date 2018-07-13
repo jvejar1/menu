@@ -11,7 +11,7 @@
     <ImageView
         android:id="@+id/caseImageView"
         android:layout_width="524dp"
-        android:layout_height="746dp"
+        android:layout_height="774dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -20,7 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/aceDescriptionTextView"
-        app:layout_constraintVertical_bias="0.18" />
+        app:layout_constraintVertical_bias="0.068" />
 
 
     <Button
@@ -39,6 +39,7 @@
         app:layout_constraintTop_toTopOf="@+id/aceDescriptionTextView" />
 
     <Button
+        android:visibility="invisible"
         android:id="@+id/backButton"
         android:layout_width="105dp"
         android:layout_height="43dp"
@@ -65,7 +66,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/caseImageView">
+        app:layout_constraintTop_toBottomOf="@+id/caseImageView"
+        app:layout_constraintVertical_bias="1.0">
 
 
         <Button
