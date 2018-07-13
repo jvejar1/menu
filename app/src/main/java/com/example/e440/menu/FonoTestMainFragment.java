@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,8 +131,8 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
         });
 
         TextView remindTextView=inflatedView.findViewById(R.id.remindTextView);
-        final String text_to_remind="Si responde con el dígito primero califique el item de 0 y diga 'recuerda que debes decirme primer la palabra,luego el número'";
-        remindTextView.setText(text_to_remind);
+        final String text_to_remind="Si responde con el dígito primero califique el item de 0 y diga <b>'recuerda que debes decirme primero la palabra, luego el número'</b>";
+        remindTextView.setText(Html.fromHtml(text_to_remind));
 
         Button nextButton=inflatedView.findViewById(R.id.nextButton);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -178,8 +180,9 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 }
                 if(errors==3){
 
-      //              finish();
+                    finish();
                     //TODO: remove the above //, only the //
+                    return;
                 }
                 current_item_index++;
                 resetVariablesForItem();
@@ -258,15 +261,19 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
         //TODO:finish
 
         JSONObject payload=new JSONObject();
-        try{payload.put("responses",response_by_item_server_id);
-            payload.put("scores",scores_by_item_server_id);
+        try{
+
+            Gson gson =new Gson();
+            payload.put("responses",new JSONObject(gson.toJson(response_by_item_server_id)));
+            payload.put("scores",new JSONObject(gson.toJson(scores_by_item_server_id)));
             payload.put("test_id",fonoTest.getServer_id());
+
+            mCallback.backFromTest(payload);
         }
         catch(JSONException e){
             e.printStackTrace();
         }
 
-        mCallback.backFromTest(payload);
 
     }
 
@@ -453,7 +460,7 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
             }
             else{
                 itemNameTextView.setTextColor(ContextCompat.getColor(getContext(),R.color.defaultBlack));
-                itemNameTextView.setText("Item "+item.getName());
+                itemNameTextView.setText(item.getName());
             }
             TextView instructionTextView=inflatedView.findViewById(R.id.fonotestInstructionTextView);
             instructionTextView.setText(item.getInstruction());

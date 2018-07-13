@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener {
@@ -136,13 +138,12 @@ public class MainActivity extends AppCompatActivity
         }*/
         //databaseManager.sendAllResults(networkManager);
 
-        ResultsSender resultsSender=new ResultsSender(this);
-        resultsSender.execute();
 
         JobInfo.Builder builder=new JobInfo.Builder(1,new ComponentName(this,ResultSendJobService.class));
         JobInfo jobInfo=builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(1000*60*60*24).setPersisted(true).build();
         JobScheduler jobScheduler = this.getSystemService(JobScheduler.class);
         jobScheduler.schedule(jobInfo);
+
 
 
 
@@ -292,6 +293,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Integer doInBackground(JSONObject... jsonObjects) {
 
+            publishProgress(0);
 
             JSONObject response = jsonObjects[0];
 
@@ -306,6 +308,9 @@ public class MainActivity extends AppCompatActivity
                 JSONArray items =fonotest_jo.optJSONArray("items");
 
                 for (int j=0;j<items.length();j++){
+                    if(j==items.length()/2){
+                        publishProgress(10);
+                    }
                     JSONObject item_jo=items.optJSONObject(j);
                     String item_description=item_jo.optString("description");
                     int item_index=item_jo.optInt("index",0);
@@ -412,8 +417,9 @@ public class MainActivity extends AppCompatActivity
                     int picture_id = acaseJO.optInt("picture_id");
                     //try to DL image
                     String description=acaseJO.optString("description");
+                    char sex=acaseJO.optString("sex").charAt(0);
                     byte[] image_bytes= downloadAsByteArray(picture_id,NetworkManager.BASE_URL+"/pictures","vertical");
-                    Acase acase = new Acase(acase_index, acase_server_id, image_bytes,description);
+                    Acase acase = new Acase(acase_index, acase_server_id, image_bytes,description,sex);
 
                     databaseManager.testDatabase.daoAccess().insertAcase(acase);
                 }

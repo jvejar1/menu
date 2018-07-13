@@ -31,15 +31,14 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
     public void backToRepeatPractice(JSONArray results) {
         if(next_instruction==ORDERED_PRACTICE){
             if(ordered_practice_tries==3){
-                next_instruction++;
+                this.backFromPracticeListener(results);
             }
 
         }
         else{
 
             if(reversed_practice_tries==3){
-
-                next_instruction++;
+                this.backFromPracticeListener(results);
             }
         }
         startInstructions(next_instruction);
@@ -54,23 +53,19 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
 
     @Override
     public void backFromPracticeListener(JSONArray results) {
-        next_instruction++;
-        startInstructions(next_instruction);
+        backFromTestListener(results);
     }
 
 
     @Override
     public void backFromTestListener(JSONArray jsonArray) {
-
         for(int i=0;i<jsonArray.length();i++){
             JSONObject response=jsonArray.optJSONObject(i);
             int score=response.optInt("score");
             if(next_instruction==REVERSED_TEST){
-
                 reversed_score+=score;
             }
-            else{
-
+            else if(next_instruction==ORDERED_TEST){
                 ordered_score+=score;
             }
 
@@ -91,7 +86,9 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
                 protected void onPostExecute(Object o) {
                     JSONObject payload=new JSONObject();
                     try{
-                    payload.put("ordered_score", ordered_score);
+                        payload.put("ordered_practice_tries",ordered_practice_tries);
+                        payload.put("reversed_practice_tries",reversed_practice_tries);
+                        payload.put("ordered_score", ordered_score);
                     payload.put("reversed_score", reversed_score);
                     payload.put("responses", results);
                     payload.put("test_id",corsi.getServer_id());}
@@ -156,7 +153,7 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
         Bundle bundle = new Bundle();
         if (next_instruction==ORDERED_PRACTICE){
             if(ordered_practice_tries==0){
-                bundle.putString("text","A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en recordar el orden en que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño).... Comencemos.");
+                bundle.putString("text","“A continuación van a aparecer 10 cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Una vez que escuches la palabra “Ahora”, tú tendrás que tocar los cuadrados en el mismo orden en que se encendieron. Los dos primeros son de práctica y a medida que avance el juego se encenderán más cuadrados. ¿Lo has entendido? (espere la respuesta del niño). Comencemos”");
 
             }
             else{
@@ -173,7 +170,7 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
         else{
 
             if(reversed_practice_tries==0) {
-                bundle.putString("text", "A continuación van a aparecer un conjunto de cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Tu tarea consiste en señalar el ORDEN CONTRARIO al que se activaron. \n\n\tLos dos primeros son de práctica. ¿Lo has entendido?... (espere la respuesta del niño) ... Comencemos.");
+                bundle.putString("text", "“A continuación van a aparecer 10 cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Una vez que escuches la palabra “Ahora”, tú tendrás que tocar los cuadrados en el orden contrario en que se encendieron.”");
             }
 
             else{

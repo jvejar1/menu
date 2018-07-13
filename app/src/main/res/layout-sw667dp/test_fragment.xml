@@ -10,83 +10,71 @@
 
     <ImageView
         android:id="@+id/caseImageView"
-        android:layout_width="653dp"
-        android:layout_height="761dp"
+        android:layout_width="524dp"
+        android:layout_height="746dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.554" />
+        app:layout_constraintTop_toBottomOf="@+id/aceDescriptionTextView"
+        app:layout_constraintVertical_bias="0.18" />
 
 
     <Button
         android:id="@+id/nextButton"
-        android:layout_width="117dp"
+        style="@style/NextButton"
         android:layout_height="43dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+
         android:text="Siguiente"
-
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.974"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.009"
+        app:layout_constraintHorizontal_bias="0.94"
 
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/aceDescriptionTextView" />
 
     <Button
         android:id="@+id/backButton"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="105dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="32dp"
         android:layout_weight="1"
-        android:text="."
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nextButton"
-        app:layout_constraintHorizontal_bias="0.051"
+        style="@style/BackButton"
+        android:text="Atrás"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@+id/aceDescriptionTextView" />
 
 
     <LinearLayout
         android:id="@+id/feelingsButtonsLinearLayout"
         android:layout_width="665dp"
-        android:layout_height="53dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
-        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
 
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.631"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/caseImageView">
 
 
         <Button
-            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button1"
             android:layout_width="132dp"
-
             android:layout_height="match_parent"
+
             android:layout_marginRight="30dp"
+            android:background="@drawable/ace_default_feeling_button"
 
 
             android:text="Asustado"
@@ -97,11 +85,11 @@
 
         <Button
 
-            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button2"
             android:layout_width="136dp"
             android:layout_height="match_parent"
             android:layout_marginRight="30dp"
+            android:background="@drawable/ace_default_feeling_button"
 
             android:text="Enojado"
             android:textSize="15sp"
@@ -111,11 +99,11 @@
 
         <Button
 
-            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button4"
             android:layout_width="146dp"
             android:layout_height="match_parent"
             android:layout_marginRight="30dp"
+            android:background="@drawable/ace_default_feeling_button"
 
 
             android:text="Button"
@@ -125,11 +113,11 @@
 
         <Button
 
-            android:background="@drawable/ace_default_feeling_button"
             android:id="@+id/button3"
             android:layout_width="146dp"
             android:layout_height="match_parent"
             android:layout_marginRight="30dp"
+            android:background="@drawable/ace_default_feeling_button"
 
             android:text="Button"
             android:textSize="15sp"
@@ -151,10 +139,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.476"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.009" />
+        app:layout_constraintVertical_bias="0.02" />
 
 
 </android.support.constraint.ConstraintLayout>

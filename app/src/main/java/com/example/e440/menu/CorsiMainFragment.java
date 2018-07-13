@@ -109,6 +109,7 @@ public class CorsiMainFragment extends Fragment{
     DatabaseManager databaseManager;
     private NextSequenceDisplayer dns;
     int score;
+    int last_csequence_lenght;
     int total_incorrects=0;
     JSONArray results;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -303,23 +304,30 @@ public class CorsiMainFragment extends Fragment{
 
                 }
 
-                if(total_incorrects==2 && !isInPracticeMode()){
+                if(current_sequence_index%2!=0 && !isInPracticeMode() && total_incorrects==2){
 
-                    myHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(),"Test finalizado debido a 2 errores",Toast.LENGTH_LONG).show();
+                        //TODO: finish in the middle
+                        int a =1;
+                        myHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(),"Test finalizado debido a 2 errores",Toast.LENGTH_LONG).show();
 
-                        }
-                    });
+                            }
+                        });
 
-                    finish();
+                        mCallback.prepareInTheMiddleFinalization();
+                        finish();
+                        return null;
                 }
-                else {
-                    current_sequence_index++;
-                    dns = new NextSequenceDisplayer();
-                    dns.execute();
+                else if(current_sequence_index%2!=0 && !isInPracticeMode()){
+                    total_incorrects=0;
                 }
+
+                current_sequence_index++;
+                dns = new NextSequenceDisplayer();
+                dns.execute();
+
             }
 
 
@@ -460,7 +468,7 @@ public class CorsiMainFragment extends Fragment{
                     mediaPlayer.start();
                     last_time=System.nanoTime();
                 }
-            },700*counter);
+            },700*counter-1000);
 
 
 

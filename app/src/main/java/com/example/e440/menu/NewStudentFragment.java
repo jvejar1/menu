@@ -3,11 +3,9 @@ package com.example.e440.menu;
 import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -19,12 +17,9 @@ import com.android.volley.VolleyError;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by e440 on 24-04-18.
@@ -38,7 +33,9 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
     final int INSERT_STUDENTS=1;
     final String SELECCIONE_STR="SELECCIONE";
     NetworkManager networkManager;
-    School[] schools;
+    Course[] schools;
+    HashMap<String,Long> course_id_by_full_name=new HashMap<>();
+    HashMap<String,Long> school_id_by_school_name=new HashMap<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,8 +43,6 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
         inflatedView = inflater.inflate(R.layout.new_student_fragment, container, false);
         networkManager=NetworkManager.getInstance(getContext());
         databaseManager= DatabaseManager.getInstance(getContext());
-        Button fetchSchoolsButton=inflatedView.findViewById(R.id.fetchSchoolsButton);
-        fetchSchoolsButton.setOnClickListener(this);
         Button fetchStudentsButton=inflatedView.findViewById(R.id.fetchStudentsBySchoolButton);
         fetchStudentsButton.setOnClickListener(this);
         school_names.add(SELECCIONE_STR);
@@ -59,7 +54,44 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         schoolSpinner.setAdapter(dataAdapter);
 
-        loadSchools();
+        networkManager.fetchCourses(new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONArray courses_ja=response.optJSONArray("courses");
+                if(courses_ja!=null){
+
+                    DataInserter dataInserter=new DataInserter(INSERT_SCHOOLS);
+                    for(int i=0;i<courses_ja.length();i++){
+                        JSONObject course_jo=courses_ja.optJSONObject(i);
+                        String course_full_name=course_jo.optString("school_name")+" - "+ course_jo.optString("level")+" "+course_jo.optString("letter");
+        //                school_names.add(course_full_name);
+
+                        long course_id=course_jo.optLong("id");
+                        course_id_by_full_name.put(course_full_name,course_id);
+
+                    }
+
+                }
+                JSONArray schools_ja=response.optJSONArray("schools");
+                if(schools_ja!=null){
+                    for(int i=0; i<schools_ja.length();i++){
+                        JSONObject school_json_object=schools_ja.optJSONObject(i);
+                        String school_name=school_json_object.optString("name");
+                        long school_server_id=school_json_object.optLong("id");
+                        school_id_by_school_name.put(school_name,school_server_id);
+                        school_names.add(school_name);
+
+                    }
+                    int a =1;
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                int a=1;
+            }
+        });
         return inflatedView;
     }
 
@@ -67,7 +99,7 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
         AsyncTask asyncTask=new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                schools=databaseManager.testDatabase.daoAccess().fetchAllSchools();
+                schools=databaseManager.testDatabase.daoAccess().fetchAllCourses();
                 generate_schools_names();
                 return null;
             }
@@ -93,23 +125,17 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
         @Override
         protected Object doInBackground(Object[] objects) {
             databaseManager= DatabaseManager.getInstance(getContext());
-            School school=new School();
-            if(what==INSERT_STUDENTS){
-                int school_server_id=(int)objects[1];
-                school=databaseManager.testDatabase.daoAccess().fetchSchoolByServerId(school_server_id);
-                if(school==null){
-                    return null;
-                }
-            }
+
             JSONArray jsonArray=(JSONArray) objects[0];
             for (int i=0;i<jsonArray.length();i++){
                 JSONObject jsonObject=jsonArray.optJSONObject(i);
                 int server_id=jsonObject.optInt("id");
-                String name=jsonObject.optString("name");
                 if(what==INSERT_STUDENTS){
+                    String name=jsonObject.optString("name");
+
                     String rut=jsonObject.optString("rut");
                     String last_name=jsonObject.optString("last_name");
-                    Student new_student=new Student(name,last_name,rut,server_id,school.getId());
+                    Student new_student=new Student(name,last_name,rut,server_id,1);
                     Student old_student=databaseManager.testDatabase.daoAccess().fetchStudentByServerId(server_id);
                     if(old_student!=null){
                         new_student.setId(old_student.getId());
@@ -122,28 +148,12 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
                         inserted_objects++;
                     }
                 }
-                else {
-                    School school_in_db=databaseManager.testDatabase.daoAccess().fetchSchoolByServerId(server_id);
-                    School new_school=new School(server_id,name);
-
-                    if (school_in_db!=null){
-                        new_school.setId(school_in_db.getId());
-                        databaseManager.testDatabase.daoAccess().updateSchool(new_school);
-                        updated_objects++;
-                    }
-                    else{
-
-                        databaseManager.testDatabase.daoAccess().insertSchool(new_school);
-                        inserted_objects++;
-
-                    }
-                }
 
             }
 
 
             if(getContext()!=null && what==INSERT_SCHOOLS){
-                schools=databaseManager.testDatabase.daoAccess().fetchAllSchools();
+                schools=databaseManager.testDatabase.daoAccess().fetchAllCourses();
                 generate_schools_names();
             }
 
@@ -163,61 +173,45 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
     void generate_schools_names(){
         school_names.subList(1,school_names.size()).clear();
 
-        for (School s:schools){
+        for (Course s:schools){
             school_names.add(s.getName());
         }
     }
     @Override
     public void onClick(View view) {
-        if (view.getId()==R.id.fetchSchoolsButton){
-                networkManager.fetchSchools(new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        JSONArray schools_ja=response.optJSONArray("schools");
-                        if(schools_ja!=null){
-                            DataInserter dataInserter=new DataInserter(INSERT_SCHOOLS);
-                            dataInserter.execute(schools_ja);
-                        }
 
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        int a=1;
-                    }
-                });
-        }
 
-        else if(view.getId()==R.id.fetchStudentsBySchoolButton){
+        if(view.getId()==R.id.fetchStudentsBySchoolButton){
 
             Spinner schoolspinner=inflatedView.findViewById(R.id.schoolsSpinner);
             String selected=(String)schoolspinner.getSelectedItem();
 
-            for (final School school:schools){
 
-                if(school.getName().equals(selected)){
-                    int school_db_id=school.getServer_id();
-                    networkManager.fetchStudentsBySchoolId(new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            JSONArray students_ja=response.optJSONArray("students");
-                            int school_server_id=response.optInt("id",-1);
 
-                            if(students_ja!=null && school_server_id!=-1){
-                                DataInserter dataInserter=new DataInserter(INSERT_STUDENTS);
-                                dataInserter.execute(students_ja,school_server_id);
+            if(selected!=SELECCIONE_STR) {
+                long school_server_id=school_id_by_school_name.get(selected);
 
-                            }
-                             }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
+                networkManager.fetchStudentsBySchoolId(new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        JSONArray students_ja = response.optJSONArray("students");
+                        int school_server_id = response.optInt("id", -1);
+
+                        if (students_ja != null && school_server_id != -1) {
+                            DataInserter dataInserter = new DataInserter(INSERT_STUDENTS);
+                            dataInserter.execute(students_ja);
 
                         }
-                    },school_db_id);
-                    break;
-                }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }, school_server_id);
             }
+
+
 
         }
     }

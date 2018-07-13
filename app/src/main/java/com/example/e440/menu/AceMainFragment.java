@@ -5,42 +5,25 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by e440 on 22-04-18.
@@ -125,7 +108,7 @@ public class AceMainFragment extends Fragment{
 
 
     public void reorderFeelings(){
-        Set<Integer> a=Ace.feelings_by_number.keySet();
+        Set<Integer> a=Ace.male_feelings_by_number.keySet();
         Integer[] v=new Integer[a.size()];
         a.toArray(v);
         Collections.shuffle(Arrays.asList(v));
@@ -138,9 +121,17 @@ public class AceMainFragment extends Fragment{
                 Button b = (Button) feelingsButtonsLinearLayout.getChildAt(index);
 
                 int feeling_number=v[index];
-                String new_text=Ace.feelings_by_number.get(feeling_number);
-                b.setText(new_text);
+                String new_text="";
+                if(current_acase.getSex()== Acase.MALE_CHAR){
+                    new_text=Ace.male_feelings_by_number.get(feeling_number);
 
+
+                }
+                else{
+                    new_text=Ace.female_feelings_by_number.get(feeling_number);
+
+                }
+                b.setText(new_text);
                 button_id_by_feeling_number.put(feeling_number,b.getId());
                 if(nextAcaseIndex==0){
                     b.setOnClickListener(new View.OnClickListener() {
@@ -165,11 +156,12 @@ public class AceMainFragment extends Fragment{
 
             return;
         }
-        new_highlighted_button.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
         if (highlighted_feeling_button!=null){
             highlighted_feeling_button.setBackgroundResource(R.drawable.ace_default_feeling_button);
 
         }
+        new_highlighted_button.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
+
         highlighted_feeling_button=new_highlighted_button;
     }
 
@@ -203,7 +195,15 @@ public class AceMainFragment extends Fragment{
 
 
             TextView descriptionTextView=inflatedView.findViewById(R.id.aceDescriptionTextView);
-            descriptionTextView.setText(current_acase.getDescription());
+            if(current_acase.getSex()==Acase.MALE_CHAR){
+
+                descriptionTextView.setText("¿Él se siente...?");
+
+            }else{
+
+                descriptionTextView.setText("¿Ella se siente...?");
+
+            }
             if(result.containsKey(Integer.toString(current_acase.getServer_id()))){
                 int feeling_number_to_restore=result.get(Integer.toString(current_acase.getServer_id()));
                 //find the button with the feeling text

@@ -29,11 +29,15 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
     @Override
     public void backFromTest(JSONObject jo) {
         //TODO:PROCESS JSON_OBJECT
-        int score=jo.optInt("score");
+
+        //int score=jo.optInt("score");
+
+        results_array.put(jo);
         if (current_mode==HnfTest.HEARTS_AND_FLOWERS_TEST_MODE){
 
+            //Try add the array to the json
             try{
-                result.put("hnf_score",score);
+                result.put("results_array",results_array);
                 result.put("test_id",hnfSet.getServer_id());
             }
 
@@ -48,26 +52,29 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
 
         else {
 
-            try{
-                if(current_mode==HnfTest.HEARTS_TEST_MODE){
-
-                    result.put("hearts_score",score);
-
-                }
-                else{
-
-                    result.put("flowers_score",score);
-                }
-            }
-
-            catch (JSONException e){
-                e.printStackTrace();
-            }
+//            try{
+//                if(current_mode==HnfTest.HEARTS_TEST_MODE){
+//
+//                    result.put("hearts_score",score);
+//
+//                }
+//                else{
+//
+//                    result.put("flowers_score",score);
+//                }
+//            }
+//
+//            catch (JSONException e){
+//                e.printStackTrace();
+//            }
             current_mode += 1;
+
+
             startInstruction();
         }
     }
     JSONObject result;
+    JSONArray results_array;
     private int current_mode;
     private HnfSet hnfSet;
     int student_server_id;
@@ -80,6 +87,7 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
         student_server_id=extras.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         current_mode=0;
         result=new JSONObject();
+        results_array=new JSONArray();
         AsyncTask asyncTask =new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {

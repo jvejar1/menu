@@ -1,13 +1,9 @@
 package com.example.e440.menu;
 
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FonoTestActivity extends BaseActivity implements MainFragmentListener{
@@ -19,7 +15,6 @@ public class FonoTestActivity extends BaseActivity implements MainFragmentListen
     }
     @Override
     public void backFromPractice() {
-
     }
 
     int student_id;
@@ -47,7 +42,6 @@ public class FonoTestActivity extends BaseActivity implements MainFragmentListen
             //TODO:FIISH
             return;
         }
-
     }
 
 

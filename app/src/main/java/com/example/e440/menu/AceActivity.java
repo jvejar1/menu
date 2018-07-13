@@ -44,7 +44,7 @@ public class AceActivity extends BaseActivity implements InstructionFragment.bac
         Bundle b=intent.getExtras();
         student_server_id=b.getInt("student_server_id");
         Bundle bundle = new Bundle();
-        bundle.putString("text","“Ahora voy a mostrarte algunas imágenes de niños y niñas," +
+        bundle.putString("text","“Ahora voy a mostrarte algunas imágenes de niños y niñas " +
                 "y quiero que tú me digas cómo se siente cada uno. Ella/Él se " +
                 "siente ¿feliz, triste, enojada/o, o asustada/o?. ¿Lo has entendido?... (espere la respuesta del niño) Comencemos.”");
 

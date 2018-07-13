@@ -28,12 +28,30 @@
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>
-    <style name="ErrorButton" parent="Widget.AppCompat.Button.Colored">
+    <style name="BackButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:drawableLeft">@drawable/ic_keyboard_arrow_left_black_24dp</item>
         <item name="colorButtonNormal">@color/colorWarning</item>
-        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColor">@color/defaultBlack</item>
+        <item name="android:background">@drawable/back_button_bg</item>
+        <item name="android:text">Atrás</item>
     </style>
 
     <style name="SuccessButton" parent="Widget.AppCompat.Button.Colored">
+
+        <item name="colorButtonNormal">@color/colorSuccess</item>
+        <item name="android:textColor">@color/defaultBlack</item>
+    </style>
+
+    <style name="NextButton" parent="Widget.AppCompat.Button">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:text">Siguiente</item>
+        <item name="android:drawableRight">@drawable/ic_keyboard_arrow_right_black_24dp</item>
+        <item name="android:background">@drawable/success_button_bg</item>
         <item name="colorButtonNormal">@color/colorSuccess</item>
         <item name="android:textColor">@color/defaultBlack</item>
     </style>

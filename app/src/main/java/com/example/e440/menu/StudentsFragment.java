@@ -3,14 +3,21 @@ package com.example.e440.menu;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Movie;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,34 +62,59 @@ public class StudentsFragment extends Fragment {
         }
     }
 
+    RecyclerView students_recycler_view;
     List<Student> studentList=new ArrayList<>();
+    StudentsAdapter studentsAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.students_fragment, container, false);
-        studentsListView=inflatedView.findViewById(R.id.studentsListView);
         databaseManager= DatabaseManager.getInstance(getContext());
 
+//        studentsListView=inflatedView.findViewById(R.id.studentsListView);
+//
+//        studentsListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+//                TextView studentIdTextView=view.findViewById(R.id.studentServerIdTextView);
+//                int student_server_id=Integer.parseInt(studentIdTextView.getText().toString());
+//                mCallback.onStudentSelected(student_server_id);
+//            }
+//        });
+//        Student s1 = new Student("","01 Alumno prueba","0",0,0);
+//        studentList.add(s1);
+//        ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, studentList);
+//        studentsListView.setAdapter(customAdapter);
+//        studentsListView.setClickable(true);
 
-        studentsListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+        students_recycler_view=inflatedView.findViewById(R.id.studentsRecycleView);
+        students_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getContext(), students_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                TextView studentIdTextView=view.findViewById(R.id.studentServerIdTextView);
-                int student_server_id=Integer.parseInt(studentIdTextView.getText().toString());
-                mCallback.onStudentSelected(student_server_id);
+            public void onClick(View view, int position) {
+                Student student = studentList.get(position);
+                Toast.makeText(getContext(), student.getLast_name() + " is selected!", Toast.LENGTH_SHORT).show();
+                mCallback.onStudentSelected(student.getServer_id());
             }
-        });
-        Student s1 = new Student("","01 Alumno prueba","0",0);
-        studentList.add(s1);
-        ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, studentList);
-        studentsListView.setAdapter(customAdapter);
-        studentsListView.setClickable(true);
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+        studentsAdapter=new StudentsAdapter(studentList);
+        RecyclerView.LayoutManager mLayoutManager= new LinearLayoutManager(getContext());
+        students_recycler_view.setHasFixedSize(true);
+        students_recycler_view.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        students_recycler_view.setLayoutManager(mLayoutManager);
+        students_recycler_view.setItemAnimator(new DefaultItemAnimator());
+        students_recycler_view.setAdapter(studentsAdapter);
         StudentsLoader studentsLoader=new StudentsLoader();
         studentsLoader.execute();
 
         return inflatedView;
     }
+
 
 
     class StudentsLoader extends AsyncTask<Void,Void,Student[]>{
@@ -102,7 +134,9 @@ public class StudentsFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Student[] students) {
-            ((BaseAdapter) studentsListView.getAdapter()).notifyDataSetChanged();
+       //     studentsListView.requestLayout();
+          //  ((BaseAdapter) studentsListView.getAdapter()).notifyDataSetChanged();
+            studentsAdapter.notifyDataSetChanged();
 
         }
     }

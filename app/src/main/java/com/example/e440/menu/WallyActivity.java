@@ -144,7 +144,7 @@ public class WallyActivity extends BaseActivity implements InstructionFragment.b
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             InstructionFragment corsiInstructionFragment= new InstructionFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("text","“Ahora vamos a hacer un juego donde yo te cuento algunas historias sobre unos niños de tu edad. Voy a utilizar unas tarjetas con imágenes para ayudar a contarte mi historia. Puedes usar las tarjetas para decirme lo que piensas de la historia”. ¿Lo has entendido?... (espere la respuesta del niño) Comencemos..");
+            bundle.putString("text","“Ahora vamos a hacer un juego donde yo te cuento algunas historias sobre unos niños de tu edad. Voy a utilizar unas imágenes para ayudar a contarte mi historia. Luego aparecerán otras imágenes para que me digas lo que piensas de la historias. ¿Lo has entendido?... (espere la respuesta del niño) Comencemos..");
 
             corsiInstructionFragment.setArguments(bundle);
             fragmentTransaction.replace(R.id.fragment_place,corsiInstructionFragment);

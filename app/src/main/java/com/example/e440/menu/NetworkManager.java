@@ -42,7 +42,7 @@ public class NetworkManager implements Executor{
     private RequestQueue mRequestQueue;
     private static Context mCtx;
 
-    public static final String BASE_URL = "http://192.168.0.108:3000/";
+    public static final String BASE_URL = "http://192.168.0.101:3000/";
 
     private static String token =  "";
 
@@ -144,12 +144,12 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    public void fetchSchools(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
-        String url =  BASE_URL + "/schools/get_all";
+    public void fetchCourses(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
+        String url =  BASE_URL + "/schools_and_courses/";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    public void fetchStudentsBySchoolId(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener,int school_id){
+    public void fetchStudentsBySchoolId(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, long school_id){
         String url =  BASE_URL + "/schools/"+school_id+"/students";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
@@ -172,9 +172,9 @@ public class NetworkManager implements Executor{
                 return headers;
             }
         };
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mRequestQueue.add(jsonObjectRequest);
     }
 

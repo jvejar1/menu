@@ -5,7 +5,6 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import android.database.Cursor;
 
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
@@ -19,25 +18,25 @@ public interface DaoAccess {
 
 
     //School
-    @Query("SELECT * FROM School")
-    School[] fetchAllSchools();
+    @Query("SELECT * FROM Course")
+    Course[] fetchAllCourses();
 
-    @Query("SELECT * FROM School where server_id=:server_id LIMIT 1")
-    School fetchSchoolByServerId(int server_id);
+    @Query("SELECT * FROM Course where server_id=:server_id LIMIT 1")
+    Course fetchSchoolByServerId(int server_id);
 
-    @Query("DELETE FROM School where server_id=:server_id")
+    @Query("DELETE FROM Course where server_id=:server_id")
     int deleteSchoolByServerId(int server_id);
 
-    @Query("DELETE FROM Student where school_id=:school_id")
+    @Query("DELETE FROM Student where course_id=:school_id")
     int deleteSchoolBySchoolId(int school_id);
 
     @Delete
-    int deleteSchool(School school);
+    int deleteSchool(Course school);
 
     @Update
-    int updateSchool(School school);
+    int updateSchool(Course school);
     @Insert
-    void insertSchool(School school);
+    void insertSchool(Course school);
 
     @Query("SELECT * FROM ResponseRequest where test_name='fonotest'")
     ResponseRequest[] fetchFonotestResponseRequests();

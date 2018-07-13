@@ -93,6 +93,7 @@ public class WallyMainFragment extends Fragment {
                         TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(view.getId()));
                         wreaction_response=wreaction_number_by_text.get(img_text_view.getText());
                     }
+                    ui_handler.removeCallbacksAndMessages(null);
                     displayNextQuestion();
                 }
             });
@@ -161,13 +162,7 @@ public class WallyMainFragment extends Fragment {
             img_view.setVisibility(View.INVISIBLE);
             final TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_view.getId()));
             img_text_view.setVisibility(View.INVISIBLE);
-            ui_handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    img_text_view.setVisibility(View.VISIBLE);
-                    img_view.setVisibility(View.VISIBLE);
-                }
-            },i*2000);
+
             i++;
         }
         if (innerQuestionPointer==0) {
@@ -185,12 +180,52 @@ public class WallyMainFragment extends Fragment {
                 jsonObject.putOpt("wfeeling",wfeeling_response);
                 jsonObject.putOpt("wreaction",wreaction_response);
                 mCallback.backFromTest(jsonObject);
+                return;
             }
             catch(JSONException e){
 
 
                 e.printStackTrace();
+                return;
             }
+        }
+
+        int delay=2800;
+        int counter=0;
+        int delay_from_last_lenght=0;
+
+        for (final ImageView imageView:imageViews){
+            int img_text_view_id=text_view_id_by_img_id.get(imageView.getId());
+            final TextView img_text_view=inflatedView.findViewById(img_text_view_id);
+            String img_text=img_text_view.getText().toString();
+            int text_lenght=img_text.length();
+            delay=delay+delay_from_last_lenght;
+
+            if(text_lenght<10){
+
+                delay_from_last_lenght=1900;
+            }
+            else if(text_lenght>=10 && text_lenght<20){
+                delay_from_last_lenght=2350;
+
+            }
+            else if(text_lenght>=20 && text_lenght<30){
+                delay_from_last_lenght=3250;
+
+            }
+            else{
+                delay_from_last_lenght=4000;
+
+            }
+
+            ui_handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    img_text_view.setVisibility(View.VISIBLE);
+                    imageView.setVisibility(View.VISIBLE);
+                }
+            },delay);
+            counter++;
         }
     }
 
