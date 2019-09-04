@@ -19,7 +19,10 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
         return;
     }
 
+    @Override
+    public void goBackFromMainFragment() {
 
+    }
 
     @Override
     public void backFromPractice() {
@@ -45,7 +48,7 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
                 e.printStackTrace();
             }
 
-            DatabaseManager.getInstance(getApplicationContext()).insertRequest(result,student_server_id,"hnf",0);
+            this.insertRequest(result,"hnf",0);
             finish();
 
         }
@@ -77,14 +80,11 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
     JSONArray results_array;
     private int current_mode;
     private HnfSet hnfSet;
-    int student_server_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hnf);
 
-        Bundle extras= getIntent().getExtras();
-        student_server_id=extras.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         current_mode=0;
         result=new JSONObject();
         results_array=new JSONArray();

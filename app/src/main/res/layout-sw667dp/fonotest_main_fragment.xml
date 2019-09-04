@@ -15,52 +15,41 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
         android:textColor="@color/defaultBlack"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.056"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toStartOf="@+id/view6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.01" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/playAudioButton"
-        android:layout_width="158dp"
+        android:layout_width="160dp"
         android:layout_height="38dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:drawableLeft="@mipmap/ic_play"
         android:text="Reproducir"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.015"
+        app:layout_constraintHorizontal_bias="0.028"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.286" />
+        app:layout_constraintTop_toBottomOf="@+id/itemNameTextView" />
 
     <TextView
         android:id="@+id/correctSeqTextView"
         android:layout_width="346dp"
-        android:layout_height="29dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.949"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.292" />
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/audioDescriptionTextView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/audioDescriptionTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView12"
+        tools:text="Descripción" />
 
     <View
+        android:id="@+id/view6"
         android:layout_width="1dp"
-        android:layout_height="205dp"
+        android:layout_height="204dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:background="@android:color/darker_gray"
@@ -90,24 +79,20 @@
         android:background="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.343"
+        app:layout_constraintVertical_bias="0.32"
         tools:layout_editor_absoluteX="0dp" />
 
     <TextView
         android:id="@+id/audioDescriptionTextView"
         android:layout_width="346dp"
-        android:layout_height="34dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="Descripción"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.946"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.231" />
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toEndOf="@+id/textView14"
+        app:layout_constraintTop_toTopOf="@+id/textView14" />
 
     <LinearLayout
         android:id="@+id/optionsLinearLayout"
@@ -128,103 +113,105 @@
     <TextView
         android:id="@+id/remindTextView"
         android:layout_width="232dp"
-        android:layout_height="177dp"
+        android:layout_height="116dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@color/defaultBlack"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/view6"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.936"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toEndOf="@+id/view6"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.01" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <TextView
         android:id="@+id/itemNameTextView"
-        android:layout_width="134dp"
-        android:layout_height="36dp"
+        android:layout_width="153dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="Item"
         android:textAlignment="center"
         android:textColor="@color/defaultBlack"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.029"
+        app:layout_constraintHorizontal_bias="0.014"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.233" />
+        app:layout_constraintTop_toBottomOf="@+id/view2"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/nextButton"
+        style="@style/NextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Siguiente"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.963"
+        app:layout_constraintHorizontal_bias="0.986"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.992" />
+        app:layout_constraintVertical_bias="0.99" />
 
     <TextView
         android:id="@+id/textView12"
-        android:layout_width="134dp"
-        android:layout_height="24dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Respuesta correcta:"
+        android:textAlignment="textEnd"
         android:textColor="@color/defaultBlack"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.338"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.29" />
+        app:layout_constraintEnd_toEndOf="@+id/textView14"
+        app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
     <TextView
         android:id="@+id/textView14"
-        android:layout_width="121dp"
-        android:layout_height="29dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Descripción audio:"
+        android:textAlignment="textEnd"
         android:textColor="@color/defaultBlack"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.349"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.23" />
+        app:layout_constraintHorizontal_bias="0.104"
+        app:layout_constraintStart_toEndOf="@+id/itemNameTextView"
+        app:layout_constraintTop_toTopOf="@+id/itemNameTextView" />
 
     <Button
 
         android:id="@+id/evaluateWithZeroButton"
         android:layout_width="114dp"
-        android:layout_height="52dp"
+        android:layout_height="47dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/error_button_bg"
         android:text="Evaluar con 0"
-        app:layout_constraintBottom_toBottomOf="@+id/remindTextView"
-        app:layout_constraintEnd_toEndOf="@+id/remindTextView"
-        app:layout_constraintStart_toStartOf="@+id/remindTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintStart_toEndOf="@+id/view6"
+        app:layout_constraintTop_toBottomOf="@+id/remindTextView"
+        app:layout_constraintVertical_bias="0.6" />
+
+    <Button
+        android:id="@+id/backButton"
+        style="@style/BackButton"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/nextButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

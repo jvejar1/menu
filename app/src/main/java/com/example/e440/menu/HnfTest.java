@@ -14,9 +14,9 @@ public class HnfTest {
     final static int FLOWERS_TEST_MODE=3;
     final static int HEARTS_AND_FLOWERS_TEST_MODE=4;
 
-    final static int HEARTS_TEST_TYPE=1;
-    final static int FLOWERS_TEST_TYPE=2;
-    final static int HEARTS_AND_FLOWERS_TEST_TYPE=0;
+    final static int HEARTS_TEST_TYPE=0;
+    final static int FLOWERS_TEST_TYPE=1;
+    final static int HEARTS_AND_FLOWERS_TEST_TYPE=2;
 
     @PrimaryKey (autoGenerate = true)
     private int id;

@@ -116,7 +116,7 @@
         android:layout_marginTop="8dp"
         android:textAlignment="center"
         android:textColor="@color/defaultBlack"
-        android:textSize="24sp"
+        android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -124,15 +124,12 @@
         app:layout_constraintVertical_bias="0.015" />
 
     <Button
-        android:id="@+id/button9"
+        android:id="@+id/backButton"
+        style="@style/BackButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="32dp"
-        style="@style/BackButton"
         android:text="Atrás"
-        app:layout_constraintEnd_toStartOf="@+id/wallyTopTextView"
-        app:layout_constraintHorizontal_bias="0.177"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/wallyTopTextView" />
 

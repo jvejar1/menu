@@ -95,7 +95,7 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
                     catch(JSONException e ){
                         e.printStackTrace();
                     }
-                    DatabaseManager.getInstance(getApplicationContext()).insertRequest(payload,student_server_id,"corsi",0);
+                    insertRequest(payload,"corsi",0);
                     super.onPostExecute(o);
                     finish();
                 }
@@ -131,15 +131,12 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
     int reversed_score=0;
     int ordered_practice_tries=0;
     int reversed_practice_tries=0;
-    int student_server_id;
     boolean finished_in_the_middle=false;
     Corsi corsi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_corsi);
-        Bundle b=getIntent().getExtras();
-        student_server_id=b.getInt(Student.EXTRA_STUDENT_SERVER_ID);
         fragmentManager = getFragmentManager();
         results=new JSONArray();
         startInstructions(next_instruction);
@@ -170,7 +167,7 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
         else{
 
             if(reversed_practice_tries==0) {
-                bundle.putString("text", "“A continuación van a aparecer 10 cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Una vez que escuches la palabra “Ahora”, tú tendrás que tocar los cuadrados en el orden contrario en que se encendieron.”");
+                bundle.putString("text", "“A continuación van a aparecer 10 cuadrados en la pantalla. De todos ellos, algunos se van a encender en un determinado orden. Una vez que escuches la palabra “Ahora”, tú tendrás que tocar los cuadrados en el orden contrario en que se encendieron.¿Lo has entendido? (espere la respuesta del niño). Comencemos”");
             }
 
             else{

@@ -3,6 +3,7 @@ package com.example.e440.menu;
 import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -129,13 +131,13 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
             JSONArray jsonArray=(JSONArray) objects[0];
             for (int i=0;i<jsonArray.length();i++){
                 JSONObject jsonObject=jsonArray.optJSONObject(i);
-                int server_id=jsonObject.optInt("id");
+                long server_id=jsonObject.optLong("server_id");
                 if(what==INSERT_STUDENTS){
                     String name=jsonObject.optString("name");
 
                     String rut=jsonObject.optString("rut");
                     String last_name=jsonObject.optString("last_name");
-                    Student new_student=new Student(name,last_name,rut,server_id,1);
+                    Student new_student=new Gson().fromJson(jsonObject.toString(), Student.class);
                     Student old_student=databaseManager.testDatabase.daoAccess().fetchStudentByServerId(server_id);
                     if(old_student!=null){
                         new_student.setId(old_student.getId());
@@ -185,18 +187,14 @@ public class NewStudentFragment extends Fragment implements View.OnClickListener
 
             Spinner schoolspinner=inflatedView.findViewById(R.id.schoolsSpinner);
             String selected=(String)schoolspinner.getSelectedItem();
-
-
-
             if(selected!=SELECCIONE_STR) {
                 long school_server_id=school_id_by_school_name.get(selected);
-
                 networkManager.fetchStudentsBySchoolId(new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         JSONArray students_ja = response.optJSONArray("students");
                         int school_server_id = response.optInt("id", -1);
-
+                        String school_name=response.optString("name");
                         if (students_ja != null && school_server_id != -1) {
                             DataInserter dataInserter = new DataInserter(INSERT_STUDENTS);
                             dataInserter.execute(students_ja);

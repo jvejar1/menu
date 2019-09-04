@@ -41,13 +41,14 @@ public class NetworkManager implements Executor{
     private static NetworkManager mInstance;
     private RequestQueue mRequestQueue;
     private static Context mCtx;
-
-    public static final String BASE_URL = "http://192.168.0.101:3000/";
+    public static final String SERVER_IP = "http://159.65.65.75:80/";
+    public static final String BASE_URL = SERVER_IP;
 
     private static String token =  "";
 
     private NetworkManager(Context context){
         mCtx = context;
+        token=CredentialsManager.getInstance(mCtx).getToken();
         mRequestQueue = getRequestQueue();
     }
 
@@ -77,13 +78,16 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
     }
 
+    void sendPendingResults(){
+
+    }
 
 
 
     public void login(final String username, final String password, final Response.Listener<JSONObject> responseListener,
                        Response.ErrorListener errorListener) throws JSONException {
 
-        String url = BASE_URL + "login.json";
+        String url = BASE_URL + "users/sign_in.json";
 
         JSONObject payload = new JSONObject();
         payload.put("email", username);
@@ -95,9 +99,9 @@ public class NetworkManager implements Executor{
                     public void onResponse(JSONObject response) {
 
                         JSONObject headers = response.optJSONObject("headers");
-                        token = headers.optString("Authorization", null);
-                        CredentialsManager.getInstance(null).saveToken(token);
-                        CredentialsManager.getInstance(null).saveCredentials(username,password);
+                        token = response.optString("Authorization", null);
+                        CredentialsManager.getInstance(mCtx).saveToken(token);
+                        CredentialsManager.getInstance(mCtx).saveCredentials(username,password);
                         responseListener.onResponse(response);
                     }
                 }, errorListener){
@@ -168,7 +172,7 @@ public class NetworkManager implements Executor{
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", token);
+                headers.put("Authorization", "Bearer "+token);
                 return headers;
             }
         };

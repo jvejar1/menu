@@ -3,29 +3,26 @@ package com.example.e440.menu;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Movie;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,14 +32,10 @@ import java.util.List;
 public class StudentsFragment extends Fragment {
 
     View inflatedView;
-   ListView studentsListView;
     DatabaseManager databaseManager;
-
     OnStudentSelectedListener mCallback;
-
-
     public interface OnStudentSelectedListener {
-        public void onStudentSelected(int student_id);
+        public void onStudentSelected(Long student_id);
     }
 
     @Override
@@ -62,9 +55,22 @@ public class StudentsFragment extends Fragment {
         }
     }
 
+
+    TextView students_count_text_view;
+    Spinner schools_names_spinner;
+    Spinner courseNamesSpinner;
+    ArrayList<String> schools_names_list=new ArrayList();
+    ArrayList<String> courseNamesList=new ArrayList();
+
+    final static String SCHOOL_SELECTION_TEXT="-- TODOS LOS ALUMNOS --";
     RecyclerView students_recycler_view;
     List<Student> studentList=new ArrayList<>();
     StudentsAdapter studentsAdapter;
+    ArrayAdapter<String> schools_names_adapter;
+    ArrayAdapter<String> courseNamesAdapter;
+    StudentsLoader studentsLoader;
+    HashMap<String, List<int[]>> courseLevelAndLetterBySchoolName = new HashMap<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -88,6 +94,76 @@ public class StudentsFragment extends Fragment {
 //        studentsListView.setAdapter(customAdapter);
 //        studentsListView.setClickable(true);
 
+        students_count_text_view=inflatedView.findViewById(R.id.studentsCountTextView);
+
+
+        schools_names_spinner=inflatedView.findViewById(R.id.schoolsNamesSpinner);
+        schools_names_adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, schools_names_list);
+
+        schools_names_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        schools_names_spinner.setAdapter(schools_names_adapter);
+        schools_names_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                String school_name=schools_names_list.get(i);
+                studentsLoader=new StudentsLoader();
+                if(school_name==SCHOOL_SELECTION_TEXT){
+                    //studentsLoader.execute((String)null);
+
+                }else{
+                    //studentsLoader.execute(school_name);
+                    courseNamesList.clear();
+                    List<int[]> coursesLevelAndLetter = courseLevelAndLetterBySchoolName.get(school_name);
+                    for (int[] courseLevelAndLetter : coursesLevelAndLetter ){
+                        String courseLevelStr = Student.course_level_by_number.get(courseLevelAndLetter[0]);
+                        char courseLetterStr = Student.course_letter_by_number.get(courseLevelAndLetter[1]);
+
+                        String courseFullName = courseLevelStr+ ' ' + courseLetterStr;
+                        courseNamesList.add(courseFullName);
+
+                    }
+                    courseNamesAdapter.notifyDataSetChanged();
+                    courseNamesSpinner.setSelection(0, true);
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        courseNamesSpinner=inflatedView.findViewById(R.id.coursesSpinner);
+        courseNamesAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, courseNamesList);
+
+        courseNamesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //sc.add(SCHOOL_SELECTION_TEXT);
+        courseNamesSpinner.setAdapter(courseNamesAdapter);
+
+        courseNamesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int selectedCourseIndex, long l) {
+
+                String schoolName = (String)schools_names_spinner.getSelectedItem();
+                int[] courseLevelAndLetter = courseLevelAndLetterBySchoolName.get(schoolName).get(selectedCourseIndex);
+
+                studentsLoader=new StudentsLoader();
+                studentsLoader.execute(schoolName, courseLevelAndLetter[0], courseLevelAndLetter[1]);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
         students_recycler_view=inflatedView.findViewById(R.id.studentsRecycleView);
         students_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getContext(), students_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -109,34 +185,82 @@ public class StudentsFragment extends Fragment {
         students_recycler_view.setLayoutManager(mLayoutManager);
         students_recycler_view.setItemAnimator(new DefaultItemAnimator());
         students_recycler_view.setAdapter(studentsAdapter);
-        StudentsLoader studentsLoader=new StudentsLoader();
-        studentsLoader.execute();
 
+        SchoolsNamesLoader schoolsNamesLoader=new SchoolsNamesLoader();
+        schoolsNamesLoader.execute();
         return inflatedView;
     }
 
+    public void onCourseSelected(AdapterView<?> adapterView, View view, int i, long l){
 
+        return;
+    }
 
-    class StudentsLoader extends AsyncTask<Void,Void,Student[]>{
-
+    class SchoolsNamesLoader extends  AsyncTask{
         @Override
-        protected Student[] doInBackground(Void... voids) {
-
-            Student[] students=databaseManager.testDatabase.daoAccess().fetchAllStudents();
+        protected Object doInBackground(Object[] objects) {
 
 
-            for (Student student:students){
-                studentList.add(student);
-
+            List<CourseTuple> courseTuples = databaseManager.testDatabase.daoAccess().getCourseTouples();
+            schools_names_list.add(SCHOOL_SELECTION_TEXT);
+            for (CourseTuple courseTuple: courseTuples){
+                courseLevelAndLetterBySchoolName.put(courseTuple.schoolName, new ArrayList<int[]>() );
+                schools_names_list.add(courseTuple.schoolName);
             }
+            for (CourseTuple courseTuple: courseTuples){
+                courseLevelAndLetterBySchoolName.get(courseTuple.schoolName).add(new int[]{courseTuple.courseLevel,courseTuple.courseLetter});
+            }
+
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            schools_names_adapter.notifyDataSetChanged();
+
+        }
+    }
+    class StudentsLoader extends AsyncTask<Object,Object,Student[]>{
+
+        @Override
+        protected Student[] doInBackground(Object[] objects) {
+
+            String school_name=(String)objects[0];
+            int courseLevel = (int)objects[1];
+            int courseLetter = (int)objects[2];
+            Student[] students;
+            if(school_name==null){
+                students = databaseManager.testDatabase.daoAccess().fetchAllStudents();
+
+            }else{
+                students=databaseManager.testDatabase.daoAccess().fetchStudentsBySchoolAndCourse(school_name, courseLevel, courseLetter);
+            }
+
+
+            studentList.clear();
+            Student fake_student=new Student(" ","0 Alumno Prueba","0",(long)0){
+                @Override
+                String getCourseFullName() {
+                    return "";
+                }
+            };
+            studentList.add(fake_student);
+            for(Student s :students){
+
+                studentList.add(s);
+            }
+            return students;
+        }
+
 
         @Override
         protected void onPostExecute(Student[] students) {
        //     studentsListView.requestLayout();
           //  ((BaseAdapter) studentsListView.getAdapter()).notifyDataSetChanged();
             studentsAdapter.notifyDataSetChanged();
+
+            students_count_text_view.setText("Mostrando "+studentList.size()+" alumnos");
 
         }
     }

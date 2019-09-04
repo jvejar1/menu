@@ -212,7 +212,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                     answered_on_time_by_index.put(current_hf_index,true);
                                         answer_time_by_index.put(current_hf_index, (System.currentTimeMillis() - start_time));
                     current_hf_index++;
-                    display_hnfFigure();
+                
 
 
                     if(correct) {
@@ -221,6 +221,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                     }else {
                       errors++;
                     }
+                    display_hnfFigure();
                 }
             }
             finally {

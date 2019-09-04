@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -24,8 +25,6 @@ public class DatabaseManager {
     static DatabaseManager databaseManager;
     TestDatabase testDatabase;
     static synchronized DatabaseManager getInstance(Context context){
-
-
         if (databaseManager==null){
 
             databaseManager =new DatabaseManager();
@@ -52,13 +51,20 @@ public class DatabaseManager {
                 payload.put("test_name", test_name);
                 payload.put("evaluator_id", evaluator_server_id);
                 payload.put("timestamp", new Timestamp(System.currentTimeMillis()));
-                ResponseRequest responseRequest = new ResponseRequest(payload.toString(), test_name);
+                ResponseRequest responseRequest = new ResponseRequest(payload.toString(), test_name,false);
                 AsyncTask asyncTask = new AsyncTask() {
                     @Override
                     protected Object doInBackground(Object[] objects) {
                         ResponseRequest r = (ResponseRequest) objects[0];
                         databaseManager.testDatabase.daoAccess().insertResponseRequest(r);
                         return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object o) {
+                        super.onPostExecute(o);
+
+
                     }
                 }.execute(responseRequest);
 
@@ -75,6 +81,39 @@ public class DatabaseManager {
 
 
 
+    void cleanAce(){
+
+        this.testDatabase.daoAccess().deleteAllAcases();
+        this.testDatabase.daoAccess().deleteAllAces();
+    }
+
+    void cleanWally(){
+        this.testDatabase.daoAccess().deleteAllWFeelings();
+        this.testDatabase.daoAccess().deleteAllWreactions();
+        this.testDatabase.daoAccess().deleteAllWSituations();
+        this.testDatabase.daoAccess().deleteAllWally();
+
+    }
+
+    void cleanCorsi(){
+
+        this.testDatabase.daoAccess().deleteAllCsequences();
+        this.testDatabase.daoAccess().deleteAllCorsis();
+    }
+
+    void cleanFonotest(){
+
+        this.testDatabase.daoAccess().deleteAllItems();
+        this.testDatabase.daoAccess().deleteAllFonotest();
+    }
+
+    void cleanHnf(){
+
+        this.testDatabase.daoAccess().deleteAllHnfFigure();
+        this.testDatabase.daoAccess().deleteAllHnfTests();
+        this.testDatabase.daoAccess().deleteAllHnfSet();
+    }
+
     void sendAllResults(final NetworkManager networkManagerInstance){
 
         AsyncTask asyncTask=new AsyncTask() {
@@ -88,10 +127,12 @@ public class DatabaseManager {
                             @Override
                             public void onResponse(JSONObject response) {
                                 JSONObject headers= response.optJSONObject("headers");
-                                int status=headers.optInt("id_to_erase");
-                                if (status==HttpURLConnection.HTTP_ACCEPTED || status==HttpURLConnection.HTTP_NOT_ACCEPTABLE){
+                                int status=headers.optInt("status");
+                                int id_to_erase=response.optInt("id_to_erase");
+                                if (status==HttpURLConnection.HTTP_OK){
 
-                                    DatabaseManager.this.testDatabase.daoAccess().fetchAllResponseRequest();
+                                    DatabaseManager.this.testDatabase.daoAccess().setEvaluationSavedToTrue(id_to_erase);
+
                                     int a =1;
                                 }else{
                                     //TODO: stuffs

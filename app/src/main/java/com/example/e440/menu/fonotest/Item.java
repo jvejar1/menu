@@ -59,9 +59,8 @@ public class Item {
     }
 
 
-    public Item(String correct_sequence, byte[] audio, String description, int sever_id, int index, String instruction,boolean example,String name) {
+    public Item(String correct_sequence,String description, int sever_id, int index, String instruction,boolean example,String name) {
         this.correct_sequence = correct_sequence;
-        this.audio = audio;
         this.instruction=instruction;
         this.description = description;
         this.sever_id = sever_id;
@@ -80,6 +79,16 @@ public class Item {
 
     String correct_sequence;
     byte[] audio;
+
+    public String getAudio_path() {
+        return audio_path;
+    }
+
+    public void setAudio_path(String audio_path) {
+        this.audio_path = audio_path;
+    }
+
+    String audio_path;
     String description;
     int sever_id;
     String instruction;

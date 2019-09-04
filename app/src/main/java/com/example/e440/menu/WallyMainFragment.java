@@ -8,15 +8,13 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,10 +40,6 @@ public class WallyMainFragment extends Fragment {
     }
     Handler ui_handler=new Handler();
     MainFragmentListener mCallback;
-    NetworkManager networkManager;
-    HashMap<Integer, Integer> result = new HashMap<>();
-    int nextSituationIndex= 0;
-    private static Random random;
     View inflatedView;
     DatabaseManager databaseManager;
     ArrayList<Integer> int_arr=new ArrayList<Integer>(Arrays.asList(0,1,2,3));
@@ -56,6 +50,8 @@ public class WallyMainFragment extends Fragment {
     WFeeling[] wFeelings;
     int wfeeling_response;
     int wreaction_response;
+    static int RESPONSE_DEFAULT_VALUE=-1;
+    Button back_button;
     HashMap<String,Integer> wreaction_number_by_text;
     HashMap <Integer,Integer> wfeeling_number_by_img_id;
     HashMap<Integer,Integer> text_view_id_by_img_id;
@@ -65,6 +61,21 @@ public class WallyMainFragment extends Fragment {
                              Bundle savedInstanceState) {
         inflatedView = inflater.inflate(R.layout.wally_fragment, container, false);
         databaseManager= DatabaseManager.getInstance(getContext());
+        back_button=inflatedView.findViewById(R.id.backButton);
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                innerQuestionPointer-=2;
+                if(innerQuestionPointer==-1){
+                    //back to activity
+                    mCallback.goBackFromMainFragment();
+                }
+                else{
+                    ui_handler.removeCallbacksAndMessages(null);
+                    displayNextQuestion();
+                }
+            }
+        });
         ImageView imageView1=inflatedView.findViewById(R.id.wallyImage1);
         ImageView imageView2=inflatedView.findViewById(R.id.wallyImage2);
         ImageView imageView3=inflatedView.findViewById(R.id.wallyImage3);
@@ -78,7 +89,8 @@ public class WallyMainFragment extends Fragment {
 
         Bundle args= getArguments();
         wsituation_id=args.getLong("wsituation_id");
-
+        wfeeling_response=args.getInt(WSituation.WFEELING_RESPONSE_EXTRA,RESPONSE_DEFAULT_VALUE);
+        wreaction_response=args.getInt(WSituation.WREACTION_RESPONSE_EXTRA,RESPONSE_DEFAULT_VALUE);
         for (ImageView i:imageViews
              ) {
 
@@ -98,12 +110,9 @@ public class WallyMainFragment extends Fragment {
                 }
             });
         }
-        if(first_start==true){
-            LoadWallyData lwd=new LoadWallyData();
-            lwd.execute();}
-        else{
-            displayNextQuestion();
-        }
+        LoadWallyData lwd=new LoadWallyData();
+        lwd.execute();
+
         return inflatedView;
     }
 
@@ -141,22 +150,22 @@ public class WallyMainFragment extends Fragment {
              ) {
 
             WReaction wac=wreactions[i];
-            final ImageView image_view=imageViews[i];
-            imageViews[i].setImageBitmap(Utilities.convertBytesArrayToBitmap(wac.getImage_bytes()));
+            int i_index=int_arr.indexOf(i);
+            final ImageView image_view=imageViews[i_index];
+            image_view.setImageBitmap(Utilities.convertBytesArrayToBitmap(wac.getImage_bytes()));
             wreaction_number_by_text.put(wac.getDescription(),wac.getWreaction());
-            int img_id=imageViews[i].getId();
+            int img_id=image_view.getId();
             final TextView img_text_view=inflatedView.findViewById(text_view_id_by_img_id.get(img_id));
             img_text_view.setText(wac.getDescription());
 
         }
 
         innerQuestionPointer++;
-        nextSituationIndex+=1;
 
     }
 
     void displayNextQuestion(){
-        Collections.shuffle(int_arr);
+        Collections.shuffle(int_arr,new Random(System.currentTimeMillis()));
         int i=1;
         for (final View img_view:imageViews){
             img_view.setVisibility(View.INVISIBLE);
@@ -247,7 +256,11 @@ public class WallyMainFragment extends Fragment {
 
         @Override
         protected void onPostExecute(ArrayList<Object[]> result) {
-            first_start=false;
+
+            //JUMP TO THE END IF ALREADY EXIST RESPONSES
+            if(wfeeling_response!=RESPONSE_DEFAULT_VALUE && wreaction_response!=RESPONSE_DEFAULT_VALUE){
+                innerQuestionPointer++;
+            }
            displayNextQuestion();
         }
     }

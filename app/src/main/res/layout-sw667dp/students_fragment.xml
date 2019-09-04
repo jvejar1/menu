@@ -8,49 +8,57 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/studentsRecycleView"
-        android:layout_width="687dp"
-        android:layout_height="817dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="874dp"
+        android:layout_marginBottom="8dp"
         android:scrollbars="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view5" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Spinner
-        android:id="@+id/spinner2"
-        android:layout_width="324dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/schoolsNamesSpinner"
+        android:layout_width="276dp"
+        android:layout_height="37dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="20dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView13"
-        app:layout_constraintStart_toEndOf="@+id/textView13"
-        app:layout_constraintTop_toTopOf="@+id/textView13"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/textView13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
+        android:layout_marginStart="44dp"
         android:layout_marginTop="16dp"
-        android:text="Institución:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/studentsRecycleView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <View
         android:id="@+id/view5"
-        android:layout_width="687dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="24dp"
-        android:background="#a6dfdfdf"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="56dp"
+        android:background="@color/futuristic_blue"
         app:layout_constraintEnd_toEndOf="@+id/studentsRecycleView"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/studentsRecycleView"
-        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/studentsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="TextView"
+        android:textColor="@color/futuristic_blue"
+        app:layout_constraintBottom_toTopOf="@+id/view5"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Spinner
+        android:id="@+id/coursesSpinner"
+        android:layout_width="261dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="72dp"
+        app:layout_constraintBottom_toBottomOf="@+id/schoolsNamesSpinner"
+        app:layout_constraintStart_toEndOf="@+id/schoolsNamesSpinner"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
 
 </android.support.constraint.ConstraintLayout>

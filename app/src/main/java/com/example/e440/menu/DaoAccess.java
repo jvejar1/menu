@@ -9,6 +9,8 @@ import android.arch.persistence.room.Update;
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
 
+import java.util.List;
+
 /**
  * Created by e440 on 09-04-18.
  */
@@ -27,9 +29,6 @@ public interface DaoAccess {
     @Query("DELETE FROM Course where server_id=:server_id")
     int deleteSchoolByServerId(int server_id);
 
-    @Query("DELETE FROM Student where course_id=:school_id")
-    int deleteSchoolBySchoolId(int school_id);
-
     @Delete
     int deleteSchool(Course school);
 
@@ -38,14 +37,31 @@ public interface DaoAccess {
     @Insert
     void insertSchool(Course school);
 
-    @Query("SELECT * FROM ResponseRequest where test_name='fonotest'")
-    ResponseRequest[] fetchFonotestResponseRequests();
     @Insert
     void insertResponseRequest(ResponseRequest responseRequest);
     @Delete
     int deleteResponseRequest(ResponseRequest responseRequest);
     @Query("SELECT * FROM ResponseRequest")
     ResponseRequest[] fetchAllResponseRequest();
+
+    @Query("SELECT * FROM ResponseRequest where saved=0")
+    ResponseRequest[] fetchNotSavedResponseRequest();
+
+
+    @Query("SELECT count(*) FROM ResponseRequest")
+    int fetchEvaluationsCount();
+
+    @Query("UPDATE ResponseRequest SET saved=1 where id=:eval_id")
+    int setEvaluationSavedToTrue(int eval_id);
+
+
+    @Query("SELECT count(*) FROM ResponseRequest where saved=1")
+    int fetchReceivedEvaluationsCount();
+
+
+    @Query("Select school_name, course_level, course_letter from Student GROUP by school_name, course_level, course_letter ")
+    List<CourseTuple> getCourseTouples();
+
     @Query("DELETE FROM ResponseRequest where id=:id_to_delete")
     int deleteRequestById(int id_to_delete);
     //Students
@@ -61,8 +77,18 @@ public interface DaoAccess {
     @Query("SELECT * FROM Student order by last_name ASC")
     Student[] fetchAllStudents();
 
+
+    @Query("SELECT school_name FROM Student group by school_name")
+    String[] fetchSchoolsNames();
+
     @Query("SELECT * FROM Student where server_id=:server_id limit 1")
-    Student fetchStudentByServerId(int server_id);
+    Student fetchStudentByServerId(long server_id);
+
+    @Query("SELECT * FROM Student where school_name=:school_name order by course_level asc,course_letter asc, last_name asc")
+    Student[] fetchStudentsBySchoolName(String school_name);
+
+    @Query("SELECT * FROM Student where school_name=:school_name and course_level=:courseLevel and course_letter=:courseLetter order by last_name asc")
+    Student[] fetchStudentsBySchoolAndCourse(String school_name, int courseLevel, int courseLetter);
 
     @Query("DELETE FROM Student where server_id=:server_id")
     int deleteStudentByServerId(int server_id);
@@ -109,6 +135,23 @@ public interface DaoAccess {
     @Query("SELECT * FROM HnfFigure where hnftest_id=:hnf_test_id")
     HnfFigure[] fetchAllHnfFiguresByHnfTestId(int hnf_test_id);
 
+    @Query("Delete From HnfTest")
+    int deleteAllHnfTests();
+
+    @Query("Delete From HnfFigure")
+    int deleteAllHnfFigure();
+
+    @Query("Delete From HnfSet")
+    int deleteAllHnfSet();
+
+
+
+
+    @Query("Delete From FonoTest")
+    int deleteAllFonotest();
+    @Query("Delete From Item")
+    int deleteAllItems();
+
 
     //CORSI
 
@@ -131,6 +174,12 @@ public interface DaoAccess {
 
     @Query("SELECT * FROM CSEQUENCE where ordered=:ordered_or_not and example=1")
     Csequence[] fetchPracticeCsequences(int ordered_or_not);
+
+    @Query("Delete from Corsi")
+    int deleteAllCorsis();
+
+    @Query("Delete from Csequence")
+    int deleteAllCsequences();
 
 
     //WALLY
@@ -157,12 +206,29 @@ public interface DaoAccess {
     @Query("SELECT id FROM WSituation")
     long[] fetchWsituationsIds();
 
+    @Query("SELECT server_id FROM WSituation where id=:wsituation_id")
+    int fetchWsituationServerIdByWsituationId(long wsituation_id);
+
+
+
     @Query("SELECT * FROM WFeeling")
     WFeeling[] fetchAllWFeelings();
 
     @Query("SELECT * FROM WReaction where wsituation_id=:id")
     WReaction[] fetchWActionsByWSituationId(long id);
 
+
+    @Query("DELETE FROM WReaction")
+    int deleteAllWreactions();
+
+    @Query("DELETE FROM WFeeling")
+    int deleteAllWFeelings();
+
+    @Query("DELETE FROM WSituation")
+    int deleteAllWSituations();
+
+    @Query("DELETE FROM Wally")
+    int deleteAllWally();
 
 
     //ACE
@@ -187,6 +253,12 @@ public interface DaoAccess {
 
     @Insert
     void insertAcase(Acase acase);
+
+    @Query("Delete FROM Acase")
+    int deleteAllAcases();
+
+    @Query("Delete FROM Ace")
+    int deleteAllAces();
 
    /* @Query("SELECT * FROM Form")
     Form[] fetchAllForms();

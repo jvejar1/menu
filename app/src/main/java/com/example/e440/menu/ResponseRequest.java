@@ -2,9 +2,6 @@ package com.example.e440.menu;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.os.AsyncTask;
-
-import java.sql.Timestamp;
 
 /**
  * Created by e440 on 03-06-18.
@@ -39,13 +36,24 @@ public class ResponseRequest {
         this.test_name = test_name;
     }
 
-    public ResponseRequest(String payload, String test_name) {
+    public ResponseRequest(String payload, String test_name, boolean saved) {
         this.payload = payload;
         this.test_name = test_name;
+        this.saved =saved;
     }
 
 
     String payload;
     String test_name;
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
+
+    boolean saved;
 
 }

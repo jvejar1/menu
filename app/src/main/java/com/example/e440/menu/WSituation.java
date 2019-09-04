@@ -10,6 +10,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
  */
 @Entity
 public class WSituation {
+    static String WREACTION_RESPONSE_EXTRA="wreaction";
+    static String WFEELING_RESPONSE_EXTRA="wfeeling";
     @NonNull
     @PrimaryKey(autoGenerate = true)
     int id;

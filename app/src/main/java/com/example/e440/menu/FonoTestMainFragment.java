@@ -5,12 +5,14 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,6 +34,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,11 +50,13 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     //TODO: the mobile device should trust in the server correct sequence, for performance purposes
 
     MainFragmentListener mCallback;
+    Context mCtx;
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
         Activity activity=(Activity)context;
         try {
+            mCtx=context;
             mCallback = (MainFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -88,10 +95,12 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     List<String> response_list=new ArrayList<>();
     DatabaseManager databaseManager= DatabaseManager.getInstance(getContext());
     Button playButton;
+    Button back_button;
     String correct_seq_str;
+
+    List<ItemState> itemStates=new ArrayList<>();
     List<String> correct_words=new ArrayList<>();
     HashMap<Integer,String> response_by_item_server_id=new HashMap<>();
-    HashMap<Integer,Boolean> success_buttons_hash=new HashMap<>();
     HashMap<Button,Integer> index_elem_by_button =new HashMap<>();
     HashMap<Button,Boolean> pressed_by_button=new HashMap<>();
 
@@ -106,9 +115,11 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
     List<int[]> pressed_boolean_touples= new ArrayList<>();
     List<String> original_sequence_list=new ArrayList<>();
     List<String> correct_sequence_list=new ArrayList<>();
-
     FonoTest fonoTest;
+    List<Integer> ordered_pressed_alternatives_indexes_in_correct_sequence=new ArrayList<>();
+    TextView correct_seq_text_view;
     boolean evaluated_with_zero;
+    int index_item_to_start=0;
     List<String> correct_numbers =new ArrayList<>();
     HashMap<Integer,Integer> scores_by_item_server_id=new HashMap<>(); //(server_item_id,score);
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -118,9 +129,28 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
         mediaPlayer=new MediaPlayer();
         AnswersVerticalLinearLayout =inflatedView.findViewById(R.id.optionsLinearLayout);
 
-        SEQ_ITEM_TEXT_VIEW_WIDTH_IN_DP=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 65, getResources().getDisplayMetrics());
+        correct_seq_text_view=inflatedView.findViewById(R.id.correctSeqTextView);
+        SEQ_ITEM_TEXT_VIEW_WIDTH_IN_DP=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
         ANSWER_HORIZONTAL_LL_HEIGHT_IN_DP=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
 
+        back_button=inflatedView.findViewById(R.id.backButton);
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Item current_item=items[current_item_index];
+                response_by_item_server_id.remove(current_item.getSever_id());
+
+                if(current_item_index<itemStates.size()){
+                    itemStates.remove(current_item_index);
+
+
+                }
+                current_item_index--;
+                resetVariablesForItem();
+                displayNextItem();
+            }
+        });
         playButton=inflatedView.findViewById(R.id.playAudioButton);
         playButton.setEnabled(false);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -146,7 +176,6 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
 
                     return;
                 }
-                AnswersVerticalLinearLayout.removeAllViews();
                 inflatedView.setVisibility(View.VISIBLE);
 
 
@@ -168,22 +197,45 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                     }
 
                 }
+                ItemState itemState=getStateForItem(current_item_index);
+                if(itemState==null){
+                    itemState=new ItemState();
+                    itemState.setErrors_at_init(errors);
+                }
 
                 Item current_item=items[current_item_index];
                 response_by_item_server_id.put(current_item.getSever_id(),TextUtils.join("..",response_list));
                 scores_by_item_server_id.put(current_item.getSever_id(),score);
                 if(score==0 && !current_item.isExample()){
-                      errors++;
+                      errors+=1;
                 }
-                if(score>0){
+                if(score==2){
                     errors=0;
                 }
                 if(errors==3){
 
+                    Toast.makeText(getContext(),"Test finalizado debido a 3 errores consecutivos",Toast.LENGTH_LONG).show();
                     finish();
                     //TODO: remove the above //, only the //
                     return;
                 }
+
+
+
+                itemState.setScore(score);
+                itemState.setResponse_list(response_list);
+                itemState.setEvaluated_with_zero(evaluated_with_zero);
+                itemState.setOrdered_pressed_alternatives(ordered_pressed_alternatives_indexes_in_correct_sequence);
+
+                if(getStateForItem(current_item_index)==null){
+                    itemStates.add(itemState);
+                }
+                else{
+                    itemStates.set(current_item_index,itemState);
+                }
+
+
+
                 current_item_index++;
                 resetVariablesForItem();
                 displayNextItem();
@@ -234,13 +286,14 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // check the index of the selected example
-                        int index_item_to_start=0;
-                        for (int i=0;i<items.length;i++ ){
 
+                        for (int i=0;i<items.length;i++ ){
                             if(items[i].getId()==starting_points_items[which].getId()){
                                 index_item_to_start=i;
-
-
+                                break;
+                            }
+                            else{
+                                itemStates.add(new ItemState());
                             }
                         }
 
@@ -274,50 +327,39 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
             e.printStackTrace();
         }
 
-
     }
 
     void resetVariablesForItem(){
         //reset zero button
+
+        AnswersVerticalLinearLayout.removeAllViews();
         Button zero_button=inflatedView.findViewById(R.id.evaluateWithZeroButton);
         zero_button.setText("Evaluar con 0");
         evaluated_with_zero=false;
-
-
         correct_words.clear();
         correct_numbers.clear();
         pressed_boolean_touples.clear();
         correct_sequence_list.clear();
         original_sequence_list.clear();
         index_elem_by_button.clear();
+        ordered_pressed_alternatives_indexes_in_correct_sequence=new ArrayList<>();
         extra_elements_count=0;
     }
 
-    void playAudio(){
-        Button b= inflatedView.findViewById(R.id.nextButton);
+    void playAudio() {
+        Button b = inflatedView.findViewById(R.id.nextButton);
         b.setEnabled(false);
+        Item item = items[current_item_index];
+        // create temp file that will hold byte array
+
+
         try {
-            Item item=items[current_item_index];
-            // create temp file that will hold byte array
-            File tempMp3 = File.createTempFile("kurchina", "mp3");
-            tempMp3.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tempMp3);
-            fos.write(item.getAudio());
-            fos.close();
 
-            // resetting mediaplayer instance to evade problems
             mediaPlayer.reset();
-
-            // In case you run into issues with threading consider new instance like:
-            // MediaPlayer mediaPlayer = new MediaPlayer();
-
-            // Tried passing path directly, but kept getting
-            // "Prepare failed.: status=0x1"
-            // so using file descriptor instead
-            FileInputStream fis = new FileInputStream(tempMp3);
-            mediaPlayer.setDataSource(fis.getFD());
-
+            mediaPlayer.setDataSource(item.getAudio_path());
+            
             playButton.setEnabled(false);
+
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
@@ -332,14 +374,17 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     playButton.setEnabled(true);
-                    Button nextButton=inflatedView.findViewById(R.id.nextButton);
+                    Button nextButton = inflatedView.findViewById(R.id.nextButton);
                     nextButton.setEnabled(true);
                 }
             });
-        } catch (IOException ex) {
-            String s = ex.toString();
-            ex.printStackTrace();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
         }
+
+
+
+
     }
 
 
@@ -352,31 +397,85 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
         }
 
         else{
-            response_list.clear();
+
+            response_list=new ArrayList<>();
             Item item=items[current_item_index];
-            if(item.getAudio()!=null){
+            if(item.getAudio_path()!=null){
                 playButton.setEnabled(true);
             }
+            if(current_item_index==index_item_to_start){
+
+                back_button.setVisibility(View.INVISIBLE);
+            }
+            else{
+
+                back_button.setVisibility(View.VISIBLE);
+            }
+
             TextView audioDescription=inflatedView.findViewById(R.id.audioDescriptionTextView);
             audioDescription.setText(item.getDescription());
 
+            correct_seq_text_view.setText(item.getCorrect_sequence());
             LinearLayout.LayoutParams seq_element_layout_params= new LinearLayout.LayoutParams(SEQ_ITEM_TEXT_VIEW_WIDTH_IN_DP,LinearLayout.LayoutParams.MATCH_PARENT);
             seq_element_layout_params.setMargins(0,0,0,0);
 
-            String[] audio_desc=item.getDescription().split("\\.\\.");
+            String[] audio_desc_splitted=item.getDescription().split("\\.\\.");
             LinearLayout.LayoutParams responseButtonLayoutParams=new LinearLayout.LayoutParams(AnswersVerticalLinearLayout.getLayoutParams().width/3, LinearLayout.LayoutParams.MATCH_PARENT);
 
             LinearLayout.LayoutParams answers_ll_params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,ANSWER_HORIZONTAL_LL_HEIGHT_IN_DP);
 
-            for (int i=0;i<audio_desc.length;i++){
-                String audio_desc_item=audio_desc[i];
-                Button b=new Button(getContext());
+            //compute the correct sequence
+
+            //check if exist State;
+            ItemState itemState=getStateForItem(current_item_index);
+            if(itemState!=null){
+
+                errors=itemState.getErrors_at_init();
+                evaluated_with_zero=itemState.evaluated_with_zero;
+                if(evaluated_with_zero){
+                    Button zero_button=inflatedView.findViewById(R.id.evaluateWithZeroButton);
+                    zero_button.setText("Revertir");
+
+                }
+
+
+
+
+                response_list=itemState.getResponse_list();
+                ordered_pressed_alternatives_indexes_in_correct_sequence=itemState.getOrdered_pressed_alternatives();
+            }
+            for(int i=0;i<audio_desc_splitted.length;i++){
+                String audio_desc_item=audio_desc_splitted[i];
+
                 original_sequence_list.add(audio_desc_item);
                 if(Utilities.isParseableToInt(audio_desc_item)){
                     correct_numbers.add(audio_desc_item);
                 }else{
                     correct_words.add(audio_desc_item);
                 }
+
+
+            }
+
+
+            for (String word:correct_words){
+
+                correct_sequence_list.add(word);
+
+            }
+
+
+            for (String number:correct_numbers){
+
+                correct_sequence_list.add(number);
+
+            }
+            correct_seq_str=TextUtils.join("..",correct_numbers)+".."+TextUtils.join("..",correct_words);
+
+
+            for (int i=0;i<correct_sequence_list.size();i++){
+                String audio_desc_item=correct_sequence_list.get(i);
+                Button b=new Button(getContext());
 
                 //create the textview to display the word or number
 
@@ -396,60 +495,43 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
 
                 responseButtonLayoutParams.setMargins(0,0,0,0);
                 b.setLayoutParams(responseButtonLayoutParams);
-                evaluated_with_zero=false;
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Button clicked_button=(Button)view;
+                        int button_index=index_elem_by_button.get(clicked_button);
                         if (pressed_by_button.containsKey(clicked_button)){
                             //do stuff
                             pressed_by_button.remove(clicked_button);
-                            response_list.remove(original_sequence_list.get(index_elem_by_button.get(clicked_button)));
+                            response_list.remove(correct_sequence_list.get(button_index));
+                            ordered_pressed_alternatives_indexes_in_correct_sequence.remove((Object)button_index);
                             clicked_button.setBackgroundResource(android.R.drawable.btn_default);
+
 
                         }
                         else{
 
                             pressed_by_button.put(clicked_button,true);
-                            response_list.add(original_sequence_list.get(index_elem_by_button.get(clicked_button)));
+                            response_list.add(correct_sequence_list.get(button_index));
+                            ordered_pressed_alternatives_indexes_in_correct_sequence.add(button_index);
                             clicked_button.setBackgroundResource(R.drawable.success_button_bg);
                         }
 
                     }
                 });
+
                 index_elem_by_button.put(b,i);
-                success_buttons_hash.put(b.getId(),true);
                 b.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_ticket,0,0);
+                if(ordered_pressed_alternatives_indexes_in_correct_sequence.contains(i)){
+                    b.setBackgroundResource(R.drawable.success_button_bg);
+                    pressed_by_button.put(b,true);
+
+                }
                 horizontal_linear_layout.addView(b);
-
-
-
                 //create the error button
-                Button error_button=new Button(getContext());
-
                 responseButtonLayoutParams.setMargins(20,0,0,0);
-                error_button.setLayoutParams(responseButtonLayoutParams);
-                error_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Button pressed_button=(Button)view;
-                        if (pressed_by_button.containsKey(pressed_button)){
-                            pressed_by_button.remove(pressed_button);
-                            extra_elements_count--;
-                            pressed_button.setBackgroundResource(android.R.drawable.btn_default);
-
-                        }
-                        else{
-                            pressed_by_button.put(pressed_button,true);
-                            extra_elements_count++;
-                            pressed_button.setBackgroundResource(R.drawable.error_button_bg);
-                        }
-                    }
-                });
-                error_button.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_close,0,0);
-               // horizontal_linear_layout.addView(error_button);
-
                 AnswersVerticalLinearLayout.addView(horizontal_linear_layout);
+
             }
 
 
@@ -465,25 +547,83 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
             TextView instructionTextView=inflatedView.findViewById(R.id.fonotestInstructionTextView);
             instructionTextView.setText(item.getInstruction());
 
-            correct_seq_str=TextUtils.join("..",correct_numbers)+".."+TextUtils.join("..",correct_words);
-
-            for (String number:correct_numbers){
-
-                correct_sequence_list.add(number);
-
-            }
-
-            for (String word:correct_words){
-
-                correct_sequence_list.add(word);
-
-            }
 
         }
         return;
 
     }
 
+    void reeplaceState(int index,ItemState new_item_state){
+
+        itemStates.set(index,new ItemState());
+    }
+    ItemState getStateForItem(int index){
+       if(itemStates.size()-1<index){
+           return null;
+       }
+       return itemStates.get(index);
+    }
+
+    class ItemState{
+        public boolean isEvaluated_with_zero() {
+            return evaluated_with_zero;
+        }
+
+
+        public int getErrors_at_init() {
+            return errors_at_init;
+        }
+
+        public void setErrors_at_init(int errors_at_init) {
+            this.errors_at_init = errors_at_init;
+        }
+
+        int errors_at_init;
+
+        public void setEvaluated_with_zero(boolean evaluated_with_zero) {
+            if(evaluated_with_zero){
+                this.evaluated_with_zero = true;
+
+            }
+            else{
+                this.evaluated_with_zero = false;
+
+            }
+            }
+
+        public List<String> getResponse_list() {
+            return response_list;
+        }
+
+        public void setResponse_list(List<String> response_list) {
+            this.response_list = response_list;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
+        }
+
+        boolean evaluated_with_zero;
+        List<String> response_list;
+        int score;
+
+        public List<Integer> getOrdered_pressed_alternatives() {
+            return ordered_pressed_alternatives;
+        }
+
+        public void setOrdered_pressed_alternatives(List<Integer> ordered_pressed_alternatives) {
+            this.ordered_pressed_alternatives = ordered_pressed_alternatives;
+        }
+
+        List<Integer> ordered_pressed_alternatives; //in the correct sequence;
+        public ItemState(){
+            this.evaluated_with_zero=false;
+        }
+    }
 
 
 }

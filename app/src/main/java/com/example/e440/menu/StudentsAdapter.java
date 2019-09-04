@@ -16,14 +16,14 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
     private List<Student> studentList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView student_name_text_view, student_rut_text_view, student_school_name_text_view;
+        public TextView student_name_text_view, student_rut_text_view, student_school_name_text_view,student_course_text_view;
 
         public MyViewHolder(View view) {
             super(view);
             student_name_text_view = (TextView) view.findViewById(R.id.studentNameTextView);
             student_rut_text_view = (TextView) view.findViewById(R.id.studentRutTextView);
-            student_school_name_text_view = (TextView) view.findViewById(R.id.studentServerIdTextView);
-
+            student_school_name_text_view = (TextView) view.findViewById(R.id.studentSchoolNameTextView);
+            student_course_text_view=view.findViewById(R.id.studentCourseTextView);
         }
     }
 
@@ -45,7 +45,8 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
         Student student = studentList.get(position);
         holder.student_name_text_view.setText(student.getFullName());
         holder.student_rut_text_view.setText("RUT: "+student.getRut());
-      //  holder.student_school_name_text_view.setText(student.getSchool_id());
+      //  holder.student_school_name_text_view.setText(student.getSchool_name());
+        holder.student_course_text_view.setText(student.getCourseFullName());
     }
 
     @Override
