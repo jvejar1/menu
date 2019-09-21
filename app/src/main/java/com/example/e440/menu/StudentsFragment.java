@@ -115,6 +115,12 @@ public class StudentsFragment extends Fragment {
                 }else{
                     //studentsLoader.execute(school_name);
                     courseNamesList.clear();
+                    courseNamesList = new ArrayList<>();
+                    courseNamesAdapter = new ArrayAdapter<String>(getContext(),
+                            android.R.layout.simple_spinner_item, courseNamesList);
+                    courseNamesSpinner.setAdapter(courseNamesAdapter);
+                    courseNamesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
                     List<int[]> coursesLevelAndLetter = courseLevelAndLetterBySchoolName.get(school_name);
                     for (int[] courseLevelAndLetter : coursesLevelAndLetter ){
                         String courseLevelStr = Student.course_level_by_number.get(courseLevelAndLetter[0]);
@@ -124,8 +130,9 @@ public class StudentsFragment extends Fragment {
                         courseNamesList.add(courseFullName);
 
                     }
+
                     courseNamesAdapter.notifyDataSetChanged();
-                    courseNamesSpinner.setSelection(0, true);
+                    //courseNamesSpinner.setSelection(0, true);
 
                 }
 
@@ -202,14 +209,21 @@ public class StudentsFragment extends Fragment {
 
 
             List<CourseTuple> courseTuples = databaseManager.testDatabase.daoAccess().getCourseTouples();
-            schools_names_list.add(SCHOOL_SELECTION_TEXT);
+            //schools_names_list.add(SCHOOL_SELECTION_TEXT);
             for (CourseTuple courseTuple: courseTuples){
                 courseLevelAndLetterBySchoolName.put(courseTuple.schoolName, new ArrayList<int[]>() );
-                schools_names_list.add(courseTuple.schoolName);
+            }
+
+            for (CourseTuple courseTuple: courseTuples){
+
+                if (!schools_names_list.contains(courseTuple.schoolName)){
+                    schools_names_list.add(courseTuple.schoolName);
+                }
             }
             for (CourseTuple courseTuple: courseTuples){
                 courseLevelAndLetterBySchoolName.get(courseTuple.schoolName).add(new int[]{courseTuple.courseLevel,courseTuple.courseLetter});
             }
+
 
             return null;
         }

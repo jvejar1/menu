@@ -20,9 +20,9 @@
         android:id="@+id/schoolsNamesSpinner"
         android:layout_width="276dp"
         android:layout_height="37dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="44dp"
+        android:layout_marginStart="52dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/studentsRecycleView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -52,13 +52,11 @@
 
     <Spinner
         android:id="@+id/coursesSpinner"
-        android:layout_width="261dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="72dp"
-        app:layout_constraintBottom_toBottomOf="@+id/schoolsNamesSpinner"
+        android:layout_width="150dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="44dp"
         app:layout_constraintStart_toEndOf="@+id/schoolsNamesSpinner"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/schoolsNamesSpinner" />
 
 
 </android.support.constraint.ConstraintLayout>
