@@ -13,7 +13,7 @@ import com.example.e440.menu.fonotest.Item;
 
 @Database(entities = {Acase.class,Ace.class,Afeeling.class,Student.class,Wally.class,WSituation.class,
                         WReaction.class,WFeeling.class,Csequence.class,HnfTest.class,HnfFigure.class,
-        FonoTest.class,Item.class,Corsi.class,ResponseRequest.class,HnfSet.class,Course.class}, version = 1, exportSchema = false)
+        FonoTest.class,Item.class,Corsi.class,ResponseRequest.class,HnfSet.class,Course.class}, version = 2, exportSchema = false)
 public abstract class TestDatabase extends RoomDatabase {
     public abstract DaoAccess daoAccess() ;
 }

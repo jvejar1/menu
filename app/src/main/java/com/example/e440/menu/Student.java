@@ -73,7 +73,11 @@ public class Student {
     String last_name;
     String rut;
     Long server_id;
-
+    int aces_count;
+    int wally_count;
+    int corsis_count;
+    int hnf_count;
+    int fonotest_count;
 
     int course_level;
     int course_letter;

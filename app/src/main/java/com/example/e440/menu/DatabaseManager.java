@@ -29,18 +29,24 @@ public class DatabaseManager {
 
             databaseManager =new DatabaseManager();
             databaseManager.testDatabase=Room.databaseBuilder(context,
-                    TestDatabase.class,DATABASE_NAME).fallbackToDestructiveMigration()
+                    TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS)
                     .build();
         }
         return databaseManager;
 
     }
-    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+    static final Migration ADD_TEST_COUNTS_TO_STUDENTS = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE Csequence "
-                    + " ADD COLUMN csequence_string STRING default ''");
-        }
+            database.execSQL("ALTER TABLE Student ADD COLUMN aces_count integer default 0 NOT NULL");
+
+            database.execSQL("ALTER TABLE Student ADD COLUMN wally_count integer default 0 NOT NULL");
+
+            database.execSQL("ALTER TABLE Student ADD COLUMN corsis_count integer default 0 NOT NULL");
+
+            database.execSQL("ALTER TABLE Student ADD COLUMN hnf_count integer default 0 NOT NULL");
+
+            database.execSQL("ALTER TABLE Student ADD COLUMN fonotest_count integer default 0 NOT NULL");        }
     };
 
     public void insertRequest(JSONObject payload,int student_server_id,String test_name,int evaluator_server_id){
