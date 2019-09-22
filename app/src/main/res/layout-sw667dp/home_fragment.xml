@@ -7,6 +7,110 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/wallyCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:text="0"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView20" />
+
+    <TextView
+        android:id="@+id/corsisCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:text="0"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView22" />
+
+    <TextView
+        android:id="@+id/fonotestCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:text="0"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView24" />
+
+    <TextView
+        android:id="@+id/hnfCountTextView"
+        android:layout_width="7dp"
+        android:layout_height="17dp"
+        android:text="0"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView23" />
+
+    <TextView
+        android:id="@+id/textView17"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Aces:"
+        android:textAlignment="textEnd"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintHorizontal_bias="0.909"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="44dp"
+        android:text="Wally:"
+        android:textAlignment="textEnd"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintHorizontal_bias="0.917"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginEnd="8dp"
+        android:text="Corsis:"
+        android:textAlignment="textEnd"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textView23"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="8dp"
+        android:text="HnF:"
+        android:textAlignment="textEnd"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/textView24"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginTop="136dp"
+        android:layout_marginEnd="8dp"
+        android:text="Test Fonológico:"
+        android:textAlignment="textEnd"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <TextView
         android:id="@+id/textView16"
         android:layout_width="wrap_content"
         android:layout_height="53dp"
@@ -44,9 +148,9 @@
         android:id="@+id/sendResultsButton"
         android:layout_width="135dp"
         android:layout_height="38dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
         android:text="Enviar Resultados"
         app:layout_constraintEnd_toEndOf="@+id/textView16"
         app:layout_constraintHorizontal_bias="0.0"
@@ -57,33 +161,12 @@
         android:id="@+id/textView18"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="168dp"
         android:text="Enviadas:"
         android:textAlignment="textEnd"
         android:textColor="@color/defaultBlack"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/evalsCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:layout_marginStart="8dp"
-        android:text="14"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/savedEvalsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="1"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView18" />
 
     <TextView
         android:id="@+id/textView21"
@@ -105,5 +188,36 @@
         android:textColor="@color/defaultBlack"
         app:layout_constraintStart_toStartOf="@+id/savedEvalsTextView"
         app:layout_constraintTop_toTopOf="@+id/textView21" />
+
+    <TextView
+        android:id="@+id/savedEvalsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView18" />
+
+    <TextView
+        android:id="@+id/evalsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:layout_marginStart="8dp"
+        android:text="14"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toTopOf="@+id/textView3" />
+
+    <TextView
+        android:id="@+id/acesCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:text="0"
+        android:textAlignment="textStart"
+        android:textColor="@color/defaultBlack"
+        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
+        app:layout_constraintTop_toTopOf="@+id/textView17" />
 
 </android.support.constraint.ConstraintLayout>

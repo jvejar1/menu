@@ -74,6 +74,15 @@ public class Student {
     String rut;
     Long server_id;
     int aces_count;
+
+    public int getWally_count() {
+        return wally_count;
+    }
+
+    public void setWally_count(int wally_count) {
+        this.wally_count = wally_count;
+    }
+
     int wally_count;
     int corsis_count;
     int hnf_count;

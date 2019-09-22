@@ -17,6 +17,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView student_name_text_view, student_rut_text_view, student_school_name_text_view,student_course_text_view;
+        public TextView wallyCountTextView;
 
         public MyViewHolder(View view) {
             super(view);
@@ -24,6 +25,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
             student_rut_text_view = (TextView) view.findViewById(R.id.studentRutTextView);
             student_school_name_text_view = (TextView) view.findViewById(R.id.studentSchoolNameTextView);
             student_course_text_view=view.findViewById(R.id.studentCourseTextView);
+            wallyCountTextView = view.findViewById(R.id.studentWallyCountTextView);
         }
     }
 
@@ -47,6 +49,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
         holder.student_rut_text_view.setText("RUT: "+student.getRut());
       //  holder.student_school_name_text_view.setText(student.getSchool_name());
         holder.student_course_text_view.setText(student.getCourseFullName());
+        holder.wallyCountTextView.setText(Integer.toString(student.getWally_count()));
     }
 
     @Override

@@ -81,4 +81,14 @@
         app:layout_constraintTop_toTopOf="@+id/studentRutTextView" />
 
 
+    <TextView
+        android:id="@+id/studentWallyCountTextView"
+        android:layout_width="33dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="12dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/studentNameTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

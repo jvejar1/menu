@@ -48,6 +48,10 @@ public interface DaoAccess {
     ResponseRequest[] fetchNotSavedResponseRequest();
 
 
+    @Query("SELECT count() FROM ResponseRequest where test_name=:testName")
+    int fetchTestEvaluationsCount(String testName);
+
+
     @Query("SELECT count(*) FROM ResponseRequest")
     int fetchEvaluationsCount();
 

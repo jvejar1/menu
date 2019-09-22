@@ -38,17 +38,35 @@ public class HomeFragment extends Fragment implements View.OnClickListener,Resul
     }
 
 
-    void updateNumbers(int total,int saved, int to_send){
+    void updateNumbers(int total,int saved, int to_send, int acesCount, int wallyCount, int corsisCount, int hnfCount, int fonotestCount){
 
         if(to_send>0){
             send_results_button.setEnabled(true);
         }
+
         TextView total_text_view=inflatedView.findViewById(R.id.evalsCountTextView);
         TextView saved_text_view=inflatedView.findViewById(R.id.savedEvalsTextView);
         TextView to_send_text_view=inflatedView.findViewById(R.id.evalsToSendTextView);
         total_text_view.setText(Integer.toString(total));
         saved_text_view.setText(Integer.toString(saved));
         to_send_text_view.setText(Integer.toString(to_send));
+
+        TextView acesCountTextView = inflatedView.findViewById(R.id.acesCountTextView);
+        acesCountTextView.setText(Integer.toString(acesCount));
+
+        TextView wallyCountTextView = inflatedView.findViewById(R.id.wallyCountTextView);
+        wallyCountTextView.setText(Integer.toString(wallyCount));
+
+        TextView corsisCountTextView = inflatedView.findViewById(R.id.corsisCountTextView);
+        corsisCountTextView.setText(Integer.toString(corsisCount));
+
+        TextView hnfCountTextView = inflatedView.findViewById(R.id.hnfCountTextView);
+        hnfCountTextView.setText(Integer.toString(hnfCount));
+
+        TextView fonotestCountTextView = inflatedView.findViewById(R.id.fonotestCountTextView);
+        fonotestCountTextView.setText(Integer.toString(fonotestCount));
+
+
 
     }
     @Override
@@ -76,7 +94,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener,Resul
 
             int total_evaluations=databaseManager.testDatabase.daoAccess().fetchEvaluationsCount();
             int saved_evaluations=databaseManager.testDatabase.daoAccess().fetchReceivedEvaluationsCount();
-            int[] result=new int[]{total_evaluations,saved_evaluations};
+            int wally_evaluations=databaseManager.testDatabase.daoAccess().fetchTestEvaluationsCount("wally");
+            int aces_evaluations=databaseManager.testDatabase.daoAccess().fetchTestEvaluationsCount("ace");
+            int corsis_evaluations=databaseManager.testDatabase.daoAccess().fetchTestEvaluationsCount("corsi");
+            int hnf_evaluations=databaseManager.testDatabase.daoAccess().fetchTestEvaluationsCount("hnf");
+            int fonotest_evaluations=databaseManager.testDatabase.daoAccess().fetchTestEvaluationsCount("fonotest");
+
+
+            int[] result=new int[]{
+                    total_evaluations,
+                    saved_evaluations,
+                    aces_evaluations,wally_evaluations,corsis_evaluations,hnf_evaluations,fonotest_evaluations};
             return result;
         }
 
@@ -86,8 +114,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener,Resul
             int[] result=(int[])o;
             int evals_count=result[0];
             int saved_evals_count= result[1];
+            int acesEvaluationsCount = result[2];
+            int wallyEvaluationsCount = result[3];
+            int corsisEvaluationsCount = result[4];
+            int hnfEvaluationsCount = result[5];
+            int fonotestEvaluationsCount = result[6];
             int evals_to_send_count=evals_count-saved_evals_count;
-            updateNumbers(evals_count,saved_evals_count,evals_to_send_count);
+            updateNumbers(evals_count,saved_evals_count,evals_to_send_count, acesEvaluationsCount, wallyEvaluationsCount, corsisEvaluationsCount, hnfEvaluationsCount, fonotestEvaluationsCount);
 
         }
     }
