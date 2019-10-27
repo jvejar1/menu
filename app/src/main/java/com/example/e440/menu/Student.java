@@ -73,6 +73,39 @@ public class Student {
     String last_name;
     String rut;
     Long server_id;
+
+    public int getAces_count() {
+        return aces_count;
+    }
+
+    public void setAces_count(int aces_count) {
+        this.aces_count = aces_count;
+    }
+
+    public int getCorsis_count() {
+        return corsis_count;
+    }
+
+    public void setCorsis_count(int corsis_count) {
+        this.corsis_count = corsis_count;
+    }
+
+    public int getHnf_count() {
+        return hnf_count;
+    }
+
+    public void setHnf_count(int hnf_count) {
+        this.hnf_count = hnf_count;
+    }
+
+    public int getFonotest_count() {
+        return fonotest_count;
+    }
+
+    public void setFonotest_count(int fonotest_count) {
+        this.fonotest_count = fonotest_count;
+    }
+
     int aces_count;
 
     public int getWally_count() {

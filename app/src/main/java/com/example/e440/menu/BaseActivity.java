@@ -128,7 +128,7 @@ public class BaseActivity extends AppCompatActivity implements MainFragmentListe
                 payload.put("test_name", test_name);
                 payload.put("evaluator_id", evaluator_server_id);
                 payload.put("timestamp", new Timestamp(System.currentTimeMillis()));
-                ResponseRequest responseRequest = new ResponseRequest(payload.toString(), test_name,false);
+                ResponseRequest responseRequest = new ResponseRequest(payload.toString(), test_name,false, student_server_id);
                 AsyncTask asyncTask = new AsyncTask() {
                     @Override
                     protected Object doInBackground(Object[] objects) {

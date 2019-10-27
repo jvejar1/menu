@@ -1,8 +1,11 @@
 package com.example.e440.menu;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -175,9 +178,40 @@ public class StudentsFragment extends Fragment {
         students_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getContext(), students_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Student student = studentList.get(position);
+                final Student student = studentList.get(position);
+
                 Toast.makeText(getContext(), student.getLast_name() + " is selected!", Toast.LENGTH_SHORT).show();
-                mCallback.onStudentSelected(student.getServer_id());
+                //mCallback.onStudentSelected(student.getServer_id());
+
+                CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","FonoTest"};
+                final Context context = getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Seleccione un test");
+                builder.setItems(colors, new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // the user clicked on colors[which]
+                        Bundle b=new Bundle();
+                        b.putLong(Student.EXTRA_STUDENT_SERVER_ID,student.getServer_id());
+                        Intent intent;
+                        if (which==0){
+                            intent = new Intent(context, AceActivity.class);
+                        }else if(which==1){
+                            intent = new Intent(context, WallyActivity.class);
+
+                        }else if(which==2){
+                            intent = new Intent(context, CorsiActivity.class);
+                        }else if(which==3){
+                            intent = new Intent(context, HnfActivity.class);
+                        }
+                        else{
+                            intent = new Intent(context, FonoTestActivity.class);
+                        }
+                        intent.putExtras(b);
+                        startActivityForResult(intent,1);
+                    }
+                });
+                builder.show();
             }
 
             @Override
@@ -196,6 +230,19 @@ public class StudentsFragment extends Fragment {
         SchoolsNamesLoader schoolsNamesLoader=new SchoolsNamesLoader();
         schoolsNamesLoader.execute();
         return inflatedView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            int selectedCoursePosition = courseNamesSpinner.getSelectedItemPosition();
+            String schoolName = (String)schools_names_spinner.getSelectedItem();
+            int[] courseLevelAndLetter = courseLevelAndLetterBySchoolName.get(schoolName).get(selectedCoursePosition);
+            studentsLoader=new StudentsLoader();
+            studentsLoader.execute(schoolName, courseLevelAndLetter[0], courseLevelAndLetter[1]);
+
+        }
     }
 
     public void onCourseSelected(AdapterView<?> adapterView, View view, int i, long l){
@@ -261,6 +308,21 @@ public class StudentsFragment extends Fragment {
             };
             studentList.add(fake_student);
             for(Student s :students){
+
+
+                //getLocalEvaluationsCounts
+                int acesCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "ace");
+                int wallyCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "wally");
+                int corsiCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "corsi");
+                int hnfCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "hnf");
+                int fonotestCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(),"fonotest");
+
+
+                s.aces_count=acesCount;
+                s.wally_count = wallyCount;
+                s.corsis_count = corsiCount;
+                s.hnf_count = hnfCount;
+                s.fonotest_count = fonotestCount;
 
                 studentList.add(s);
             }

@@ -4,17 +4,7 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.provider.ContactsContract;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.HttpURLConnection;
-import java.sql.Timestamp;
 
 /**
  * Created by e440 on 09-04-18.
@@ -29,7 +19,7 @@ public class DatabaseManager {
 
             databaseManager =new DatabaseManager();
             databaseManager.testDatabase=Room.databaseBuilder(context,
-                    TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS)
+                    TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS, ADD_STUDENT_SERVER_ID_TO_EVALUATIONS)
                     .build();
         }
         return databaseManager;
@@ -49,41 +39,14 @@ public class DatabaseManager {
             database.execSQL("ALTER TABLE Student ADD COLUMN fonotest_count integer default 0 NOT NULL");        }
     };
 
-    public void insertRequest(JSONObject payload,int student_server_id,String test_name,int evaluator_server_id){
+    static final Migration ADD_STUDENT_SERVER_ID_TO_EVALUATIONS = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
 
-        if(student_server_id!=0) {
-            try {
-                payload.put("student_id", student_server_id);
-                payload.put("test_name", test_name);
-                payload.put("evaluator_id", evaluator_server_id);
-                payload.put("timestamp", new Timestamp(System.currentTimeMillis()));
-                ResponseRequest responseRequest = new ResponseRequest(payload.toString(), test_name,false);
-                AsyncTask asyncTask = new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
-                        ResponseRequest r = (ResponseRequest) objects[0];
-                        databaseManager.testDatabase.daoAccess().insertResponseRequest(r);
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        super.onPostExecute(o);
-
-
-                    }
-                }.execute(responseRequest);
+            database.execSQL("ALTER TABLE ResponseRequest ADD COLUMN student_server_id integer default 0 ");
 
             }
-            catch (JSONException e){
-                e.printStackTrace();
-            }
-
-
-        }
-
-
-    }
+    };
 
 
 
@@ -120,49 +83,5 @@ public class DatabaseManager {
         this.testDatabase.daoAccess().deleteAllHnfSet();
     }
 
-    void sendAllResults(final NetworkManager networkManagerInstance){
-
-        AsyncTask asyncTask=new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                ResponseRequest[] responseRequests=DatabaseManager.this.testDatabase.daoAccess().fetchAllResponseRequest();
-                for (final ResponseRequest responseRequest:responseRequests){
-                    try {
-                        JSONObject payload = new JSONObject(responseRequest.getPayload());
-                        networkManagerInstance.sendEvaluation(payload, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                JSONObject headers= response.optJSONObject("headers");
-                                int status=headers.optInt("status");
-                                int id_to_erase=response.optInt("id_to_erase");
-                                if (status==HttpURLConnection.HTTP_OK){
-
-                                    DatabaseManager.this.testDatabase.daoAccess().setEvaluationSavedToTrue(id_to_erase);
-
-                                    int a =1;
-                                }else{
-                                    //TODO: stuffs
-                                    int a =1;
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                int a =1;
-                            }
-                        });
-                    }
-
-                    catch(JSONException e ){
-                        e.printStackTrace();
-
-                    }
-
-
-                }
-                return null;
-            }
-        }.execute();
-    }
 
 }

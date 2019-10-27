@@ -36,16 +36,26 @@ public class ResponseRequest {
         this.test_name = test_name;
     }
 
-    public ResponseRequest(String payload, String test_name, boolean saved) {
+    public ResponseRequest(String payload, String test_name, boolean saved, Long student_server_id) {
         this.payload = payload;
         this.test_name = test_name;
         this.saved =saved;
+        this.student_server_id = student_server_id;
     }
 
 
     String payload;
     String test_name;
 
+    public Long getStudent_server_id() {
+        return student_server_id;
+    }
+
+    public void setStudent_server_id(Long student_server_id) {
+        this.student_server_id = student_server_id;
+    }
+
+    Long student_server_id;
     public boolean isSaved() {
         return saved;
     }

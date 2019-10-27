@@ -69,6 +69,10 @@ public interface DaoAccess {
     @Query("DELETE FROM ResponseRequest where id=:id_to_delete")
     int deleteRequestById(int id_to_delete);
     //Students
+
+    @Query("Select count() from ResponseRequest where student_server_id=:studentServerId and test_name=:testName")
+    int getTestEvaluationsCountByStudentServerId(Long studentServerId, String testName);
+
     @Insert
     long insertOneStudent(Student student);
 
