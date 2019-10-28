@@ -7,110 +7,6 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/wallyCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:text="0"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView20" />
-
-    <TextView
-        android:id="@+id/corsisCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:text="0"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView22" />
-
-    <TextView
-        android:id="@+id/fonotestCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:text="0"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView24" />
-
-    <TextView
-        android:id="@+id/hnfCountTextView"
-        android:layout_width="7dp"
-        android:layout_height="17dp"
-        android:text="0"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView23" />
-
-    <TextView
-        android:id="@+id/textView17"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:text="Aces:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintHorizontal_bias="0.909"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/textView20"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="44dp"
-        android:text="Wally:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintHorizontal_bias="0.917"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/textView22"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="8dp"
-        android:text="Corsis:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/textView23"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginTop="104dp"
-        android:layout_marginEnd="8dp"
-        android:text="HnF:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/textView24"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginTop="136dp"
-        android:layout_marginEnd="8dp"
-        android:text="Test Fonológico:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
         android:id="@+id/textView16"
         android:layout_width="wrap_content"
         android:layout_height="53dp"
@@ -129,154 +25,335 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.044" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="Total realizadas:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.031"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView16" />
-
     <Button
         android:id="@+id/sendResultsButton"
         android:layout_width="135dp"
         android:layout_height="38dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="48dp"
         android:text="Enviar Resultados"
-        app:layout_constraintEnd_toEndOf="@+id/textView16"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textView16"
-        app:layout_constraintTop_toBottomOf="@+id/textView21" />
-
-    <TextView
-        android:id="@+id/textView18"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="168dp"
-        android:text="Enviadas:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/textView21"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Por enviar:"
-        android:textAlignment="textEnd"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintEnd_toEndOf="@+id/textView18"
-        app:layout_constraintTop_toBottomOf="@+id/textView18" />
-
-    <TextView
-        android:id="@+id/evalsToSendTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="13"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/savedEvalsTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-    <TextView
-        android:id="@+id/savedEvalsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="1"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView18" />
-
-    <TextView
-        android:id="@+id/evalsCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:layout_marginStart="8dp"
-        android:text="14"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/acesCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:text="0"
-        android:textAlignment="textStart"
-        android:textColor="@color/defaultBlack"
-        app:layout_constraintStart_toStartOf="@+id/evalsCountTextView"
-        app:layout_constraintTop_toTopOf="@+id/textView17" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.845"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TableLayout
         android:layout_width="514dp"
-        android:layout_height="628dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="124dp"
-        android:layout_marginTop="460dp"
-        android:showDividers="middle"
+        android:layout_marginTop="70dp"
+        android:background="@color/black_overlay"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout">
 
         <TableRow
-            android:background="@drawable/semirounded_blue_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/semirounded_blue_background"
             android:showDividers="middle">
-            <TextView
-                android:text="Test"
-                android:layout_height="30dp"
-                android:layout_width="150dp"
-                android:textAlignment="center"
-                android:textStyle="bold"
-                android:textColor="@color/colorWhite"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="35dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Test"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_marginStart="1px"
+                android:layout_marginRight="1px"
+                android:layout_width="match_parent"
+                android:width="213dp"
+                android:height="35dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
                 android:text="Total"
-                android:width="150dp"
-                android:height="30dp"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:textColor="@color/colorWhite" />
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
 
         </TableRow>
+
+        <TableRow
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginLeft="1px"
+
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Aces"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+            <TextView
+
+                android:id="@+id/acesCountTextView"
+                android:layout_marginLeft="1px"
+                android:layout_marginRight="1px"
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="150"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+        </TableRow>
+
+        <TableRow
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginLeft="1px"
+
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Wally"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/wallyCountTextView"
+                android:layout_marginLeft="1px"
+                android:layout_marginRight="1px"
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="150"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+        </TableRow>
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <TextView
-
-                android:text="Aces"
-                android:textAlignment="center"
-                android:textColor="@color/defaultBlack"/>
 
             <TextView
+                android:layout_marginLeft="1px"
 
-                android:layout_width="wrap_content"
-                android:text="1"
-                android:textAlignment="textStart"
-                android:textColor="@color/defaultBlack" />
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Corsis"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/corsisCountTextView"
+                android:layout_marginLeft="1px"
+                android:layout_marginRight="1px"
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="150"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
 
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginLeft="1px"
+                android:layout_marginBottom="1px"
+
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Corazones y Flores"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/hnfCountTextView"
+                android:layout_marginLeft="1px"
+                android:layout_marginRight="1px"
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="150"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+
+        </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginLeft="1px"
+
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Fonológico"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/fonotestCountTextView"
+                android:layout_marginLeft="1px"
+                android:layout_marginRight="1px"
+                android:layout_marginBottom="1px"
+                android:height="35dp"
+                android:background="@color/colorWhite"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="150"
+                android:textColor="@color/defaultBlack"
+                android:textSize="15dp" />
+
+
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="514dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="120dp"
+
+        android:layout_marginTop="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:layout_width="300dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Realizadas"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/evalsCountTextView"
+                android:layout_width="wrap_content"
+                android:width="214dp"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:height="35dp"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp">
+
+
+            <TextView
+                android:layout_width="220dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Enviadas"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/savedEvalsTextView"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:layout_marginRight="1px"
+                android:height="35dp"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp">
+
+
+            <TextView
+                android:layout_width="220dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Por Enviar"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/evalsToSendTextView"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="1px"
+                android:layout_marginTop="1px"
+                android:layout_marginRight="1px"
+                android:height="35dp"
+                android:background="@color/futuristic_blue"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/colorWhite"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+        </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
