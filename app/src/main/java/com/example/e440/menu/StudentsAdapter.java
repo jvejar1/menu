@@ -51,7 +51,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
         holder.student_course_text_view.setText(student.getCourseFullName());
         String evaluationsCounts = "";
         evaluationsCounts += "A: "+student.getAces_count()+ "    W: "+student.getWally_count()+"    C: "+student.getCorsis_count()+"    HNF: " + student.getHnf_count() + "    FON: " + student.getFonotest_count();
-        holder.wallyCountTextView.setText(evaluationsCounts);
+        //holder.wallyCountTextView.setText(evaluationsCounts);
     }
 
     @Override

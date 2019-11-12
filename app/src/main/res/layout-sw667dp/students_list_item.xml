@@ -3,10 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="100dp"
 
     android:background="@android:drawable/list_selector_background"
     android:clickable="true">
+
+    <TableRow
+        android:layout_width="56dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="700dp"
+        android:layout_marginTop="28dp"
+        android:backgroundTintMode="src_in"
+        android:backgroundTint="@color/futuristic_blue_dark"
+        android:background="@drawable/test_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:text="F"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            >
+
+        </TextView>
+
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@color/defaultBlack"
+            android:textSize="14dp">
+
+        </TextView>
+
+
+
+    </TableRow>
 
     <ImageView
         android:id="@+id/imageView2"
@@ -30,7 +69,6 @@
         android:layout_marginTop="8dp"
         android:focusable="false"
         android:text="TextView"
-        android:textColor="@color/futuristic_blue"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/studentNameTextView"
@@ -41,8 +79,8 @@
         android:id="@+id/studentNameTextView"
         android:layout_width="339dp"
         android:layout_height="22dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="28dp"
 
         android:ems="10"
         android:focusable="false"
@@ -72,6 +110,7 @@
         app:layout_constraintVertical_bias="0.058" />
 
     <TextView
+        android:visibility="invisible"
         android:id="@+id/studentCourseTextView"
         android:layout_width="105dp"
         android:layout_height="21dp"
@@ -92,15 +131,162 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/studentWallyCountTextView"
-        android:layout_width="294dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="12dp"
-        android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/studentNameTextView"
-        app:layout_constraintTop_toTopOf="parent" />
+
+    <TableRow
+        android:layout_width="56dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="424dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/test_label"
+        android:backgroundTint="@color/futuristic_blue_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/colorWhite"
+            android:textSize="14dp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/acesCountTextView"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@color/defaultBlack"
+            android:textSize="14dp">
+
+        </TextView>
+
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/view7"
+        android:layout_width="56dp"
+
+        android:layout_height="23dp"
+        android:layout_marginStart="496dp"
+        android:layout_marginTop="28dp"
+
+
+            android:backgroundTint="@color/futuristic_blue_dark"
+            android:background="@drawable/test_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:text="W"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:textColor="@color/colorWhite"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                >
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/wallyCountTextView"
+                android:layout_width="32dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:text="7"
+                android:textColor="@color/defaultBlack"
+                android:textSize="14dp">
+
+            </TextView>
+
+        </TableRow>
+
+    <TableRow
+        android:id="@+id/view8"
+        android:layout_width="56dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="564dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/test_label"
+        android:backgroundTint="@color/futuristic_blue_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:text="C"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            >
+
+        </TextView>
+
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@color/defaultBlack"
+            android:textSize="14dp">
+
+        </TextView>
+
+
+    </TableRow>
+
+    <TableRow
+
+        android:id="@+id/view9"
+        android:layout_width="56dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="632dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/test_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="@color/futuristic_blue_dark"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:text="CF"
+            android:textColor="@color/colorWhite"
+            android:textSize="14dp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@color/defaultBlack"
+            android:textSize="14dp">
+
+        </TextView>
+
+
+    </TableRow>
 
 
 </android.support.constraint.ConstraintLayout>
