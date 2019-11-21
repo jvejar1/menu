@@ -17,15 +17,23 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView student_name_text_view, student_rut_text_view, student_school_name_text_view,student_course_text_view;
+        public TextView acesCountTextView;
         public TextView wallyCountTextView;
-
+        public TextView corsiCountTextView;
+        public TextView hnfCountTextView;
+        public TextView fonotestCountTextView;
         public MyViewHolder(View view) {
             super(view);
             student_name_text_view = (TextView) view.findViewById(R.id.studentNameTextView);
             student_rut_text_view = (TextView) view.findViewById(R.id.studentRutTextView);
             student_school_name_text_view = (TextView) view.findViewById(R.id.studentSchoolNameTextView);
             student_course_text_view=view.findViewById(R.id.studentCourseTextView);
-            wallyCountTextView = view.findViewById(R.id.studentWallyCountTextView);
+            wallyCountTextView = view.findViewById(R.id.wallyCountTextView);
+            acesCountTextView = view.findViewById(R.id.acesCountTextView);
+            corsiCountTextView = view.findViewById(R.id.corsisCountTextView);
+            hnfCountTextView = view.findViewById(R.id.hnfCountTextView);
+            fonotestCountTextView = view.findViewById(R.id.fonotestCountTextView);
+
         }
     }
 
@@ -49,6 +57,11 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
         holder.student_rut_text_view.setText("RUT: "+student.getRut());
       //  holder.student_school_name_text_view.setText(student.getSchool_name());
         holder.student_course_text_view.setText(student.getCourseFullName());
+        holder.acesCountTextView.setText(""+student.getAces_count());
+        holder.wallyCountTextView.setText(""+student.getWally_count());
+        holder.corsiCountTextView.setText(""+student.getCorsis_count());
+        holder.hnfCountTextView.setText(""+student.getHnf_count());
+        holder.fonotestCountTextView.setText(""+student.getHnf_count());
         String evaluationsCounts = "";
         evaluationsCounts += "A: "+student.getAces_count()+ "    W: "+student.getWally_count()+"    C: "+student.getCorsis_count()+"    HNF: " + student.getHnf_count() + "    FON: " + student.getFonotest_count();
         //holder.wallyCountTextView.setText(evaluationsCounts);

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="130dp"
 
     android:background="@android:drawable/list_selector_background"
     android:clickable="true">
@@ -33,11 +33,12 @@
         </TextView>
 
         <TextView
+            android:id="@+id/fonotestCountTextView"
             android:layout_width="32dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="6dp"
             android:gravity="center"
-            android:text="7"
+            android:text="0"
             android:textColor="@color/defaultBlack"
             android:textSize="14dp">
 
@@ -51,13 +52,14 @@
         android:id="@+id/imageView2"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/ic_action_name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.253" />
 
     <TextView
         android:id="@+id/studentRutTextView"
@@ -160,7 +162,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="6dp"
             android:gravity="center"
-            android:text="7"
+            android:text="0"
             android:textColor="@color/defaultBlack"
             android:textSize="14dp">
 
@@ -202,7 +204,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="5dp"
                 android:gravity="center"
-                android:text="7"
+                android:text="0"
                 android:textColor="@color/defaultBlack"
                 android:textSize="14dp">
 
@@ -235,11 +237,12 @@
         </TextView>
 
         <TextView
+            android:id="@+id/corsisCountTextView"
             android:layout_width="32dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="6dp"
             android:gravity="center"
-            android:text="7"
+            android:text="0"
             android:textColor="@color/defaultBlack"
             android:textSize="14dp">
 
@@ -275,11 +278,12 @@
         </TextView>
 
         <TextView
+            android:id="@+id/hnfCountTextView"
             android:layout_width="32dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
             android:gravity="center"
-            android:text="7"
+            android:text="0"
             android:textColor="@color/defaultBlack"
             android:textSize="14dp">
 
