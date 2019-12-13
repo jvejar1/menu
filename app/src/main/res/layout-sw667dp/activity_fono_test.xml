@@ -6,10 +6,30 @@
     android:layout_height="match_parent"
     tools:context="com.example.e440.menu.FonoTestActivity">
 
-    <FrameLayout
-        android:id="@+id/fragment_place"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </FrameLayout>
+
+        <TextView
+            android:id="@+id/studentInfoTextView"
+            android:layout_width="793dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="Nombre alumno"
+            android:background="#43000000"
+            android:textColor="@color/defaultBlack"
+            android:textSize="15sp"/>
+
+
+        <FrameLayout
+            android:id="@+id/fragment_place"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+        </FrameLayout>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

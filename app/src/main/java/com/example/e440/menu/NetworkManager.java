@@ -41,7 +41,7 @@ public class NetworkManager implements Executor{
     private static NetworkManager mInstance;
     private RequestQueue mRequestQueue;
     private static Context mCtx;
-    public static final String SERVER_IP = "http://159.65.65.75:80/";
+    public static final String SERVER_IP = "http://192.168.43.159:3000/";
     public static final String BASE_URL = SERVER_IP;
 
     private static String token =  "";

@@ -29,6 +29,7 @@ import java.util.List;
 
 public class BaseActivity extends AppCompatActivity implements MainFragmentListener {
     Long student_server_id;
+    String studentFullName;
 
     @Override
     public void backFromPractice() {
@@ -51,6 +52,7 @@ public class BaseActivity extends AppCompatActivity implements MainFragmentListe
         super.onCreate(savedInstanceState);
         Bundle extras=getIntent().getExtras();
         student_server_id=extras.getLong(Student.EXTRA_STUDENT_SERVER_ID);
+        studentFullName=extras.getString("student_full_name");
     }
 
     @Override

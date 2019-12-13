@@ -3,6 +3,7 @@ package com.example.e440.menu;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -27,6 +28,9 @@ public class FonoTestActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fono_test);
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
         start_main_fragment();
     }
     void start_main_fragment(){

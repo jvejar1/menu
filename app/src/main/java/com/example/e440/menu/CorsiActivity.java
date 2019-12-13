@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,6 +138,11 @@ public class CorsiActivity extends BaseActivity implements InstructionFragment.b
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_corsi);
+
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
+
         fragmentManager = getFragmentManager();
         results=new JSONArray();
         startInstructions(next_instruction);

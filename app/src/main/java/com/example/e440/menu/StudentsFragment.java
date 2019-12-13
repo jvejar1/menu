@@ -186,13 +186,14 @@ public class StudentsFragment extends Fragment {
                 CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","FonoTest"};
                 final Context context = getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Seleccione un test");
+                builder.setTitle(student.getFullName());
                 builder.setItems(colors, new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // the user clicked on colors[which]
                         Bundle b=new Bundle();
                         b.putLong(Student.EXTRA_STUDENT_SERVER_ID,student.getServer_id());
+                        b.putString("student_full_name",student.getFullName());
                         Intent intent;
                         if (which==0){
                             intent = new Intent(context, AceActivity.class);

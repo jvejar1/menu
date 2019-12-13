@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,6 +86,10 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hnf);
+
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
 
         current_mode=0;
         result=new JSONObject();

@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -163,6 +164,11 @@ public class WallyActivity extends BaseActivity implements InstructionFragment.b
         super.onCreate(savedInstanceState);
         databaseManager= DatabaseManager.getInstance(getApplicationContext());
         setContentView(R.layout.activity_wally);
+
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
+
         fragmentManager=getFragmentManager();
         responses=new JSONObject();
         DataLoader dl = new DataLoader();

@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,10 @@ public class AceActivity extends BaseActivity implements InstructionFragment.bac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ace);
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
+
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         InstructionFragment instructionFragment= new InstructionFragment();
         Bundle bundle = new Bundle();
@@ -52,4 +57,5 @@ public class AceActivity extends BaseActivity implements InstructionFragment.bac
         fragmentTransaction.replace(R.id.fragment_place,instructionFragment);
         fragmentTransaction.commit();
     }
+
 }

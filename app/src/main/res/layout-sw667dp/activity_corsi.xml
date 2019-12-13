@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
     tools:context="com.example.e440.menu.CorsiActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -11,14 +10,32 @@
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
-    <FrameLayout
-        android:id="@+id/fragment_place"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        >
+        android:orientation="vertical">
 
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/studentInfoTextView"
+            android:layout_width="793dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="Nombre alumno"
+            android:background="#43000000"
+            android:textColor="@color/defaultBlack"
+            android:textSize="15sp"/>
+
+
+        <FrameLayout
+            android:id="@+id/fragment_place"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+        </FrameLayout>
+    </LinearLayout>
+
 
 </FrameLayout>
