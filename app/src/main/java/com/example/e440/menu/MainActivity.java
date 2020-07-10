@@ -82,7 +82,7 @@ MainActivity extends AppCompatActivity
 
 
     public void onStudentSelected(final Long studentId) {
-        CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","FonoTest"};
+        CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Seleccione un test");
         builder.setItems(colors, new DialogInterface.OnClickListener(){
@@ -178,7 +178,7 @@ MainActivity extends AppCompatActivity
         if(requestCode==LOGIN_REQUEST){
 
             if(resultCode== Activity.RESULT_OK){
-                checkAllTestAreReady();
+                //checkAllTestAreReady();
             }
             else{
 

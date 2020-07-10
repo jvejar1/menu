@@ -15,11 +15,32 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            def DEFAULT_SERVER_URL = '"http://10.0.2.2:3000/"'
+            def SERVER_URL = System.getenv('SELB_SERVER_URL')
+
+            if (!SERVER_URL){
+
+                SERVER_URL = DEFAULT_SERVER_URL
+            }
+            buildConfigField "String", "SERVER_URL", "$SERVER_URL"
+            println "server url: $SERVER_URL"
         }
         debug {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
+            def DEFAULT_SERVER_URL = '"http://10.0.2.2:3000/"'
+            def SERVER_URL = System.getenv('SELB_SERVER_URL')
+
+            if (!SERVER_URL){
+
+                SERVER_URL = DEFAULT_SERVER_URL
+            }
+            buildConfigField "String", "SERVER_URL", "$SERVER_URL"
+            println "server url: $SERVER_URL"
 
         }
     }
