@@ -8,10 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +19,13 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.e440.menu.wally_original.WallyOriginalActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,10 +184,10 @@ public class StudentsFragment extends Fragment {
             public void onClick(View view, int position) {
                 final Student student = studentList.get(position);
 
-                Toast.makeText(getContext(), student.getLast_name() + " is selected!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), student.getLast_name() + " seleccionado!", Toast.LENGTH_SHORT).show();
                 //mCallback.onStudentSelected(student.getServer_id());
 
-                CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","FonoTest"};
+                CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico", "Wally Original"};
                 final Context context = getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(student.getFullName());
@@ -205,8 +209,11 @@ public class StudentsFragment extends Fragment {
                         }else if(which==3){
                             intent = new Intent(context, HnfActivity.class);
                         }
-                        else{
+                        else if (which==4){
                             intent = new Intent(context, FonoTestActivity.class);
+                        }
+                        else{
+                            intent = new Intent(context, WallyOriginalActivity.class);
                         }
                         intent.putExtras(b);
                         startActivityForResult(intent,1);

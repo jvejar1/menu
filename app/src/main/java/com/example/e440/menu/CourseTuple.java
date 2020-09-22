@@ -1,6 +1,7 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.ColumnInfo;
+
+import androidx.room.ColumnInfo;
 
 public class CourseTuple {
     @ColumnInfo(name = "school_name")

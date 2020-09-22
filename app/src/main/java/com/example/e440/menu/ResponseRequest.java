@@ -1,7 +1,7 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 03-06-18.

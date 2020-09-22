@@ -1,14 +1,14 @@
 package com.example.e440.menu;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import java.util.HashMap;
+
 /**
  * Created by e440 on 07-05-18.
  */
-
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-
-import java.util.HashMap;
 
 @Entity
 public class Wally {

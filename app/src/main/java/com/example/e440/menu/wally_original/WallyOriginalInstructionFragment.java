@@ -23,12 +23,7 @@ import com.example.e440.menu.R;
 public class WallyOriginalInstructionFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -44,12 +39,18 @@ public class WallyOriginalInstructionFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment WallyOriginalInstructionFragment.
      */
+
+    private static String ARG_ITEM_STATEMENT = "item_statement";
+    private static String ARG_ITEM_ID= "item_id";
+    private String statement = "Enunciado pregunta";
+    private String answer = null;
+    private String inferred_text = null;
     // TODO: Rename and change types and number of parameters
-    public static WallyOriginalInstructionFragment newInstance(String param1, String param2) {
+    public static WallyOriginalInstructionFragment newInstance(int itemId, String itemStatement) {
         WallyOriginalInstructionFragment fragment = new WallyOriginalInstructionFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_ITEM_ID, itemId);
+        args.putString(ARG_ITEM_STATEMENT, itemStatement);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,8 +59,8 @@ public class WallyOriginalInstructionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            statement = getArguments().getString(ARG_ITEM_ID);
+
         }
     }
 

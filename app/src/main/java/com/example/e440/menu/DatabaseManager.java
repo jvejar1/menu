@@ -1,9 +1,11 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.migration.Migration;
+
 import android.content.Context;
+
+import androidx.room.Room;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 
 /**
@@ -18,7 +20,7 @@ public class DatabaseManager {
         if (databaseManager==null){
 
             databaseManager =new DatabaseManager();
-            databaseManager.testDatabase=Room.databaseBuilder(context,
+            databaseManager.testDatabase= Room.databaseBuilder(context,
                     TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS, ADD_STUDENT_SERVER_ID_TO_EVALUATIONS)
                     .build();
         }

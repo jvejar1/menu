@@ -1,12 +1,11 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
 
-import java.util.HashMap;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static androidx.room.ForeignKey.CASCADE;
 
 /**
  * Created by e440 on 17-05-18.
@@ -21,7 +20,7 @@ public class HnfFigure {
     static int RIGHT=1;
     static int HEART=0;
     static int FLOWER=1;
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     int id;
     int figure;
 

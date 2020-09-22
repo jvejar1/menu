@@ -1,7 +1,7 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 17-05-18.
@@ -18,7 +18,7 @@ public class HnfTest {
     final static int FLOWERS_TEST_TYPE=1;
     final static int HEARTS_AND_FLOWERS_TEST_TYPE=2;
 
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     private int id;
     private int server_id;
 

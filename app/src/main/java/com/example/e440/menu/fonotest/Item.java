@@ -1,21 +1,15 @@
 package com.example.e440.menu.fonotest;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
 
-import com.example.e440.menu.WSituation;
-
-import java.sql.Blob;
-
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 30-05-18.
  */
 @Entity
 public class Item {
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     int id;
 
 
