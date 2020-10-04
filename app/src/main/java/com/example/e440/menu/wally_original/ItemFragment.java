@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -11,11 +12,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,44 +54,67 @@ import java.lang.ref.WeakReference;
  * Use the {@link ItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ItemFragment extends Fragment implements RecognitionListener{
-    @Override
-    public void onPartialResult(String s) {
+public class ItemFragment extends Fragment implements OnKeyPressedListener, Chronometer.OnChronometerTickListener {
 
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onItemAnswered(int itemId, String answer, int itemIndex);
+
+        void OnItemBack();
     }
 
     @Override
-    public void onResult(String s) {
-        try{
-            JSONObject json = new JSONObject(s);
-            //JSONArray result = json.getJSONArray("result");
-            String text = json.getString("text");
-            inferred_text += " "+ text;
+    public void onChronometerTick(Chronometer chronometer) {
+        ;
+        latencySeconds +=1;
+        chron.setText(Integer.toString(latencySeconds));
+    }
 
-        }catch(JSONException e){
+    void resetChronometer(){
+        latencySeconds = 0;
+        chron.setText(Integer.toString(latencySeconds));
+    }
 
+
+    public void OnKeyPressed(int keyCode) {
+        if(editText.hasFocus() && CHRONOMETER_STARTED){
+
+            chron.stop();
+            CHRONOMETER_STARTED = false;
+
+            Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+            stopChronButton.setVisibility(View.INVISIBLE);
+            Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+            startChronButton.setVisibility(View.VISIBLE);
 
         }
+        if(editText.hasFocus() && keyCode == KeyEvent.KEYCODE_ENTER){
 
-        TextView resultTextView = inflatedView.findViewById(R.id.wallyOriginalInferredTextView);
-        resultTextView.setText(inferred_text);
 
-        EditText resultEditText = inflatedView.findViewById(R.id.wallyOriginalInferredEditText);
-        resultEditText.setText(inferred_text);
+            //delete all line breaks inserted by ENTER key
+            int cursorPosition = editText.getSelectionStart();
+            int indexCharToDelete = cursorPosition-1;
+            while(indexCharToDelete>0){
+                char c = editText.getText().charAt(indexCharToDelete);
+                if (c == '\n'){
 
+                    editText.setText(editText.getText().delete(indexCharToDelete, indexCharToDelete+1));
+
+                }
+                indexCharToDelete--;
+            }
+            //editText.setText(editText.getText().delete(cursorPosition-1, cursorPosition));
+
+            //give focus to next button to save answer
+            Button nextButton = inflatedView.findViewById(R.id.itemNextButton);
+            nextButton.setFocusableInTouchMode(true);
+            nextButton.requestFocus();
+
+        }
     }
 
-    @Override
-    public void onError(Exception e) {
-
-    }
-
-    @Override
-    public void onTimeout() {
-
-    }
-    // TODO: Rename parameter arguments, choose names that match
-
+    EditText editText;
+    static boolean CHRONOMETER_STARTED = false;
     private OnFragmentInteractionListener mListener;
 
     public ItemFragment() {
@@ -109,13 +135,11 @@ public class ItemFragment extends Fragment implements RecognitionListener{
 
     private String text = "Enunciado pregunta";
     private String answer = null;
-    private String inferred_text = "";
+    private int latencySeconds = 0;
     private String encodedImage = null;
     private Integer id = null;
     private View inflatedView;
-    private SpeechRecognizer recognizer;
-    private Model model;
-    private boolean startRecording = false;
+    private Chronometer chron;
 
     // TODO: Rename and change types and number of parameters
     public static ItemFragment newInstance(int itemServerId, String itemText, String imageBase64Encoded) {
@@ -128,7 +152,6 @@ public class ItemFragment extends Fragment implements RecognitionListener{
         return fragment;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,10 +163,9 @@ public class ItemFragment extends Fragment implements RecognitionListener{
         }
 
 
+
     }
 
-    Button confirmTextButton;
-    Button editButton;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -151,33 +173,7 @@ public class ItemFragment extends Fragment implements RecognitionListener{
         View view = inflater.inflate(R.layout.fragment_item, container, false);
         inflatedView = view;
 
-        confirmTextButton = inflatedView.findViewById(R.id.wallyOriginalConfirmTextButton);
-        confirmTextButton.setOnClickListener(onConfirmTextButtonListener);
-        confirmTextButton.setVisibility(View.INVISIBLE);
-
-        editButton = inflatedView.findViewById(R.id.wallyOriginalEditInferredTextButton);
-
-
-        View inferredResultBox = view.findViewById(R.id.wallyOriginalInferredResultBox);
-        inferredResultBox.setVisibility(View.GONE);
-
-        View inferredTextEdit = view.findViewById(R.id.wallyOriginalInferredEditText);
-        inferredTextEdit.setVisibility(View.GONE);
-
-        View editInferredTextButton = view.findViewById(R.id.wallyOriginalEditInferredTextButton);
-        editInferredTextButton.setOnClickListener(editInferredTextButtonListener);
-
-
-        Button startRecordingButton = view.findViewById(R.id.wallyOriginalStartRecordingButton);
-        startRecordingButton.setOnClickListener(startButtonListener);
-
-        Button stopRecordingButton = view.findViewById(R.id.wallyOriginalStopRecordingButton);
-        stopRecordingButton.setOnClickListener(stopButtonListener);
-        stopRecordingButton.setVisibility(View.GONE);
-
-
-
-
+        editText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
         //put the question text
         TextView textView = view.findViewById(R.id.wallyOriginalItemTextView);
         textView.setText(text);
@@ -189,140 +185,73 @@ public class ItemFragment extends Fragment implements RecognitionListener{
         ImageView imageView =  view.findViewById(R.id.wallyOriginalImageView);
         imageView.setImageBitmap(decodedByte);
 
+        //buttons listeners
+        Button startChronButton = view.findViewById(R.id.wallyOriginalStartChronometerButton);
+        startChronButton.setOnClickListener(this.startChronometerListener);
+
+        Button stopChronButton = view.findViewById(R.id.wallyOriginalStopChronometerButton);
+        stopChronButton.setOnClickListener(this.stopChronometerListener);
+
+        Button resetChronButton = view.findViewById(R.id.wallyOriginalResetChronometerButton);
+        resetChronButton.setOnClickListener(this.resetChronometerButtonListener);
+        //buttons in the navbar
         Button nextButton = view.findViewById(R.id.itemNextButton);
         nextButton.setOnClickListener(this.nextButtonListener);
 
         Button backButton = view.findViewById(R.id.itemFragmentBackButton);
         backButton.setOnClickListener(this.backButtonClickListener);
 
+        chron = inflatedView.findViewById(R.id.chronometer);
+        chron.setOnChronometerTickListener(this);
+        chron.setFormat("");
+
+
+        startChronButton.requestFocusFromTouch();
         return view;
     }
 
-    private static class SetupTask extends AsyncTask<Void, Void, Exception> {
-        WeakReference<Activity> activityReference;
-        WeakReference<ItemFragment> itemFragment;
-
-        SetupTask(Activity activity, ItemFragment fragment ) {
-            this.activityReference = new WeakReference<>(activity);
-            itemFragment = new WeakReference<>(fragment);
-        }
-
+    View.OnClickListener startChronometerListener = new View.OnClickListener(){
         @Override
-        protected Exception doInBackground(Void... params) {
-            try {
-                Assets assets = new Assets(activityReference.get());
-                File assetDir = assets.syncAssets();
-                Log.d("KaldiDemo", "Sync files in the folder " + assetDir.toString());
+        public void onClick(View v) {
 
-                Vosk.SetLogLevel(0);
+            chron.start();
+            CHRONOMETER_STARTED = true;
 
-                itemFragment.get().model = new Model(assetDir.toString() + "/model-spanish");
-            } catch (IOException e) {
-                return e;
-            }
-            return null;
-        }
+            v.setVisibility(View.INVISIBLE);
+            Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+            stopChronButton.setVisibility(View.VISIBLE);
 
-        @Override
-        protected void onPostExecute(Exception result) {
-            if (result != null) {
-                //activityReference.get().setErrorState(String.format(activityReference.get().getString(R.string.failed), result));
-            } else {
-                //activityReference.get().setUiState(STATE_READY);
-            }
-        }
-    }
-
-    View.OnClickListener editInferredTextButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-
-
-            final EditText inferredTextEditText = inflatedView.findViewById(R.id.wallyOriginalInferredEditText);
-            inferredTextEditText.post(new Runnable() {
-                @Override
-                public void run() {
-                    inferredTextEditText.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) ((Activity)mListener).getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-                }
-            });
-
-
-            inferredTextEditText.setVisibility(View.VISIBLE);
-            inflatedView.findViewById(R.id.wallyOriginalInferredTextView).setVisibility(View.INVISIBLE);
-            editButton.setVisibility(View.INVISIBLE);
-            confirmTextButton.setVisibility(View.VISIBLE);
-            //
+            //give focus to EditText;
+            View answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
+            answerEditText.requestFocus();
+            Context ctx = (Context) mListener;
+            final InputMethodManager inputMethodManager = (InputMethodManager) ctx
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(answerEditText, InputMethodManager.SHOW_IMPLICIT);
+            return;
         }
     };
 
-    View.OnClickListener onConfirmTextButtonListener = new View.OnClickListener() {
+    View.OnClickListener stopChronometerListener = new View.OnClickListener(){
         @Override
-        public void onClick(View view) {
+        public void onClick(View v) {
+            chron.stop();
+            CHRONOMETER_STARTED = false;
 
 
-            final TextView inferredTextEdit = inflatedView.findViewById(R.id.wallyOriginalInferredEditText);
-
-            inferredTextEdit.post(new Runnable() {
-                @Override
-                public void run() {
-                    InputMethodManager imm = (InputMethodManager) ((Activity)mListener).getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(inferredTextEdit.getWindowToken(), 0);
-
-                }
-            });
-
-
-            String confirmedText = inferredTextEdit.getText().toString();
-
-            TextView inferredTextView = inflatedView.findViewById(R.id.wallyOriginalInferredTextView);
-            inferredTextView.setText(confirmedText);
-
-            inferredTextEdit.setVisibility(View.INVISIBLE);
-            inferredTextView.setVisibility(View.VISIBLE);
-
-            confirmTextButton.setVisibility(View.INVISIBLE);
-            editButton.setVisibility(View.VISIBLE);
-
+            Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+            stopChronButton.setVisibility(View.INVISIBLE);
+            Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+            startChronButton.setVisibility(View.VISIBLE);
 
         }
     };
 
-    View.OnClickListener startButtonListener = new View.OnClickListener() {
+    View.OnClickListener resetChronometerButtonListener = new View.OnClickListener() {
         @Override
-        public void onClick(View view) {
-
-            recognizeMicrophone();
-
-            view.setVisibility(View.GONE);
-            inflatedView.findViewById(R.id.wallyOriginalStopRecordingButton).setVisibility(View.VISIBLE);
-
-        }
-    };
-
-    void recognizeMicrophone(){
-        RecognizerManager.getInstance().recognizeMic(this);
-
-    }
-
-
-    View.OnClickListener stopButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            RecognizerManager.getInstance().stop();
-            view.setVisibility(View.GONE);
-            TextView inferredTextView = inflatedView.findViewById(R.id.wallyOriginalInferredTextView);
-            inferredTextView.setText(inferred_text);
-            TextView inferredTextEdit = inflatedView.findViewById(R.id.wallyOriginalInferredEditText);
-            inferredTextEdit.setText(inferred_text);
-
-            View inferredResultBox = inflatedView.findViewById(R.id.wallyOriginalInferredResultBox);
-            inferredResultBox.setVisibility(View.VISIBLE);
-
-            //show the results
+        public void onClick(View v) {
+            v.setEnabled(false);
+            resetChronometer();
         }
     };
 
@@ -330,7 +259,7 @@ public class ItemFragment extends Fragment implements RecognitionListener{
         @Override
         public void onClick(View v) {
 
-            mListener.onItemAnswered(id, inferred_text, 0);
+            mListener.onItemAnswered(id, answer, 0);
 
         }
     };
@@ -342,9 +271,6 @@ public class ItemFragment extends Fragment implements RecognitionListener{
             mListener.OnItemBack();
         }
     };
-
-
-
 
     @Override
     public void onResume() {
@@ -372,11 +298,7 @@ public class ItemFragment extends Fragment implements RecognitionListener{
     }
 
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onItemAnswered(int itemId, String answer, int itemIndex);
 
-        void OnItemBack();
-    }
+
 
 }

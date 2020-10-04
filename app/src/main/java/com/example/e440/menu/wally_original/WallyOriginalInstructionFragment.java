@@ -35,22 +35,17 @@ public class WallyOriginalInstructionFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+
      * @return A new instance of fragment WallyOriginalInstructionFragment.
      */
 
-    private static String ARG_ITEM_STATEMENT = "item_statement";
-    private static String ARG_ITEM_ID= "item_id";
-    private String statement = "Enunciado pregunta";
-    private String answer = null;
-    private String inferred_text = null;
+
+
     // TODO: Rename and change types and number of parameters
     public static WallyOriginalInstructionFragment newInstance(int itemId, String itemStatement) {
         WallyOriginalInstructionFragment fragment = new WallyOriginalInstructionFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_ITEM_ID, itemId);
-        args.putString(ARG_ITEM_STATEMENT, itemStatement);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,8 +54,8 @@ public class WallyOriginalInstructionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            statement = getArguments().getString(ARG_ITEM_ID);
 
+            //
         }
     }
 

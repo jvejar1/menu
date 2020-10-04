@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.e440.menu.R;
+
+import org.w3c.dom.Text;
 
 
 public class AssentFragment extends Fragment {
@@ -20,9 +24,19 @@ public class AssentFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public AssentFragment() {
+    public AssentFragment(String mainText, String cancelButtonText, String continueButtonText) {
+        Bundle bundle = new Bundle();
+        bundle.putString(MAIN_TEXT_ARG, mainText);
+        bundle.putString(CANCEL_BUTTON_TEXT_ARG, cancelButtonText);
+        bundle.putString(CONTINUE_BUTTON_TEXT_ARG, continueButtonText);
+
+        this.setArguments(bundle);
         // Required empty public constructor
-    }
+    };
+
+    static String MAIN_TEXT_ARG= "main_text";
+    static String CANCEL_BUTTON_TEXT_ARG = "cancel_button_text";
+    static String CONTINUE_BUTTON_TEXT_ARG = "continue_button_text";
 
 
     @Override
@@ -36,20 +50,33 @@ public class AssentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        String mainText = getArguments().getString(MAIN_TEXT_ARG);
+
+        String continueButtonText = getArguments().getString(CONTINUE_BUTTON_TEXT_ARG);
+        String cancelButtonText = getArguments().getString(CANCEL_BUTTON_TEXT_ARG);
         View view = inflater.inflate(R.layout.fragment_assent, container, false);
-        view.findViewById(R.id.assentYesButton).setOnClickListener(new View.OnClickListener() {
+
+
+        TextView mainTextView = view.findViewById(R.id.assentStatement);
+        mainTextView.setText(mainText);
+
+        Button continueButton = view.findViewById(R.id.assentYesButton);
+        continueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onYesButtonPressed(view);
             }
         });
+        continueButton.setText(continueButtonText);
 
-        view.findViewById(R.id.assentNotButton).setOnClickListener(new View.OnClickListener() {
+        Button cancelButton = view.findViewById(R.id.assentNotButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onNotButtonPressed(view);
             }
         });
+        cancelButton.setText(cancelButtonText);
         return view;
 
     }
@@ -57,12 +84,12 @@ public class AssentFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onYesButtonPressed(View view) {
         if (mListener != null) {
-            mListener.onYesAssent();
+            mListener.onContinue();
         }
     }
     public void onNotButtonPressed(View view) {
         if (mListener != null) {
-            mListener.onNotAssent();
+            mListener.onCancel();
         }
     }
 
@@ -95,7 +122,7 @@ public class AssentFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onYesAssent();
-        void onNotAssent();
+        void onContinue();
+        void onCancel();
     }
 }

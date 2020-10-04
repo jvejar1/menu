@@ -1,13 +1,13 @@
 package com.example.e440.menu.wally_original;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,12 +20,40 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.e440.menu.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class WallyOriginalActivity extends AppCompatActivity implements AssentFragment.OnFragmentInteractionListener, ItemFragment.OnFragmentInteractionListener{
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
 
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        Toast  t = Toast.makeText(this,"hola",Toast.LENGTH_SHORT);
+        t.show();
+        try{
+
+            OnKeyPressedListener fragment = (OnKeyPressedListener) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+            fragment.OnKeyPressed(keyCode);
+
+        }catch (Exception e) {
+
+        }
+
+        return super.onKeyUp(keyCode, event);
+
+    }
+
+    static String ASSENT_TEXT = "Hola, mi nombre es _____________ (ayudante de investigación), vendremos varias veces" +
+            "a tu escuela y queremos que participes en un juego que está en una Tablet y que respondas" +
+            "Si no quieres seguir, me dices y páramos. No hay ningún problema, nadie se enojará" +
+            "contigo. ¿Quieres participar?";
+    static String INSTRUCTION_TEXT = "Aquí hay una prueba de detectives para ver qué tan bueno eres como detective" +
+            "para resolver problemas. Aquí tienes tu sombrero de detective, " +
+            "si quieres usarlo (usted deberá hacer la acción de entregarle un sombrero imaginario). " +
+            "Te mostraré algunas imágenes de escenas donde aparecen problemas. " +
+            "Ve si puedes resolverlos por tu cuenta. ¡Buena suerte!";
+    static String FINISHING_TEXT = "MUCHAS GRACIAS";
+    enum State {ASSENT, INSTRUCTION, ITEM, FINISHING}
+    private ArrayList<State> stateStack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +69,12 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
 
-            //Error
-        }
-        AssentFragment assentFragment = new AssentFragment();
+        //first, display assent
+        stateStack = new ArrayList<>();
+        stateStack.add(State.ASSENT);
+
+        AssentFragment assentFragment = new AssentFragment(ASSENT_TEXT, "NO","SI");
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, assentFragment);
         fragmentTransaction.addToBackStack(null);
@@ -92,45 +119,86 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
                 7));
 
 
-
-        RecognizerManager.Setup(this);
     }
 
     int itemCount = 10;
     int itemIndex = 0;
     ArrayList<WallyOriginalItem> items;
-    Boolean assentAnswer = null;
+    ArrayList<String> answers;
+    ArrayList<Integer> latencySeconds;
     @Override
-    public void onYesAssent() {
-        assentAnswer = true;
-
-        WallyOriginalItem item = items.get(itemIndex);
-
-        ItemFragment itemFragment = ItemFragment.newInstance(item.getServer_id(), item.getText(), item.getEncoded_image());
+    public void onContinue() {
+        Toast  t = Toast.makeText(this,State.INSTRUCTION.toString(),Toast.LENGTH_SHORT);
+        t.show();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, itemFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+
+
+        switch (stateStack.get(stateStack.size()-1)){
+            case ASSENT:
+                //
+                AssentFragment assentFragment = new AssentFragment(INSTRUCTION_TEXT, "CANCELAR", "CONTINUAR");
+
+                fragmentTransaction.replace(R.id.frameLayout, assentFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                stateStack.add(State.INSTRUCTION);
+                break;
+            case INSTRUCTION:
+
+                WallyOriginalItem item = items.get(itemIndex);
+
+                ItemFragment itemFragment = ItemFragment.newInstance(item.getServer_id(), item.getText(), item.getEncoded_image());
+                fragmentTransaction.replace(R.id.frameLayout, itemFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                stateStack.add(State.ITEM);
+
+            case FINISHING:
+
+                this.finish();
+                //finish the evaluation of the instrument and save data
+
+        }
+
     }
-
-
-
 
     @Override
-    public void onNotAssent() {
-        assentAnswer = false;
-    }
+    public void onCancel() {
+
+        switch (stateStack.get(stateStack.size()-1)){
+            case ASSENT:
+                case INSTRUCTION:
+
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    AssentFragment assentFragment = new AssentFragment(FINISHING_TEXT, "VOLVER", "FIN");
+                    fragmentTransaction.replace(R.id.frameLayout, assentFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                    stateStack.add(State.FINISHING);
+                //display the finish fragment
+
+                break;
+            case FINISHING:
+                stateStack.remove(stateStack.size()-1);
+                getSupportFragmentManager().popBackStack();
+
+        }    }
 
     @Override
     public void onItemAnswered(int itemId, String answer, int answeredItemIndex) {
-
         ///save the result
-
         //display next item
-
 
         boolean lastItemAnswered = this.itemIndex == items.size() - 1;
         if (lastItemAnswered){
+
+            stateStack.add(State.FINISHING);
+
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            AssentFragment assentFragment = new AssentFragment(FINISHING_TEXT, "VOLVER", "FIN");
+            fragmentTransaction.replace(R.id.frameLayout, assentFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
             //display finish
             return;
         }
@@ -146,23 +214,22 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        return;
+    }
+
     @Override
     public void OnItemBack() {
+        //use the backstack transaction
+        getSupportFragmentManager().popBackStack();
 
-        if (this.itemIndex<= 0){
+        if (this.itemIndex== 0){
+            stateStack.remove(stateStack.size()-1);
             return;
         }
 
-
         this.itemIndex = this.itemIndex - 1;
-        WallyOriginalItem item = items.get(this.itemIndex);
-
-        ItemFragment itemFragment = ItemFragment.newInstance(item.getServer_id(), item.getText(), item.getEncoded_image());
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, itemFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-
     }
 }
