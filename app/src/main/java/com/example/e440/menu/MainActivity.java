@@ -16,13 +16,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -115,6 +118,17 @@ MainActivity extends AppCompatActivity
 
     protected void onCreate(Bundle savedInstanceState) {
 
+        Configuration configuration = getResources().getConfiguration();
+        int smallestWidthDp  = configuration.smallestScreenWidthDp;
+        Log.d("SELB smallest width", Integer.toString(smallestWidthDp));
+
+        int screenWidthDp = configuration.screenWidthDp;
+        Log.d("SELB screen width", Integer.toString(screenWidthDp));
+
+        DisplayMetrics dm = getApplicationContext().getResources().getDisplayMetrics();
+        Log.d("SELB display metrics h ", Integer.toString(dm.heightPixels));
+
+        Log.d("SELB display metrics w", Integer.toString(dm.widthPixels));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
