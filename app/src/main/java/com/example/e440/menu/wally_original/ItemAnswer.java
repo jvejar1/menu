@@ -5,12 +5,13 @@ public class ItemAnswer {
     int itemId;
     String answer;
     int latencySeconds;
+    int evaluationId;
+
     public ItemAnswer(){
         this.answer = "";
         this.latencySeconds = 0;
     }
 
-    
 
     public int getItemId() {
         return itemId;

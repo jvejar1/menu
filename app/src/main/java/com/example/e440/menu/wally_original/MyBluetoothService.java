@@ -243,6 +243,7 @@ public class MyBluetoothService<Contex> {
     void finish(){
         if (this.connectedThread !=null){
             connectedThread.cancel();
+            connectedThread = null;
                 return;
 
         }

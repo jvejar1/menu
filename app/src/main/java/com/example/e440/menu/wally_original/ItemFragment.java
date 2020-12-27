@@ -239,9 +239,40 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                     }
 
 
-                    Button nextButton = inflatedView.findViewById(R.id.itemNextButton);
-                    nextButton.setFocusableInTouchMode(true);
-                    nextButton.requestFocus();
+                    final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
+                    final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Confirmar Respuesta");
+                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User clicked OK button
+
+                            itemAnswer.setAnswer(answer.toString());
+                            itemAnswer.setLatencySeconds(latencySeconds);
+                            mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+                    final AlertDialog dialog = builder.create();
+                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface d) {
+                            Button negative = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                            negative.setFocusable(true);
+                            negative.setFocusableInTouchMode(true);
+                            negative.requestFocus();
+                        }
+                    });
+                    dialog.show();
+
+
 
                 }
                 return false;
@@ -275,8 +306,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         chron = inflatedView.findViewById(R.id.chronometer);
         chron.setOnChronometerTickListener(this);
 
+        startChronButton.setFocusableInTouchMode(true);
         startChronButton.requestFocusFromTouch();
-        startChronButton.setFocusableInTouchMode(false);
 
         return inflatedView;
     }
@@ -337,6 +368,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         @Override
         public void onClick(View v) {
 
+            v.setFocusableInTouchMode(false);
             chron.start();
             chronometerIsRunning = true;
 
@@ -413,7 +445,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
                         itemAnswer.setAnswer(answer.toString());
                         itemAnswer.setLatencySeconds(latencySeconds);
-
                         mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
 
                     }
