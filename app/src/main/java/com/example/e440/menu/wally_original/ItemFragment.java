@@ -63,7 +63,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         chron.setText(Integer.toString(latencySeconds) + "s");
     }
 
-
     public ItemFragment() {
         // Required empty public constructor
     }
@@ -80,10 +79,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     private static String ARG_ITEM_SERVER_ID= "item_id";
     private static String ARG_ENCODED_IMAGE="item_img";
 
-
-
-
-    EditText editText;
+    EditText answerEditText;
 
     static String CHRONOMETER_IS_RUNNING_ARG = "chronometer_is_running";
     static String LATENCY_SECONDS_ARG = "latency_seconds";
@@ -91,7 +87,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     private boolean chronometerIsRunning = false;
     private OnFragmentInteractionListener mListener;
 
-    private String answer = null;
     private Integer latencySeconds = 0;
     private String encodedImage = null;
     private Integer id = null;
@@ -118,10 +113,13 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             encodedImage = getArguments().getString(ARG_ENCODED_IMAGE);
         }
         if(savedInstanceState!=null){
-
             latencySeconds = savedInstanceState.getInt(LATENCY_SECONDS_ARG);
             chronometerIsRunning = savedInstanceState.getBoolean(CHRONOMETER_IS_RUNNING_ARG);
-
+        }else{
+            chronometerIsRunning = false;
+            model = new ViewModelProvider(requireActivity()).get(ViewModel.class);
+            ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+            latencySeconds = itemAnswer.getLatencySeconds();
         }
     }
 
@@ -134,20 +132,21 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
     }
 
-
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        if(savedInstanceState == null){
-            return;
-        }
+        chron = inflatedView.findViewById(R.id.chronometer);
+        chron.setFormat("");
+        chron.setText(latencySeconds + "s");
 
-        chron.setText(latencySeconds.toString());
         if(chronometerIsRunning){
             chron.start();
+            Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+            Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+            startChronButton.setVisibility(View.INVISIBLE);
+            stopChronButton.setVisibility(View.VISIBLE);
         }
-        Log.d("ITM_FRGMT VW_STT_RSTRD", savedInstanceState.toString());
     }
 
     @Override
@@ -166,7 +165,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         inflatedView =  inflater.inflate(R.layout.fragment_item_2, container, false);
 
 
-        //editText.setInputType(InputType.TYPE_NULL);
+        //answerEditText.setInputType(InputType.TYPE_NULL);
         //put the question text
         TextView textView = inflatedView.findViewById(R.id.wallyOriginalItemTextView);
         textView.setText(item.getText());
@@ -183,19 +182,11 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         imageView.setImageBitmap(decodedByte);
 
 
-        latencySeconds = itemAnswer.getLatencySeconds();
-
-        chron = inflatedView.findViewById(R.id.chronometer);
-        chron.setFormat("");
-        chron.setText(itemAnswer.getLatencySeconds() + "s");
-        chron.setText(Integer.toString(itemAnswer.getLatencySeconds()));
-
-        editText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
-        editText.setText(itemAnswer.getAnswer());
+        answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
+        answerEditText.setText(itemAnswer.getAnswer());
 
         //listeners
-        editText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
-        editText.addTextChangedListener(new TextWatcher() {
+        answerEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -223,7 +214,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             }
         });
 
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        answerEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
@@ -379,8 +370,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             //give focus to EditText;
             View answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
             answerEditText.requestFocus();
-            Context ctx = (Context) mListener;
-            /*final InputMethodManager inputMethodManager = (InputMethodManager) ctx
+            /*Context ctx = (Context) mListener;
+            final InputMethodManager inputMethodManager = (InputMethodManager) ctx
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.showSoftInput(answerEditText, InputMethodManager.SHOW_IMPLICIT);
             */
@@ -394,7 +385,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         public void onClick(View v) {
             chron.stop();
             chronometerIsRunning = false;
-
 
             Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
             stopChronButton.setVisibility(View.INVISIBLE);
@@ -480,9 +470,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
         @Override
         public void onClick(View v) {
-
-
-
             final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
             final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
 
@@ -564,9 +551,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         super.onDetach();
         mListener = null;
     }
-
-
-
 
 
 }

@@ -26,7 +26,6 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         currentItemIndex++;
     }
 
-
      public void DecrementCurrentItemIndex(){
 
         currentItemIndex--;
@@ -145,6 +144,12 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     public void setCurrentItemIndex(int currentItemIndex) {
         this.currentItemIndex = currentItemIndex;
     }
+
+    public void SavePersistent(){
+
+        //access the persistent layer and save the actual data and next submit it to server
+    }
+
 
 
     public ItemAnswer getAnswer(int index){
