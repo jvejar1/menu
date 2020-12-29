@@ -39,9 +39,9 @@
     <TableLayout
         android:layout_width="514dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
         android:layout_marginTop="70dp"
         android:background="@color/black_overlay"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout">
 
@@ -62,9 +62,9 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:layout_width="match_parent"
                 android:layout_marginStart="1px"
                 android:layout_marginRight="1px"
-                android:layout_width="match_parent"
                 android:width="213dp"
                 android:height="35dp"
                 android:fontFamily="sans-serif"
@@ -239,11 +239,14 @@
 
     <TableLayout
         android:id="@+id/tableLayout"
-        android:layout_width="514dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
+
 
         android:layout_marginTop="120dp"
+        android:gravity="center_horizontal"
+
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -269,9 +272,9 @@
             <TextView
                 android:id="@+id/evalsCountTextView"
                 android:layout_width="wrap_content"
-                android:width="214dp"
                 android:layout_marginLeft="1px"
                 android:layout_marginTop="1px"
+                android:width="214dp"
                 android:height="35dp"
                 android:background="@color/futuristic_blue"
                 android:fontFamily="sans-serif"

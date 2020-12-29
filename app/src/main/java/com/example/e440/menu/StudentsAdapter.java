@@ -27,8 +27,8 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
             super(view);
             student_name_text_view = (TextView) view.findViewById(R.id.studentNameTextView);
             student_rut_text_view = (TextView) view.findViewById(R.id.studentRutTextView);
-            student_school_name_text_view = (TextView) view.findViewById(R.id.studentSchoolNameTextView);
-            student_course_text_view=view.findViewById(R.id.studentCourseTextView);
+            //student_school_name_text_view = (TextView) view.findViewById(R.id.studentSchoolNameTextView);
+            //student_course_text_view=view.findViewById(R.id.studentCourseTextView);
             wallyCountTextView = view.findViewById(R.id.wallyCountTextView);
             acesCountTextView = view.findViewById(R.id.acesCountTextView);
             corsiCountTextView = view.findViewById(R.id.corsisCountTextView);
@@ -57,7 +57,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.MyView
         holder.student_name_text_view.setText(student.getFullName());
         holder.student_rut_text_view.setText("RUT: "+student.getRut());
       //  holder.student_school_name_text_view.setText(student.getSchool_name());
-        holder.student_course_text_view.setText(student.getCourseFullName());
+        //holder.student_course_text_view.setText(student.getCourseFullName());
         holder.acesCountTextView.setText(""+student.getAces_count());
         holder.wallyCountTextView.setText(""+student.getWally_count());
         holder.corsiCountTextView.setText(""+student.getCorsis_count());

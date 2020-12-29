@@ -8,45 +8,12 @@
     android:background="@android:drawable/list_selector_background"
     android:clickable="true">
 
-    <TableRow
-        android:layout_width="56dp"
-        android:layout_height="23dp"
-        android:layout_marginStart="700dp"
-        android:layout_marginTop="28dp"
-        android:backgroundTintMode="src_in"
-        android:backgroundTint="@color/futuristic_blue_dark"
-        android:background="@drawable/test_label"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+>
 
-        <TextView
-            android:text="F"
-            android:textSize="14dp"
-            android:textStyle="bold"
-            android:textColor="@color/colorWhite"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="6dp"
-            >
-
-        </TextView>
-
-        <TextView
-            android:id="@+id/fonotestCountTextView"
-            android:layout_width="32dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="6dp"
-            android:gravity="center"
-            android:text="0"
-            android:textColor="@color/defaultBlack"
-            android:textSize="14dp">
-
-        </TextView>
-
-
-
-    </TableRow>
 
     <ImageView
         android:id="@+id/imageView2"
@@ -60,7 +27,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.253" />
+<View
+    android:layout_width="14dp"
+    android:layout_height="match_parent"></View>
+<LinearLayout android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:gravity="center_vertical"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/studentNameTextView"
+        android:layout_width="wrap_content"
+        android:maxWidth="320dp"
+        android:layout_height="wrap_content"
 
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="textPersonName"
+        android:text="Juan Camilo Perez Gonzalez"
+        android:textColor="#000000"
+
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/studentRutTextView"
         android:layout_width="110dp"
@@ -70,31 +57,15 @@
 
         android:layout_marginTop="8dp"
         android:focusable="false"
-        android:text="TextView"
+        android:text="19181716-8"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/studentNameTextView"
         app:layout_constraintTop_toBottomOf="@+id/studentNameTextView"
         app:layout_constraintVertical_bias="0.153" />
+</LinearLayout>
 
-    <TextView
-        android:id="@+id/studentNameTextView"
-        android:layout_width="339dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="28dp"
-
-        android:ems="10"
-        android:focusable="false"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:textColor="#000000"
-
-        android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
+  <!--  <TextView
         android:id="@+id/studentServerIdTextView"
         android:layout_width="17dp"
         android:layout_height="18dp"
@@ -111,34 +82,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.058" />
 
-    <TextView
-        android:visibility="invisible"
-        android:id="@+id/studentCourseTextView"
-        android:layout_width="105dp"
-        android:layout_height="21dp"
-        android:layout_marginStart="36dp"
-        android:textColor="@color/futuristic_blue"
-        app:layout_constraintStart_toEndOf="@+id/studentRutTextView"
-        app:layout_constraintTop_toTopOf="@+id/studentRutTextView" />
-
-    <TextView
-        android:id="@+id/studentSchoolNameTextView"
-        android:ellipsize="end"
-        android:textAlignment="textEnd"
-        android:maxLines="1"
-        android:layout_width="263dp"
-        android:layout_height="19dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
+-->
+    <View
+        android:layout_width="14dp"
+        android:layout_height="match_parent"></View>
+    <LinearLayout
+        android:paddingBottom="30dp"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="match_parent">
     <TableRow
         android:layout_width="56dp"
         android:layout_height="23dp"
-        android:layout_marginStart="424dp"
-        android:layout_marginTop="28dp"
         android:background="@drawable/test_label"
         android:backgroundTint="@color/futuristic_blue_dark"
         app:layout_constraintStart_toStartOf="parent"
@@ -170,14 +125,15 @@
 
 
     </TableRow>
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"></View>
 
     <TableRow
         android:id="@+id/view7"
         android:layout_width="56dp"
 
         android:layout_height="23dp"
-        android:layout_marginStart="496dp"
-        android:layout_marginTop="28dp"
 
 
             android:backgroundTint="@color/futuristic_blue_dark"
@@ -212,12 +168,14 @@
 
         </TableRow>
 
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"></View>
+
     <TableRow
         android:id="@+id/view8"
         android:layout_width="56dp"
         android:layout_height="23dp"
-        android:layout_marginStart="564dp"
-        android:layout_marginTop="28dp"
         android:background="@drawable/test_label"
         android:backgroundTint="@color/futuristic_blue_dark"
         app:layout_constraintStart_toStartOf="parent"
@@ -251,13 +209,15 @@
 
     </TableRow>
 
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"></View>
+
     <TableRow
 
         android:id="@+id/view9"
         android:layout_width="56dp"
         android:layout_height="23dp"
-        android:layout_marginStart="632dp"
-        android:layout_marginTop="28dp"
         android:background="@drawable/test_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -291,6 +251,49 @@
 
 
     </TableRow>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"></View>
+
+        <TableRow
+        android:layout_width="56dp"
+        android:layout_height="23dp"
+        android:backgroundTintMode="src_in"
+        android:backgroundTint="@color/futuristic_blue_dark"
+        android:background="@drawable/test_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:text="F"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            >
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/fonotestCountTextView"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:gravity="center"
+            android:text="0"
+            android:textColor="@color/defaultBlack"
+            android:textSize="14dp">
+        </TextView>
+
+
+
+    </TableRow>
+    </LinearLayout>
+</LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
