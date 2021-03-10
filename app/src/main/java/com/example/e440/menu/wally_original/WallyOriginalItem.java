@@ -1,7 +1,39 @@
 package com.example.e440.menu.wally_original;
 
-public class WallyOriginalItem {
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
+
+@Entity(tableName = "item")
+public class WallyOriginalItem implements Serializable {
+
+    @PrimaryKey
     private int id;
+
+    private String text;
+    private String encoded_image;
+    public int pictureId;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    private String description;
+
+    public String getImagePath() {
+        return ImagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        ImagePath = imagePath;
+    }
+
+    private String ImagePath;
+    private int server_id;
 
     public int getId() {
         return id;
@@ -12,7 +44,7 @@ public class WallyOriginalItem {
     }
 
     public String getText() {
-        return text;
+        return getDescription();
     }
 
     public void setText(String text) {
@@ -35,9 +67,7 @@ public class WallyOriginalItem {
         this.server_id = server_id;
     }
 
-    private String text;
-    private String encoded_image;
-    private int server_id;
+
     public WallyOriginalItem(String text, String encoded_image, int server_id){
         this.text = text;
         this.encoded_image = encoded_image;

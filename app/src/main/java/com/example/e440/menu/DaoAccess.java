@@ -9,6 +9,7 @@ import androidx.room.Update;
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +18,6 @@ import java.util.List;
 
 @Dao
 public interface DaoAccess {
-
 
     //School
     @Query("SELECT * FROM Course")
@@ -38,7 +38,14 @@ public interface DaoAccess {
     void insertSchool(Course school);
 
     @Insert
-    void insertResponseRequest(ResponseRequest responseRequest);
+    Long insertResponseRequest(ResponseRequest responseRequest);
+
+    @Update
+    int updateResponseReQuest(ResponseRequest responseRequest);
+
+    @Query("UPDATE ResponseRequest set finished =:finished where id =:id")
+    int updateResponseRequest(Long id, boolean finished );
+
     @Delete
     int deleteResponseRequest(ResponseRequest responseRequest);
     @Query("SELECT * FROM ResponseRequest")
@@ -46,6 +53,9 @@ public interface DaoAccess {
 
     @Query("SELECT * FROM ResponseRequest where saved=0")
     ResponseRequest[] fetchNotSavedResponseRequest();
+
+    @Query("SELECT * FROM ResponseRequest where student_server_id=:StudentId and finished=0 and instrumentId=:InstrumentId limit 1")
+    ResponseRequest[] loadContinuableEvaluationInAJsonString(long StudentId, long InstrumentId);
 
 
     @Query("SELECT count() FROM ResponseRequest where test_name=:testName")
@@ -113,7 +123,7 @@ public interface DaoAccess {
     @Query("SELECT * FROM FonoTest LIMIT 1")
     FonoTest fetchFonotest();
 
-    @Query("SELECT * FROM ITEM WHERE example=1")
+    @Query("SELECT * FROM ITEM WHERE isForPractice=1")
     Item[] fetchStartingPointsItems();
 
 

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,13 +30,7 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +200,7 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
                 Item current_item=items[current_item_index];
                 response_by_item_server_id.put(current_item.getSever_id(),TextUtils.join("..",response_list));
                 scores_by_item_server_id.put(current_item.getSever_id(),score);
-                if(score==0 && !current_item.isExample()){
+                if(score==0 && !current_item.isForPractice()){
                       errors+=1;
                 }
                 if(score==2){
@@ -537,7 +530,7 @@ public class FonoTestMainFragment extends Fragment implements View.OnClickListen
 
 
             TextView itemNameTextView=inflatedView.findViewById(R.id.itemNameTextView);
-            if(item.isExample()){
+            if(item.isForPractice()){
                 itemNameTextView.setTextColor(ContextCompat.getColor(getContext(),R.color.colorWarning));
                 itemNameTextView.setText(item.getName());
             }

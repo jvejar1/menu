@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#000000"
+
     android:layout_height="match_parent"
     >
 
     <Button
-        android:enabled="false"
-        android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton2"
-        android:layout_width="65dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/corsi_default_button_bg"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.118"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.079"
-        />
+        app:layout_constraintVertical_bias="0.079" />
 
     <Button
-        android:enabled="false"
         android:id="@+id/corsiButton4"
-        android:layout_width="58dp"
-        android:background="@drawable/corsi_default_button_bg"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="112dp"
+        android:background="@drawable/corsi_default_button_bg"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.325"
+        app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.151" />
 
     <Button
         android:enabled="false"
         android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton8"
-        android:layout_width="68dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -64,8 +65,8 @@
         android:enabled="false"
         android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton10"
-        android:layout_width="63dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -81,8 +82,8 @@
         android:enabled="false"
         android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton6"
-        android:layout_width="67dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -94,28 +95,28 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:enabled="false"
-        android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton1"
-        android:layout_width="64dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/corsi_default_button_bg"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.631"
+        app:layout_constraintHorizontal_bias="0.627"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.061"/>
+        app:layout_constraintVertical_bias="0.05" />
 
     <Button
         android:enabled="false"
         android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton3"
-        android:layout_width="58dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -128,46 +129,46 @@
         app:layout_constraintVertical_bias="0.159" />
 
     <Button
-        android:enabled="false"
-        android:background="@drawable/corsi_default_button_bg"
-
         android:id="@+id/corsiButton5"
-        android:layout_width="58dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/corsi_default_button_bg"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.803"
+        app:layout_constraintHorizontal_bias="0.764"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.311" />
+        app:layout_constraintVertical_bias="0.336" />
 
     <Button
-        android:enabled="false"
-        android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton7"
-        android:layout_width="63dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/corsi_default_button_bg"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.665"
+        app:layout_constraintHorizontal_bias="0.714"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.625" />
+        app:layout_constraintVertical_bias="0.594" />
 
     <Button
         android:enabled="false"
         android:background="@drawable/corsi_default_button_bg"
         android:id="@+id/corsiButton9"
-        android:layout_width="55dp"
-        android:layout_height="wrap_content"
+        android:layout_width="104dp"
+        android:layout_height="101dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -178,4 +179,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.831" />
-</android.support.constraint.ConstraintLayout>
+
+    <Button
+        android:visibility="invisible"
+        android:id="@+id/corsiSkipButton"
+        style="@style/SuccessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginTop="60dp"
+        android:text="Saltar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/corsiButton9"
+        app:layout_constraintVertical_bias="0.75" />
+</androidx.constraintlayout.widget.ConstraintLayout>

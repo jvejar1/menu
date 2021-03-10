@@ -29,6 +29,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.e440.menu.R;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -45,10 +49,9 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onItemAnswered(int itemId, String answer, int itemIndex);
-
         void OnItemBack();
-
         void OnFinishRequest();
+        
     }
 
     @Override
@@ -171,15 +174,41 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         textView.setText(item.getText());
 
         TextView itemIndexInfoTextView = inflatedView.findViewById(R.id.itemIndexInfo);
-        String itemCountInfo = model.GetCurrentItemIndex() + "/" + model.getItemsCount();
+        String itemCountInfo = model.GetCurrentItemIndex()+1 + "/" + model.getItemsCount();
         itemIndexInfoTextView.setText(itemCountInfo);
 
         //draw the image
-        final String pureBase64Encoded = encodedImage.substring(encodedImage.indexOf(",")  + 1);
+
+        File file = new File(item.getImagePath());
+        try{
+
+            FileInputStream fileInputStream = new FileInputStream( file);
+            int fileSize = (int) file.length();
+            byte[] byteArr = new byte[fileSize];
+            fileInputStream.read(byteArr);
+
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(byteArr, 0, fileSize);
+            Log.d("ByteARr", Integer.toString(byteArr.length));
+            ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
+            imageView.setImageBitmap(decodedByte);
+
+            String imgAsBase64 = Base64.encodeToString(byteArr, Base64.DEFAULT);
+
+            encodedImage = imgAsBase64;
+        }catch (FileNotFoundException e){
+
+            e.printStackTrace();
+
+        }catch (IOException e){
+
+            e.printStackTrace();
+        }
+
+       /* final String pureBase64Encoded = encodedImage.substring(encodedImage.indexOf(",")  + 1);
         byte[] decodedString = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
-        imageView.setImageBitmap(decodedByte);
+        imageView.setImageBitmap(decodedByte);*/
 
 
         answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);

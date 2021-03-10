@@ -167,20 +167,19 @@ public class MyBluetoothService<Contex> {
     }
 
 
-
     void sendMessage(ImageTask imageTask){
-        // put the separator between messages;
         boolean messageWasWritten = false;
+
         if(connectedThread!=null){
             messageWasWritten = connectedThread.write(imageTask);
         }
+
         if (!messageWasWritten){
             try{connectedThread.cancel();}
             catch (NullPointerException e){
                 Log.d(TAG, e.getMessage());
             }
             startAsClient(imageTask);
-
         }
 
 
@@ -245,7 +244,6 @@ public class MyBluetoothService<Contex> {
             connectedThread.cancel();
             connectedThread = null;
                 return;
-
         }
 
         return;
@@ -383,6 +381,7 @@ public class MyBluetoothService<Contex> {
                 mmSocket.connect();
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and return.
+
                 try {
                     mmSocket.close();
                 } catch (IOException closeException) {

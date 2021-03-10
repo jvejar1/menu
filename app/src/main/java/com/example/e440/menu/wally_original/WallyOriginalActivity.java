@@ -1,49 +1,45 @@
 package com.example.e440.menu.wally_original;
 
-import android.Manifest;
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.example.e440.menu.CredentialsManager;
+import com.example.e440.menu.DatabaseManager;
+import com.example.e440.menu.EXTRA;
+import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
-import com.example.e440.menu.fonotest.Item;
+import com.example.e440.menu.ResponseRequest;
+import com.example.e440.menu.Student;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.UUID;
-
-import javax.xml.datatype.Duration;
 
 public class WallyOriginalActivity extends AppCompatActivity implements AssentFragment.OnFragmentInteractionListener, ItemFragment.OnFragmentInteractionListener{
 
+
+    static int CONTIBUABLE_EVALUATION_ENCOUNTERED = 0;
+
+    static int NOTHING_CONTINUABLE_EVALUATION_ENCOUNTERED = 1;
 
     static String ASSENT_TEXT = "Hola, mi nombre es _____________ (ayudante de investigación), vendremos varias veces " +
             "a tu escuela y queremos que participes en un juego que está en una Tablet y que respondas. " +
@@ -80,6 +76,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
         actionBar.hide();
 
         model = new ViewModelProvider(this).get(ViewModel.class);
+
         //first, display assent
         if( savedInstanceState != null){
             //restore data
@@ -89,11 +86,175 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
         }else{
 
             //Initialize data
-            model.LoadItems();
+
             stateStack = new ArrayList<>();
             stateStack.add(ActivityStatus.ASSENT);
 
-            AssentFragment assentFragment = new AssentFragment(ASSENT_TEXT, "NO","SI");
+            //final ItemsBank instrument = (ItemsBank) getIntent().getExtras().getSerializable("bank");
+            int instrumentIndex = getIntent().getExtras().getInt(EXTRA.EXTRA_INSTRUMENT_INDEX);
+            final ItemsBank instrument = InstrumentsManager.getInstance(this).getInstruments().get(instrumentIndex);
+
+            final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
+
+            model.items = instrument.items;
+
+            INSTRUCTION_TEXT = instrument.instruction;
+
+            Evaluation evaluation = new Evaluation();
+            evaluation.itemAnswerList = new ArrayList<>();
+            evaluation.instrumentId = instrument.id;
+            evaluation.timestamp = new Timestamp(System.currentTimeMillis());
+            evaluation.studentId =  studentId;
+            evaluation.itemsList = instrument.items;
+            evaluation.setFinished(false);
+
+            long userId = CredentialsManager.getInstance(this).getUserId();
+            evaluation.setUserId(userId);
+
+            model.setEvaluation(evaluation);
+
+
+            /*
+            NetworkManager networkManager = NetworkManager.getInstance(this);
+
+            Gson gson = new Gson();
+            String jsonObject = gson.toJson(evaluation);
+            JsonElement a = gson.toJsonTree(evaluation);
+
+            try{
+
+                JSONObject j = new JSONObject(jsonObject);
+
+
+               /* networkManager.sendEvaluation(j, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("res",response.toString());
+                        ;
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("res", error.toString());
+                        ;
+                    }
+                });
+                Log.d("Pato",j.toString());
+
+                Log.d("Patoa",jsonObject);
+
+                Log.d("Patob",a.toString());
+
+            }catch(JSONException e){
+                Log.d("Pato","malo");
+            }
+
+            ResponseRequest responseRequest = new ResponseRequest(jsonObject, null, false, evaluation.studentId);
+            responseRequest.setFinished(true);
+
+
+
+            databaseManager.insertResponseRequestAsync(evaluation);
+            final DatabaseManager databaseManager = DatabaseManager.getInstance(this);
+            final Context context = this;
+            Looper looper = getMainLooper();
+
+            final Handler handler1 = new Handler(looper){
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    super.handleMessage(msg);
+
+
+                    Log.d("Handling msg", msg.toString());
+                    if (msg.what == CONTIBUABLE_EVALUATION_ENCOUNTERED){
+                        final Evaluation evaluation = (Evaluation) msg.obj;
+                        post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which){
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                //Yes button clicked
+
+                                                model = new ViewModelProvider((WallyOriginalActivity)context).get(ViewModel.class);
+                                                model.setEvaluation(evaluation);
+
+
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                //No button clicked
+                                                evaluation.setFinished(true);
+                                                databaseManager.insertResponseRequestAsync(evaluation);
+                                                break;
+                                        }
+                                    }
+                                };
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setMessage("¿Continuar con la última evaluación?").setPositiveButton("Si", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener).show();
+
+                            }
+                        });
+
+                    }
+                    else if(msg.what == NOTHING_CONTINUABLE_EVALUATION_ENCOUNTERED){
+
+
+                    }
+                }
+            };
+
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    Evaluation e = databaseManager.checkIfCanContinueAnEvaluation(studentId, instrument);
+
+                    if (e!=null){
+                        Message messsage = new Message();
+                        messsage.what = CONTIBUABLE_EVALUATION_ENCOUNTERED;
+
+                        messsage.obj = e;
+                        handler1.sendMessage(messsage);
+                    }
+                    else{
+
+                        Message messsage = new Message();
+                        messsage.what = NOTHING_CONTINUABLE_EVALUATION_ENCOUNTERED;
+                        messsage.obj = e;
+                        handler1.sendMessage(messsage);
+                    }
+                }
+
+            };
+
+            //Thread t = new Thread(r);
+            //t.start();
+
+            File folder = new File(  this.getFilesDir(), "evaluations/");
+            folder.mkdirs();
+            String folderPath = folder.getPath();
+            File file = new File(folderPath, "eval.json");
+            try {
+
+                file.createNewFile();
+                FileOutputStream fOut2 = new FileOutputStream(file);
+
+
+                ObjectOutputStream out = new ObjectOutputStream(fOut2);
+                out.writeObject(evaluation);
+                out.close();
+                Log.d("aa", "Serialized data to "+ file.getPath());
+
+                ;}catch (IOException exc){
+                Log.d("Perro", "gato");
+                Log.d("sapo", exc.getMessage());}
+
+*/
+
+           AssentFragment assentFragment = new AssentFragment(ASSENT_TEXT, "NO","SI");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frameLayout, assentFragment);
             fragmentTransaction.addToBackStack(null);
@@ -103,6 +264,9 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
 
     }
 
+    interface TaskCallback{
+        void onComplete(Evaluation e);
+    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -117,6 +281,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
 
+        Log.d("Stack: ", stateStack.toString());
         switch (stateStack.get(stateStack.size()-1)){
             case ActivityStatus.ASSENT:
                 //
@@ -127,6 +292,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
                 fragmentTransaction.commit();
                 stateStack.add(ActivityStatus.INSTRUCTION);
                 break;
+
             case ActivityStatus.INSTRUCTION:
 
                 WallyOriginalItem item = model.GetItem(0);
@@ -135,9 +301,12 @@ public class WallyOriginalActivity extends AppCompatActivity implements AssentFr
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 stateStack.add(ActivityStatus.ANSWERING_ITEMS);
-
                 break;
             case ActivityStatus.FINISHING:
+                Evaluation evaluation = model.getEvaluation();
+
+                evaluation.setFinished(true);
+                DatabaseManager.getInstance(this).insertResponseRequestAsync(evaluation);
 
                 this.finish();
                 //finish the evaluation of the instrument and save data

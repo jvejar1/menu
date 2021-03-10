@@ -73,7 +73,7 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
+    public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
         String url = BASE_URL + "evaluations";
         makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
     }
@@ -98,8 +98,11 @@ public class NetworkManager implements Executor{
                     @Override
                     public void onResponse(JSONObject response) {
 
+
                         JSONObject headers = response.optJSONObject("headers");
                         token = response.optString("Authorization", null);
+                        long userId = response.optLong("user_id");
+                        CredentialsManager.getInstance(mCtx).saveUserId(userId);
                         CredentialsManager.getInstance(mCtx).saveToken(token);
                         CredentialsManager.getInstance(mCtx).saveCredentials(username,password);
                         responseListener.onResponse(response);
@@ -144,7 +147,9 @@ public class NetworkManager implements Executor{
 
 
     public void getAll(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
-        String url =  BASE_URL + "/get_all";
+
+        long userId = CredentialsManager.getInstance(mCtx).getUserId();
+        String url =  BASE_URL + "/get_all?user_id="+userId;
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 

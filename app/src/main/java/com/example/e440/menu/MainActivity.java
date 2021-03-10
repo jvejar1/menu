@@ -22,6 +22,9 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Message;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -30,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -40,9 +44,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
+import com.example.e440.menu.wally_original.InstrumentsManager;
+import com.example.e440.menu.wally_original.ItemsBank;
 import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,15 +58,20 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
-public class
-MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener {
 
 
@@ -79,7 +92,6 @@ MainActivity extends AppCompatActivity
     ProgressDialog mProgressDialog;
 
     DatabaseManager databaseManager;
-
 
     public void onStudentSelected(final Long studentId) {
         CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico"};
@@ -153,19 +165,20 @@ MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
-
-
-
-
-
         credentialsManager = CredentialsManager.getInstance(this);
+
 
 
         //databaseManager.sendAllResults(networkManager);
 
 
+        checkAllTestAreReady();
 
-
+        if (credentialsManager.getToken() == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            //  intent.putExtra(EXTRA_MESSAGE, message);
+            startActivityForResult(intent, LOGIN_REQUEST);
+        }
     }
     private static final int PERMISSION_REQUEST_CODE = 1;
     @Override
@@ -192,7 +205,6 @@ MainActivity extends AppCompatActivity
                 //checkAllTestAreReady();
             }
             else{
-
                 finish();
             }
         }
@@ -204,27 +216,35 @@ MainActivity extends AppCompatActivity
         super.onResume();
 
 
-        if(credentialsManager.isFirstRun()){
+        final Handler handler = new Handler(this.getMainLooper()){
+
+            };
+
+       /* if(credentialsManager.isFirstRun()){
 
             Thread db_thread = new Thread(){
                 @Override
                 public void run() {
                     databaseManager.testDatabase.daoAccess().deleteAllStudents();
-
+                    databaseManager.cleanAce();
+                    databaseManager.cleanCorsi();
+                    databaseManager.cleanWally();
+                    databaseManager.cleanHnf();
+                    databaseManager.cleanFonotest();
+                    credentialsManager.setAllTestUnready();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            checkAllTestAreReady();
+                        }
+                    });
                 }
             };
             db_thread.start();
 
+        }*/
 
-        }
-        if (credentialsManager.getToken() == null) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            //  intent.putExtra(EXTRA_MESSAGE, message);
-            startActivityForResult(intent, LOGIN_REQUEST);
-        }
-        else{
-            checkAllTestAreReady();
-        }
+
 
     }
 
@@ -248,59 +268,6 @@ MainActivity extends AppCompatActivity
             });
             builder.setCancelable(false);
             builder.show();
-        }
-
-
-
-
-
-
-    }
-
-
-
-
-    class AudioDownloader extends AsyncTask{
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            try{
-
-                File cacheDir=new File(getApplicationContext().getFilesDir(),"fonotes_audios");
-                if(!cacheDir.exists())
-                    cacheDir.mkdirs();
-
-                File f=new File(cacheDir,"song.mp3");
-                URL url = new URL("http://192.168.43.176:3000/audios/download/1");
-
-                InputStream input = new BufferedInputStream(url.openStream());
-                OutputStream output = new FileOutputStream(f);
-
-                byte data[] = new byte[1024];
-                long total = 0;
-                int count=0;
-                while ((count = input.read(data)) != -1) {
-                    total++;
-                    Log.e("while","A"+total);
-
-                    output.write(data, 0, count);
-                }
-
-                output.flush();
-                output.close();
-                input.close();
-                MediaPlayer mediaPlayer;
-                mediaPlayer = new  MediaPlayer();
-                mediaPlayer.setDataSource(f.getPath());
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-
-
-            return null;
         }
     }
 
@@ -337,7 +304,7 @@ MainActivity extends AppCompatActivity
     }
 
 
-    private class InsertAll extends AsyncTask<JSONObject, Integer, Integer> {
+    private class InsertAll extends AsyncTask<JSONObject, Object, Object> {
 
         protected void onProgressUpdate(Integer... progress){
             super.onProgressUpdate(progress);
@@ -362,7 +329,7 @@ MainActivity extends AppCompatActivity
 
 
         @Override
-        protected Integer doInBackground(JSONObject... jsonObjects) {
+        protected Object doInBackground(JSONObject... jsonObjects) {
 
             int current_progress=0;
             publishProgress(current_progress);
@@ -408,7 +375,7 @@ MainActivity extends AppCompatActivity
                     publishProgress(current_progress+(int)fonotest_percent_count);
                 }
                 if(errors==0){
-
+                    
                     credentialsManager.setTestAvailability(Utilities.FONOTEST_NAME,true);
                 }
 
@@ -611,10 +578,98 @@ MainActivity extends AppCompatActivity
             }
 
 
+            ItemsBank[] instruments = null;
+            Gson gson = new Gson();
+            try{
+
+                JSONArray instrumentsJson = response.getJSONArray("instruments");
+                instruments = gson.fromJson(instrumentsJson.toString(), ItemsBank[].class);
+                for(int i=0; i<instruments.length; i++ ){
+
+                    for (int j=0; j<instruments[i].items.size(); j++){
+
+                        //download the photo
+
+                        byte[] imgBytes = downloadAsByteArray(instruments[i].items.get(j).pictureId,NetworkManager.BASE_URL+"/pictures", "original" );
+                        Context context = MainActivity.this;
+
+                        File file = new File(context.getFilesDir(), "pictures_"+Integer.toString(instruments[i].items.get(j).pictureId)+".jpg");
+
+                        try {
+                            file.createNewFile();
+                            FileOutputStream fOut2 = new FileOutputStream(file);
+                            fOut2.write(imgBytes);
+                            fOut2.close();
+                            instruments[i].items.get(j).setImagePath(file.getPath());
+
+                            //ObjectOutputStream out = new ObjectOutputStream(fOut2);
+                            //out.writeObject(imgBytes);
+                            //out.close();
+                            Log.d("SAVING IMG", "Serialized data to "+ file.getPath());
+                            ;}catch (IOException exc){
+                            exc.printStackTrace();
+                        }
+                    }
+                        //String encoded = Base64.encodeToString(imgBytes, Base64.DEFAULT);
+                        //instruments[i].items.get(j).setEncoded_image(encoded);
+
+                        //if (j==4){break;}
+
+                    }
+
+
+
+        }
+            catch (JSONException exc){
+
+
+        }
+
+
+
+/*
+                try {
+                    File file = new File(MainActivity.this.getFilesDir(), "employee.txt");
+
+                    FileOutputStream fOut = openFileOutput("employee.txt",
+                            MODE_PRIVATE);
+                    FileOutputStream fOut2 = new FileOutputStream(file);
+
+
+                    ObjectOutputStream out = new ObjectOutputStream(fOut2);
+                    out.writeObject(instruments[1]);
+                    out.close();
+                    System.out.printf("Serialized data is saved in /tmp/employee.ser");
+                } catch (IOException i) {
+                    i.printStackTrace();
+                }
+
+
+                ItemsBank e = null;
+                try {
+
+                    FileInputStream fileIn = new FileInputStream(MainActivity.this.getFilesDir() + "/employee.txt");
+                    ObjectInputStream in = new ObjectInputStream(fileIn);
+                    e = (ItemsBank) in.readObject();
+                    in.close();
+                    fileIn.close();
+
+                } catch (IOException i) {
+                    i.printStackTrace();
+
+                } catch (ClassNotFoundException c) {
+                    System.out.println("Employee class not found");
+                    c.printStackTrace();
+                }
+*/
+
+
+
+
 
 
             publishProgress(100);
-            return 1;
+            return instruments;
 
         }
 
@@ -674,108 +729,90 @@ MainActivity extends AppCompatActivity
 
 
             @Override
-            protected void onPostExecute (Integer result){
+            protected void onPostExecute (Object result){
                 // Set the bitmap into ImageView
-
                 mProgressDialog.dismiss();
+
+                InstrumentsManager instrumentsManager = InstrumentsManager.getInstance(MainActivity.this);
+                instrumentsManager.setInstruments(Arrays.asList( ( (ItemsBank[]) result)));
 
                 checkAllTestAreReady();
             }
         }
-
-
-        public void startTest(int id_student) {
-
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(ACES_PACKAGE_NAME);
-            launchIntent.putExtra("student_id", 1);
-
-
-            if (launchIntent != null) {
-                startActivity(launchIntent);//null pointer check in case package name was not found
-            }
-
-
-        }
-
-
-
-        @Override
-        public void onBackPressed() {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                super.onBackPressed();
-            }
-        }
-
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.main, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
-
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.action_settings) {
-                return true;
-            }
-
-            return super.onOptionsItemSelected(item);
-        }
-
-        @SuppressWarnings("StatementWithEmptyBody")
-        @Override
-        public boolean onNavigationItemSelected(MenuItem item) {
-            // Handle navigation view item clicks here.
-            int id = item.getItemId();
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-            if(id==R.id.nav_home){
-                HomeFragment homeFragment=new HomeFragment();
-                fragmentTransaction.replace(R.id.fragment_place,homeFragment);
-                fragmentTransaction.commit();
-
-          }
-            else if (id == R.id.nav_my_students) {
-
-
-                StudentsFragment resultFragment = new StudentsFragment();
-                fragmentTransaction.replace(R.id.fragment_place, resultFragment);
-                fragmentTransaction.commit();}
-                // Handle the camera action
-          else if (id == R.id.nav_add_student) {
-                NewStudentFragment nsf = new NewStudentFragment();
-                fragmentTransaction.replace(R.id.fragment_place, nsf);
-                fragmentTransaction.commit();
-
-            }
-           else if (id == R.id.nav_share) {
-
-            } else if (id == R.id.nav_send) {
-
-            }
-
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
             return true;
         }
 
-
-
-        public void sendResults(){
-
-            int a =1;
-            ResponseRequest[] responseRequests=databaseManager.testDatabase.daoAccess().fetchAllResponseRequest();
-
-
-       }
+        return super.onOptionsItemSelected(item);
     }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        if(id==R.id.nav_home){
+            HomeFragment homeFragment=new HomeFragment();
+            fragmentTransaction.replace(R.id.fragment_place,homeFragment);
+            fragmentTransaction.commit();
+        }
+        else if (id == R.id.nav_my_students) {
+
+
+            StudentsFragment resultFragment = new StudentsFragment();
+            Bundle bundle = new Bundle();
+
+            resultFragment.setArguments(bundle);
+
+            fragmentTransaction.replace(R.id.fragment_place, resultFragment);
+            fragmentTransaction.commit();}
+            // Handle the camera action
+      else if (id == R.id.nav_add_student) {
+            NewStudentFragment nsf = new NewStudentFragment();
+            fragmentTransaction.replace(R.id.fragment_place, nsf);
+            fragmentTransaction.commit();
+
+        }
+       else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+
+
+}

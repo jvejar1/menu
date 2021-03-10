@@ -11,18 +11,17 @@ public class CredentialsManager {
     static CredentialsManager credentialsManager;
     static String preferencesFileName = "Credentials";
     public SharedPreferences preferences;
+    static String IS_FIRST_RUN_KEY = "first_run_1";
     public CredentialsManager(Context context){
         this.preferences = context.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
     }
-    static synchronized CredentialsManager getInstance(Context context){
+    public static synchronized CredentialsManager getInstance(Context context){
         if (credentialsManager==null){
             credentialsManager =new CredentialsManager(context.getApplicationContext());
         }
         return credentialsManager;
 
     }
-
-
 
     String getUserName(){
 
@@ -32,15 +31,16 @@ public class CredentialsManager {
 
 
     boolean isFirstRun(){
-        boolean first_run=this.preferences.getBoolean("first-run",true);
+        boolean first_run=this.preferences.getBoolean(IS_FIRST_RUN_KEY,true);
         if(first_run){
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean("first-run",false );
+            editor.putBoolean(IS_FIRST_RUN_KEY,false );
             editor.commit();
 
         }
 
         return first_run;
+
 
     }
 
@@ -67,6 +67,20 @@ public class CredentialsManager {
               hnf_ready);
     }
 
+    boolean setAllTestUnready(){
+
+        boolean isReady = false;
+        SharedPreferences.Editor editor = this.preferences.edit();
+        editor.putBoolean(Utilities.ACE_NAME, isReady);
+        editor.putBoolean(Utilities.CORSI_NAME, isReady);
+        editor.putBoolean(Utilities.WALLY_NAME, isReady);
+        editor.putBoolean(Utilities.FONOTEST_NAME, isReady);
+        editor.putBoolean(Utilities.HNF_NAME, isReady);
+        editor.commit();
+        return true;
+
+    }
+
     String getUserPassword(){
         String user_password = this.preferences.getString("password", null);
         return user_password;
@@ -88,6 +102,16 @@ public class CredentialsManager {
         editor.putString("user", user_name);
         editor.putString("password",user_password);
         editor.commit();
+    }
+
+    void saveUserId(long userId){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong("userId", userId);
+        editor.commit();
+    }
+
+    public long getUserId(){
+        return preferences.getLong("userId", 0);
     }
 
 

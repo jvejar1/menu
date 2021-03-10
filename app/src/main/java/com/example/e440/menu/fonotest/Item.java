@@ -4,14 +4,32 @@ package com.example.e440.menu.fonotest;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 /**
  * Created by e440 on 30-05-18.
  */
 @Entity
-public class Item {
+public class Item implements Serializable {
     @PrimaryKey(autoGenerate = true)
     int id;
+    public String name;
+    public boolean isForPractice;
+    public int order;
+    public String audio_path;
 
+    public String description;
+    public int sever_id;
+    public String instruction;
+    public String correct_sequence;
+    public byte[] audio;
+
+    public String picturePath;
+    public String pictureUrl;
+    public String encodedPicture;
+    public int instrumentId;
+
+    public int itemTypeId;
 
     public int getId() {
         return id;
@@ -44,24 +62,25 @@ public class Item {
         this.sever_id = sever_id;
     }
 
-    public int getIndex() {
-        return index;
+    public int getOrder() {
+        return order;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setOrder(int order) {
+        this.order = order;
     }
 
 
-    public Item(String correct_sequence,String description, int sever_id, int index, String instruction,boolean example,String name) {
+    public Item(String correct_sequence, String description, int sever_id, int order, String instruction, boolean example, String name) {
         this.correct_sequence = correct_sequence;
         this.instruction=instruction;
         this.description = description;
         this.sever_id = sever_id;
-        this.index = index;
-        this.example=example;
+        this.order = order;
+        this.isForPractice = example;
         this.name=name;
     }
+    public Item(){}
 
     public String getCorrect_sequence() {
         return correct_sequence;
@@ -71,9 +90,6 @@ public class Item {
         this.correct_sequence = correct_sequence;
     }
 
-    String correct_sequence;
-    byte[] audio;
-
     public String getAudio_path() {
         return audio_path;
     }
@@ -82,10 +98,6 @@ public class Item {
         this.audio_path = audio_path;
     }
 
-    String audio_path;
-    String description;
-    int sever_id;
-    String instruction;
 
     public String getName() {
         return name;
@@ -95,7 +107,6 @@ public class Item {
         this.name = name;
     }
 
-    String name;
     public String getInstruction() {
         return instruction;
     }
@@ -104,14 +115,12 @@ public class Item {
         this.instruction = instruction;
     }
 
-    public boolean isExample() {
-        return example;
+    public boolean isForPractice() {
+        return isForPractice;
     }
 
-    public void setExample(boolean example) {
-        this.example = example;
+    public void setForPractice(boolean forPractice) {
+        this.isForPractice = forPractice;
     }
 
-    boolean example;
-    int index;
 }

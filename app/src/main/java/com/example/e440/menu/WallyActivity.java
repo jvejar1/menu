@@ -2,8 +2,10 @@ package com.example.e440.menu;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -173,6 +175,13 @@ public class WallyActivity extends BaseActivity implements InstructionFragment.b
         responses=new JSONObject();
         DataLoader dl = new DataLoader();
         dl.execute();
+        DisplayMetrics dm = this.getApplicationContext()
+                .getResources().getDisplayMetrics();
+        float screenWidth = dm.widthPixels / dm.xdpi;
+        float screenHeight = dm.heightPixels / dm.ydpi;
+        Configuration config = getResources().getConfiguration();
+        int sw = config.smallestScreenWidthDp;
+        ;
     }
 
 

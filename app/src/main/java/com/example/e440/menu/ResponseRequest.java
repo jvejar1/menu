@@ -47,6 +47,18 @@ public class ResponseRequest {
     String payload;
     String test_name;
 
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    boolean finished;
+    long instrumentId;
+
+
     public Long getStudent_server_id() {
         return student_server_id;
     }

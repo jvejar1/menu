@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.e440.menu.wally_original.InstrumentsManager;
+import com.example.e440.menu.wally_original.ItemsBank;
 import com.example.e440.menu.wally_original.WallyOriginalActivity;
 
 import java.util.ArrayList;
@@ -81,6 +83,7 @@ public class StudentsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //instruments = (ItemsBank[]) getArguments().getSerializable("key");
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.students_fragment, container, false);
         databaseManager= DatabaseManager.getInstance(getContext());
@@ -187,11 +190,23 @@ public class StudentsFragment extends Fragment {
                 Toast.makeText(getContext(), student.getLast_name() + " seleccionado!", Toast.LENGTH_SHORT).show();
                 //mCallback.onStudentSelected(student.getServer_id());
 
-                CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico", "Wally Original"};
+                CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico"};
+                final List<ItemsBank> instruments = InstrumentsManager.getInstance(getContext()).getInstruments();
+
+
+                CharSequence availableItemsStr[] = new CharSequence[ colors.length + instruments.size()];
+
+                for(int i = 0; i<colors.length; i++){
+                    availableItemsStr[i] = colors[i];
+                }
+
+                for(int i = 0; i<instruments.size(); i++){
+                   availableItemsStr[colors.length + i] = instruments.get(i).name;
+                }
                 final Context context = getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(student.getFullName());
-                builder.setItems(colors, new DialogInterface.OnClickListener(){
+                builder.setItems(availableItemsStr, new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // the user clicked on colors[which]
@@ -213,7 +228,12 @@ public class StudentsFragment extends Fragment {
                             intent = new Intent(context, FonoTestActivity.class);
                         }
                         else{
+
                             intent = new Intent(context, WallyOriginalActivity.class);
+                            int instrumentIndex = which-5;
+                            b.putInt(EXTRA.EXTRA_INSTRUMENT_INDEX, instrumentIndex);
+                            Log.d("intent", intent.toString());
+
                         }
                         intent.putExtras(b);
                         startActivityForResult(intent,1);
