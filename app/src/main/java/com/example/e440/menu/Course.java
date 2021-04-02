@@ -1,7 +1,10 @@
 package com.example.e440.menu;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import java.util.List;
 
 /**
  * Created by e440 on 09-06-18.
@@ -87,5 +90,7 @@ public class Course {
 
     }
 
+    @Ignore
+    Student[] students;
 
 }

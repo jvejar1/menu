@@ -19,7 +19,7 @@ android {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
-            def DEFAULT_SERVER_URL = 'http://10.0.2.2:3000/'
+            def DEFAULT_SERVER_URL = 'http://192.168.50.137:3000/'
             def SERVER_URL = System.getenv('SELB_SERVER_URL')
 
             if (!SERVER_URL) {
@@ -33,7 +33,7 @@ android {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
-            def DEFAULT_SERVER_URL = 'http://192.168.50.228:3000/'
+            def DEFAULT_SERVER_URL = 'http://192.168.50.137:3000/'
             def SERVER_URL = System.getenv('SELB_SERVER_URL')
             def SERVER_URL1 = "$System.env.SELB_SERVER_URL"
             if (!SERVER_URL) {

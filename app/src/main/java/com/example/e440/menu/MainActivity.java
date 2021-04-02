@@ -24,6 +24,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Message;
+import android.renderscript.RenderScript;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -51,6 +52,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -625,6 +628,14 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+            try{
+                School[] schools = gson.fromJson(response.getJSONArray("schools").toString(), School[].class);
+                Log.println(Log.DEBUG,"downloadedSchools", schools.length + "");
+            }catch (JsonIOException | JSONException jsonIOException){
+
+                ;
+            }
+
 
 
 /*
@@ -766,6 +777,13 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            return true;
+        }
+
+        else if (id== R.id.action_update){
+
+            requestInfoToServer();
             return true;
         }
 
