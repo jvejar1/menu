@@ -1,6 +1,7 @@
 package com.example.e440.menu.wally_original;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemAnswer implements Serializable {
@@ -13,6 +14,7 @@ public class ItemAnswer implements Serializable {
     public ItemAnswer(){
         this.answer = "";
         this.latencySeconds = 0;
+        answersChoices = new ArrayList<>();
     }
 
     public int getItemId() {

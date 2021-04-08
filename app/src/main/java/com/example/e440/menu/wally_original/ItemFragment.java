@@ -40,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -186,6 +187,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
             WallyOriginalItem item = model.GetCurrentItem();
 
+            itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
             Context ctx = getContext();
             if (item.itemTypeId == 1){
                 //assent item
@@ -233,6 +235,47 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 LinearLayout linearLayout = new LinearLayout(ctx);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
+                final int nChoices = item.choiceList.size();
+                final List<Button> buttons = new ArrayList<>();
+                for (int i = 0; i<nChoices; i++){
+                    ItemChoice choice = item.choiceList.get(i);
+                    final int choiceId = choice.id;
+                    String choiceText = choice.text;
+                    Button choiceBtn = new Button(ctx);
+                    choiceBtn.setText(choiceText);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    layoutParams.weight = 1;
+                    choiceBtn.setLayoutParams(layoutParams);
+                    linearLayout.addView(choiceBtn);
+                    buttons.add(choiceBtn);
+
+                }
+                for (int i = 0; i< nChoices; i++){
+                    final Button b  = buttons.get(i);
+                    b.setBackgroundResource(R.drawable.ace_default_feeling_button);
+                    ItemChoice choice = item.choiceList.get(i);
+                    final int choiceId = choice.id;
+                    b.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            itemAnswer.answersChoices.clear();
+                            itemAnswer.answersChoices.add(choiceId);
+
+                            for (int idxBtn = 0; idxBtn< nChoices; idxBtn++){
+                                Button otherButton = buttons.get(idxBtn);
+                                //otherButton.setBackgroundColor(view.getContext().getResources().getColor(R.color.colorTransparent));
+                                otherButton.setBackgroundResource(R.drawable.ace_default_feeling_button);
+                            }
+
+                            b.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
+
+                        }
+                    });
+                }
+
+                frameLayout.addView(linearLayout);
+
+
             }else if (item.itemTypeId == 4){
                 //wally instruction item
             }else if (item.itemTypeId == 5){
@@ -270,7 +313,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 //open answer item
             }
 
-            else{
+            else if (item.itemTypeId == 15){
                 //item open answered with chronometer, wally original
                 chronFrameLayout.setVisibility(View.VISIBLE);
                 FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
@@ -558,6 +601,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         @Override
         public void onClick(View v) {
 
+
             if (model.CurrentItemIsThanksItem()) {
                 mListener.OnAllItemsFinished();
                 return;
@@ -566,13 +610,20 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 //mListener.OnFinishRequest();
                 mListener.onItemAnswered(1, "", 0);
                 return;
+            }else if (model.GetCurrentItem().itemTypeId == 2){
+                mListener.onItemAnswered(1, "", 0);
+                return;
+            }
+            else if (model.GetCurrentItem().itemTypeId == 12){
+                final String answer = ((EditText) inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
+                final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+                itemAnswer.setAnswer(answer.toString());
+                itemAnswer.setLatencySeconds(latencySeconds);
+                mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
+
             }
 
-            final String answer = ((EditText) inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
-            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
-            itemAnswer.setAnswer(answer.toString());
-            itemAnswer.setLatencySeconds(latencySeconds);
-            mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
+            mListener.onItemAnswered(1,"",0);
 
         }
     };

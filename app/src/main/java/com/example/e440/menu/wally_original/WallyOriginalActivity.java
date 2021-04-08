@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
@@ -86,16 +87,29 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
             evaluation.studentId =  studentId;
             evaluation.itemsList = instrument.items;
             evaluation.itemWithAnswers = new ArrayList<>();
+            evaluation.setFinished(false);
+
             for (int i=1; i<instrument.items.size(); i++){
 
                 WallyOriginalItem item = instrument.items.get(i);
-                if(i != 0 || i != 1 ){
+
+                if(i != 0 && i != 1 ){
+                    item.choiceList = new ArrayList<>(Arrays.asList(new ItemChoice()));
                     item.itemTypeId = 3;
+                    for (int j = 0;j<3; j++){
+                        ItemChoice itemChoice = new ItemChoice();
+                        itemChoice.text = "text";
+                        itemChoice.order = j+1;
+                        itemChoice.value = j+1;
+                        itemChoice.id = j+1;
+                        item.choiceList.add(itemChoice);
+                    }
+
                 }
+
                 evaluation.itemWithAnswers.add(new ItemWithAnswer(item));
             }
 
-            evaluation.setFinished(false);
             long userId = CredentialsManager.getInstance(this).getUserId();
             evaluation.setUserId(userId);
 

@@ -4,12 +4,15 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(tableName = "item")
 public class WallyOriginalItem implements Serializable {
 
     @PrimaryKey
     private int id;
+
+    public List<ItemChoice> choiceList;
 
     private String text;
     private String encoded_image;
