@@ -18,82 +18,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewModel extends androidx.lifecycle.ViewModel {
-    private List<ItemAnswer> answers = new ArrayList<ItemAnswer>();
-
     public Evaluation getEvaluation() {
         return evaluation;
     }
-
     private Evaluation evaluation;
-
     public void setEvaluation(Evaluation evaluation){
         this.evaluation = evaluation;
-        answers = evaluation.itemAnswerList;
         items = evaluation.itemsList;
         //currentItemIndex = answers.size();
     }
 
     private int currentItemIndex = 0;
 
-    List<WallyOriginalItem> items = new ArrayList<>();
+    List<WallyOriginalItem> items;
 
-
-    public void insertAnswer(ItemAnswer answer, int index){
-
-        answer.setItemId(items.get(index).getId());
-        answers.set(index, answer);
-
-    }
     public ViewModel(){}
 
-    public WallyOriginalItem GetItem(int index){
-
-        return items.get(index);
-    }
 
     public void IncrementCurrentItemIndex(){
         currentItemIndex++;
     }
 
      public void DecrementCurrentItemIndex(){
-
         currentItemIndex--;
     }
 
-    public boolean CurrentItemIsFirstItem(){
-        return GetCurrentItem() == items.get(0);
-    }
-
-    public boolean CurrentItemIsLastItem(){
-
-        return GetCurrentItem() == items.get(items.size()-1);
+    public boolean CurrentItemIsThanksItem(){
+        return currentItemIndex >= evaluation.itemWithAnswers.size();
     }
 
     public WallyOriginalItem GetCurrentItem(){
-        return items.get(GetCurrentItemIndex());
-
+        return evaluation.itemWithAnswers.get(GetCurrentItemIndex()).getItem();
     }
 
     public int getItemsCount(){
-     return items.size();
-    }
-
-
-    public void LoadItems(){
-
+        return evaluation.itemWithAnswers.size();
     }
 
     public int GetCurrentItemIndex() {
         return currentItemIndex;
     }
 
-    public void setCurrentItemIndex(int currentItemIndex) {
-        this.currentItemIndex = currentItemIndex;
-    }
-
     public void SavePersistent(){
 
-        evaluation.itemAnswerList = answers;
         File folder = new File(  "", "evaluations/");
         folder.mkdirs();
         String folderPath = folder.getPath();
@@ -117,19 +84,10 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         //access the persistent layer and save the actual data and next submit it to server
     }
 
-
     public ItemAnswer getAnswer(int index){
 
-        try{
-            answers.get(index);
-        }catch(IndexOutOfBoundsException e){
+        return this.evaluation.itemWithAnswers.get(index).getItemAnswer();
 
-            ItemAnswer itemAnswer = new ItemAnswer();
-            itemAnswer.setItemId(items.get(index).getId());
-            answers.add(itemAnswer);
-        }
-
-        return answers.get(index);
     }
 
 

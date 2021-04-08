@@ -3,7 +3,6 @@ package com.example.e440.menu.wally_original;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +14,6 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.e440.menu.R;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -68,10 +65,10 @@ public class AssentFragment extends Fragment implements View.OnClickListener, Vi
         View view = inflater.inflate(R.layout.fragment_assent, container, false);
         inflatedView = view;
 
-        TextView mainTextView = view.findViewById(R.id.assentStatement);
+        TextView mainTextView = view.findViewById(R.id.itemTextTextView);
         mainTextView.setText(mainText);
 
-        Button continueButton = view.findViewById(R.id.assentYesButton);
+        Button continueButton = view.findViewById(R.id.itemNextButton);
         continueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +81,7 @@ public class AssentFragment extends Fragment implements View.OnClickListener, Vi
         bluetoothButton.setOnClickListener(this);
         bluetoothButton.setOnLongClickListener(this);
 
-        Button cancelButton = view.findViewById(R.id.assentNotButton);
+        Button cancelButton = view.findViewById(R.id.itemFragmentBackButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,7 +132,7 @@ public class AssentFragment extends Fragment implements View.OnClickListener, Vi
     // TODO: Rename method, update argument and hook method into UI event
     public void onYesButtonPressed(View view) {
         if (mListener != null) {
-            mListener.onContinue();
+            mListener.onAllItemsFinished();
         }
     }
     public void onNotButtonPressed(View view) {
@@ -182,7 +179,7 @@ public class AssentFragment extends Fragment implements View.OnClickListener, Vi
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onContinue();
+        void onAllItemsFinished();
         void onCancel();
     }
 }

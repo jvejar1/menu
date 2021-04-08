@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,6 +57,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         void onItemAnswered(int itemId, String answer, int itemIndex);
         void OnItemBack();
         void OnFinishRequest();
+        void OnAllItemsFinished();
         
     }
 
@@ -70,17 +77,10 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ItemFragment.
-     */
     private static String ARG_ITEM_TEXT = "item_statement";
     private static String ARG_ITEM_SERVER_ID= "item_id";
     private static String ARG_ENCODED_IMAGE="item_img";
+    private static String ARG_IS_FINISH_ITEM ="is_finish_item";
 
     EditText answerEditText;
 
@@ -92,15 +92,17 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
     private Integer latencySeconds = 0;
     private String encodedImage = null;
-    private Integer id = null;
+    private Integer id = 1;
     private View inflatedView;
     private Chronometer chron;
     ViewModel model;
+    ItemAnswer itemAnswer;
 
     // TODO: Rename and change types and number of parameters
-    public static ItemFragment newInstance(int itemServerId, String itemText, String imageBase64Encoded) {
+    public static ItemFragment newInstance(int itemServerId, String itemText, String imageBase64Encoded, boolean isFinishItem) {
         ItemFragment fragment = new ItemFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ARG_IS_FINISH_ITEM, isFinishItem);
         args.putInt(ARG_ITEM_SERVER_ID, itemServerId);
         args.putString(ARG_ITEM_TEXT, itemText);
         args.putString(ARG_ENCODED_IMAGE, imageBase64Encoded);
@@ -111,6 +113,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
         if (getArguments() != null) {
             id = getArguments().getInt(ARG_ITEM_SERVER_ID);
             encodedImage = getArguments().getString(ARG_ENCODED_IMAGE);
@@ -123,7 +127,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             model = new ViewModelProvider(requireActivity()).get(ViewModel.class);
             ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
             latencySeconds = itemAnswer.getLatencySeconds();
-        }
+        }*/
     }
 
     @Override
@@ -139,7 +143,9 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        chron = inflatedView.findViewById(R.id.chronometer);
+
+        return;
+        /*chron = inflatedView.findViewById(R.id.chronometer);
         chron.setFormat("");
         chron.setText(latencySeconds + "s");
 
@@ -149,167 +155,279 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
             startChronButton.setVisibility(View.INVISIBLE);
             stopChronButton.setVisibility(View.VISIBLE);
-        }
+        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         String savedInstanceStateSTR = savedInstanceState == null?"null":savedInstanceState.toString();
         savedInstanceStateSTR = "savedInstanceState: "+ savedInstanceStateSTR;
         Log.d("ITM_FRGMNT_ON_CRTVW", savedInstanceStateSTR);
+
         model = new ViewModelProvider(requireActivity()).get(ViewModel.class);
-        WallyOriginalItem item = model.GetCurrentItem();
 
-        ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+        if(model.CurrentItemIsThanksItem()){
 
-        inflatedView =  inflater.inflate(R.layout.fragment_item_2, container, false);
+            inflatedView = inflater.inflate(R.layout.fragment_assent, container, false);
+            TextView itemTextTextView = inflatedView.findViewById(R.id.itemTextTextView);
+            itemTextTextView.setTextSize(150);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            itemTextTextView.setLayoutParams(layoutParams);
+            //itemTextTextView.setGravity(Gravity.CENTER_VERTICAL);
+            itemTextTextView.setText("Muchas Gracias");
 
+        }else{
 
-        //answerEditText.setInputType(InputType.TYPE_NULL);
-        //put the question text
-        TextView textView = inflatedView.findViewById(R.id.wallyOriginalItemTextView);
-        textView.setText(item.getText());
+            inflatedView =  inflater.inflate(R.layout.fragment_assent, container, false);
+            FrameLayout chronFrameLayout =(FrameLayout) inflatedView.findViewById(R.id.chronometerFrameLayout);
+            chronFrameLayout.setVisibility(View.GONE);
 
-        TextView itemIndexInfoTextView = inflatedView.findViewById(R.id.itemIndexInfo);
-        String itemCountInfo = model.GetCurrentItemIndex()+1 + "/" + model.getItemsCount();
-        itemIndexInfoTextView.setText(itemCountInfo);
+            WallyOriginalItem item = model.GetCurrentItem();
 
-        //draw the image
+            Context ctx = getContext();
+            if (item.itemTypeId == 1){
+                //assent item
 
-        File file = new File(item.getImagePath());
-        try{
+                FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
 
-            FileInputStream fileInputStream = new FileInputStream( file);
-            int fileSize = (int) file.length();
-            byte[] byteArr = new byte[fileSize];
-            fileInputStream.read(byteArr);
+                LinearLayout linearLayout = new LinearLayout(ctx);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(byteArr, 0, fileSize);
-            Log.d("ByteARr", Integer.toString(byteArr.length));
-            ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
-            imageView.setImageBitmap(decodedByte);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.weight = 1;
+                layoutParams.leftMargin = 10;
+                layoutParams.rightMargin = 10;
+                Button noButton = new Button(getContext());
+                noButton.setTextSize(20);
+                noButton.setText("Rechazar");
+                noButton.setLayoutParams(layoutParams);
 
-            String imgAsBase64 = Base64.encodeToString(byteArr, Base64.DEFAULT);
+                Button yesButton = new Button(getContext());
+                yesButton.setTextSize(20);
+                yesButton.setText("Aceptar");
+                yesButton.setLayoutParams(layoutParams);
 
-            encodedImage = imgAsBase64;
-        }catch (FileNotFoundException e){
+                linearLayout.addView(noButton);
+                linearLayout.addView(yesButton);
 
-            e.printStackTrace();
+                frameLayout.addView(linearLayout);
+                //frameLayout.addView(gridLayout);
+            }else if (item.itemTypeId == 2){
+                //instruction without input
+                inflatedView =  inflater.inflate(R.layout.fragment_assent, container, false);
+                FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
 
-        }catch (IOException e){
+                LinearLayout linearLayout = new LinearLayout(ctx);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            e.printStackTrace();
-        }
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.weight = 1;
+                layoutParams.leftMargin = 10;
+                layoutParams.rightMargin = 10;
 
-       /* final String pureBase64Encoded = encodedImage.substring(encodedImage.indexOf(",")  + 1);
-        byte[] decodedString = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
-        imageView.setImageBitmap(decodedByte);*/
+            }else if (item.itemTypeId == 3){
+                //aces
+                FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
+                LinearLayout linearLayout = new LinearLayout(ctx);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-
-        answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
-        answerEditText.setText(itemAnswer.getAnswer());
-
-        //listeners
-        answerEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            }else if (item.itemTypeId == 4){
+                //wally instruction item
+            }else if (item.itemTypeId == 5){
+                //wally item
+            }
+            else if (item.itemTypeId == 6){
+                //corsi essay
+            }
+            else if (item.itemTypeId == 7){
+                //corsi item
+            }
+            else if (item.itemTypeId == 8){
+                //corsi reversed essay
+            }
+            else if (item.itemTypeId == 9){
+                //corsi reversed item
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(chronometerIsRunning){
-
-                    chron.stop();
-                    chronometerIsRunning = false;
-
-                    Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
-                    stopChronButton.setVisibility(View.INVISIBLE);
-                    Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
-                    startChronButton.setVisibility(View.VISIBLE);
-
-                }
+            else if (item.itemTypeId == 10) {
+                //hnf essay
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-
+            else if (item.itemTypeId == 11) {
+                //hnf item
             }
-        });
 
-        answerEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            else if (item.itemTypeId == 12) {
+                //fonotest example
+            }
 
-                if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_NEXT){
+            else if (item.itemTypeId == 13) {
+                //fonotest item
+            }
+            else if (item.itemTypeId == 14){
+                //open answer item
+            }
 
-                    if(chronometerIsRunning){
-                        chron.stop();
-                        chronometerIsRunning = false;
-                        Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
-                        stopChronButton.setVisibility(View.INVISIBLE);
-                        Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
-                        startChronButton.setVisibility(View.VISIBLE);
+            else{
+                //item open answered with chronometer, wally original
+                chronFrameLayout.setVisibility(View.VISIBLE);
+                FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
+                EditText textView = new EditText(ctx);
+                textView.setId(R.id.wallyOriginalAnswerEditText);
+                textView.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+                textView.setHeight(200);
+                answerEditText = textView;
+                frameLayout.addView(textView);
+
+                answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
+                ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+
+                answerEditText.setText(itemAnswer.getAnswer());
+                //listeners
+                answerEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
                     }
 
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                    final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
-                    final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+                        if(chronometerIsRunning){
 
+                            chron.stop();
+                            chronometerIsRunning = false;
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Confirmar Respuesta");
-                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User clicked OK button
-
-                            itemAnswer.setAnswer(answer.toString());
-                            itemAnswer.setLatencySeconds(latencySeconds);
-                            mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
+                            Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+                            stopChronButton.setVisibility(View.INVISIBLE);
+                            Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+                            startChronButton.setVisibility(View.VISIBLE);
 
                         }
-                    });
-                    builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+
+                answerEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                        if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_NEXT){
+
+                            if(chronometerIsRunning){
+                                chron.stop();
+                                chronometerIsRunning = false;
+                                Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+                                stopChronButton.setVisibility(View.INVISIBLE);
+                                Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+                                startChronButton.setVisibility(View.VISIBLE);
+                            }
+
+
+                            final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
+                            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setMessage("Confirmar Respuesta");
+                            builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // User clicked OK button
+
+                                    itemAnswer.setAnswer(answer.toString());
+                                    itemAnswer.setLatencySeconds(latencySeconds);
+                                    mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
+
+                                }
+                            });
+                            builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // User cancelled the dialog
+                                }
+                            });
+                            final AlertDialog dialog = builder.create();
+                            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                                @Override
+                                public void onShow(DialogInterface d) {
+                                    Button negative = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                    negative.setFocusable(true);
+                                    negative.setFocusableInTouchMode(true);
+                                    negative.requestFocus();
+                                }
+                            });
+                            dialog.show();
+
                         }
-                    });
-                    final AlertDialog dialog = builder.create();
-                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface d) {
-                            Button negative = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                            negative.setFocusable(true);
-                            negative.setFocusableInTouchMode(true);
-                            negative.requestFocus();
-                        }
-                    });
-                    dialog.show();
+                        return false;
+                    }
+                });
+                Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
+                startChronButton.setOnClickListener(this.startChronometerListener);
+
+                Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
+                stopChronButton.setOnClickListener(this.stopChronometerListener);
+
+                Button resetChronButton = inflatedView.findViewById(R.id.wallyOriginalResetChronometerButton);
+                resetChronButton.setOnClickListener(this.resetChronometerButtonListener);
+                startChronButton.setFocusableInTouchMode(true);
+                startChronButton.requestFocusFromTouch();
+
+                chron = inflatedView.findViewById(R.id.chronometer);
+                chron.setOnChronometerTickListener(this);
 
 
-
-                }
-                return false;
             }
-        });
 
-        Button finishButton = inflatedView.findViewById(R.id.finishButton);
-        finishButton.setOnClickListener(this);
+                TextView textView = inflatedView.findViewById(R.id.itemTextTextView);
+                textView.setText(item.getText());
 
-        Button startChronButton = inflatedView.findViewById(R.id.wallyOriginalStartChronometerButton);
-        startChronButton.setOnClickListener(this.startChronometerListener);
+                String itemCountInfo = model.GetCurrentItemIndex()+1 + "/" + model.getItemsCount();
 
-        Button stopChronButton = inflatedView.findViewById(R.id.wallyOriginalStopChronometerButton);
-        stopChronButton.setOnClickListener(this.stopChronometerListener);
+                TextView itemIndexInfoTextView = inflatedView.findViewById(R.id.itemIndexInfo);
+                itemIndexInfoTextView.setText(itemCountInfo);
 
-        Button resetChronButton = inflatedView.findViewById(R.id.wallyOriginalResetChronometerButton);
-        resetChronButton.setOnClickListener(this.resetChronometerButtonListener);
+                if (item.getImagePath() != null){
+                    try{
+                        File file = new File(item.getImagePath());
+                        FileInputStream fileInputStream = new FileInputStream( file);
+                        int fileSize = (int) file.length();
+                        byte[] byteArr = new byte[fileSize];
+                        fileInputStream.read(byteArr);
+
+                        Bitmap decodedByte = BitmapFactory.decodeByteArray(byteArr, 0, fileSize);
+                        Log.d("ByteARr", Integer.toString(byteArr.length));
+                        ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
+                        imageView.setImageBitmap(decodedByte);
+
+                        String imgAsBase64 = Base64.encodeToString(byteArr, Base64.DEFAULT);
+
+                        encodedImage = imgAsBase64;
+                    }catch (FileNotFoundException e){
+
+                        e.printStackTrace();
+
+                    }catch (IOException e){
+
+                        e.printStackTrace();
+                    }
+                }else{
+
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    layoutParams.addRule(RelativeLayout.ABOVE, R.id.answerFrameLayout);
+
+                    textView.setLayoutParams(layoutParams); }
+            }
+
+        /*Button finishButton = inflatedView.findViewById(R.id.finishButton);
+        finishButton.setOnClickListener(this);*/
+
         //buttons in the navbar
         Button nextButton = inflatedView.findViewById(R.id.itemNextButton);
         nextButton.setOnClickListener(this.nextButtonListener);
@@ -321,13 +439,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         bluetoothLogoImageView.setOnLongClickListener(this.bluetoothLogoLongClickListener);
 
         bluetoothLogoImageView.setOnClickListener(this.bluetoothLogoClickListener);
-
-
-        chron = inflatedView.findViewById(R.id.chronometer);
-        chron.setOnChronometerTickListener(this);
-
-        startChronButton.setFocusableInTouchMode(true);
-        startChronButton.requestFocusFromTouch();
 
         return inflatedView;
     }
@@ -399,11 +510,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             //give focus to EditText;
             View answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
             answerEditText.requestFocus();
-            /*Context ctx = (Context) mListener;
-            final InputMethodManager inputMethodManager = (InputMethodManager) ctx
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.showSoftInput(answerEditText, InputMethodManager.SHOW_IMPLICIT);
-            */
+
             return;
 
         }
@@ -451,46 +558,21 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         @Override
         public void onClick(View v) {
 
-            final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
-            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
-
-            if(!answer.equals(itemAnswer.getAnswer()) || !latencySeconds.equals(itemAnswer.getLatencySeconds()) || answer.equals("")) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Confirmar Respuesta");
-                builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-
-                        itemAnswer.setAnswer(answer.toString());
-                        itemAnswer.setLatencySeconds(latencySeconds);
-                        mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
-
-                    }
-                });
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
-                });
-                final AlertDialog dialog = builder.create();
-                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface d) {
-                        Button negative = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        negative.setFocusable(true);
-                        negative.setFocusableInTouchMode(true);
-                        negative.requestFocus();
-                    }
-                });
-                dialog.show();
-
-            }else{
-
-                mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
-
+            if (model.CurrentItemIsThanksItem()) {
+                mListener.OnAllItemsFinished();
+                return;
+            } else if (model.GetCurrentItem().itemTypeId == 1) {
+                /*if (itemAnswer.answersChoices.get(0) )*/
+                //mListener.OnFinishRequest();
+                mListener.onItemAnswered(1, "", 0);
+                return;
             }
 
+            final String answer = ((EditText) inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
+            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+            itemAnswer.setAnswer(answer.toString());
+            itemAnswer.setLatencySeconds(latencySeconds);
+            mListener.onItemAnswered(id, answer.toString(), model.GetCurrentItemIndex());
 
         }
     };
@@ -499,53 +581,19 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
         @Override
         public void onClick(View v) {
-            final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
-            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
-
-            if( !answer.equals(itemAnswer.getAnswer() )|| !latencySeconds.equals(itemAnswer.getLatencySeconds())){
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("¿Guardar cambio antes de volver?");
-                builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-
-                        itemAnswer.setAnswer(answer.toString());
-                        itemAnswer.setLatencySeconds(latencySeconds);
-                        mListener.OnItemBack();
-
-                    }
-                });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                        mListener.OnItemBack();
-                    }
-                });
-                builder.setNeutralButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-
-            }else{
-
+            if (model.CurrentItemIsThanksItem()){
                 mListener.OnItemBack();
+                return;
             }
 
-            //model.insertAnswer(itemAnswer, model.GetCurrentItemIndex());
-
+            final String answer = ((EditText)inflatedView.findViewById(R.id.wallyOriginalAnswerEditText)).getText().toString();
+            final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+            itemAnswer.setAnswer(answer.toString());
+            itemAnswer.setLatencySeconds(latencySeconds);
+            mListener.OnItemBack();
 
         }
     };
-
-
 
     @Override
     public void onResume() {

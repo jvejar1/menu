@@ -85,5 +85,6 @@ public class Evaluation implements Serializable {
 
     List<WallyOriginalItem> itemsList;
     List<ItemAnswer> itemAnswerList;
-
+    
+    List<ItemWithAnswer> itemWithAnswers;
 }

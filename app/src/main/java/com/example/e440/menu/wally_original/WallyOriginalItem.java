@@ -14,6 +14,7 @@ public class WallyOriginalItem implements Serializable {
     private String text;
     private String encoded_image;
     public int pictureId;
+    public int itemTypeId;
     public String getDescription() {
         return description;
     }
@@ -68,9 +69,11 @@ public class WallyOriginalItem implements Serializable {
     }
 
 
-    public WallyOriginalItem(String text, String encoded_image, int server_id){
+    public WallyOriginalItem(String text, String encoded_image, int server_id, int itemTypeId){
         this.text = text;
+        this.description = text;
         this.encoded_image = encoded_image;
         this.server_id = server_id;
+        this.itemTypeId = itemTypeId;
     }
 }
