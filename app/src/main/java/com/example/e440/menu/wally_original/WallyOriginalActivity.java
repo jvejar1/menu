@@ -1,20 +1,18 @@
 package com.example.e440.menu.wally_original;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Database;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -24,10 +22,12 @@ import com.example.e440.menu.EXTRA;
 import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
 import com.example.e440.menu.ResponseRequest;
+import com.example.e440.menu.ResultSendJobService;
+import com.example.e440.menu.ResultSendService;
+import com.example.e440.menu.ResultsSenderListener;
 import com.example.e440.menu.Student;
-import com.example.e440.menu.fonotest.Item;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,19 +38,12 @@ import java.util.Arrays;
 
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
-    static String ASSENT_TEXT = "Hola, mi nombre es _____________ (ayudante de investigación), vendremos varias veces " +
-            "a tu escuela y queremos que participes en un juego que está en una Tablet y que respondas. " +
-            "Si no quieres seguir, me dices y paramos. No hay ningún problema, nadie se enojará " +
-            "contigo. ¿Quieres participar?";
-    static String INSTRUCTION_TEXT = "Aquí hay una prueba de detectives para ver qué tan bueno eres como detective " +
-            "para resolver problemas. Aquí tienes tu sombrero de detective, " +
-            "si quieres usarlo (usted deberá hacer la acción de entregarle un sombrero imaginario). " +
-            "Te mostraré algunas imágenes de escenas donde aparecen problemas. " +
-            "Ve si puedes resolverlos por tu cuenta. ¡Buena suerte!";
-    static String FINISHING_TEXT = "MUCHAS GRACIAS";
-    static String STATUS_STACK_ARG = "status_stack_arg";
-    private ArrayList<String> stateStack;
     ViewModel model;
+
+    interface SpecialItemIndex {
+        int INSTRUCTION_ITEM = -1;
+        int ASSENT_ITEM = -2;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,57 +58,20 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
         if( savedInstanceState != null){
 
-        }else{
-
-            stateStack = new ArrayList<>();
+        }else {
             int instrumentIndex = getIntent().getExtras().getInt(EXTRA.EXTRA_INSTRUMENT_INDEX);
             final ItemsBank instrument = InstrumentsManager.getInstance(this).getInstruments().get(instrumentIndex);
-
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
-
-
-            instrument.items.add(0,new WallyOriginalItem(ASSENT_TEXT, null, 0, 1));
-            instrument.items.add(1,new WallyOriginalItem(INSTRUCTION_TEXT, null, 0, 1));
-            model.items = instrument.items;
-
-            INSTRUCTION_TEXT = instrument.instruction;
-
-            Evaluation evaluation = new Evaluation();
-            evaluation.itemAnswerList = new ArrayList<>();
-            evaluation.instrumentId = instrument.id;
-            evaluation.timestamp = new Timestamp(System.currentTimeMillis());
-            evaluation.studentId =  studentId;
-            evaluation.itemsList = instrument.items;
-            evaluation.itemWithAnswers = new ArrayList<>();
-            evaluation.setFinished(false);
-
-            for (int i=1; i<instrument.items.size(); i++){
-
-                WallyOriginalItem item = instrument.items.get(i);
-
-                if(i != 0 && i != 1 ){
-                    item.choiceList = new ArrayList<>(Arrays.asList(new ItemChoice()));
-                    item.itemTypeId = 3;
-                    for (int j = 0;j<3; j++){
-                        ItemChoice itemChoice = new ItemChoice();
-                        itemChoice.text = "text";
-                        itemChoice.order = j+1;
-                        itemChoice.value = j+1;
-                        itemChoice.id = j+1;
-                        item.choiceList.add(itemChoice);
-                    }
-
-                }
-
-                evaluation.itemWithAnswers.add(new ItemWithAnswer(item));
-            }
-
             long userId = CredentialsManager.getInstance(this).getUserId();
+
+            instrument.items = instrument.items.subList(0,3);
+            Evaluation evaluation = new Evaluation(instrument);
+            evaluation.studentId =  studentId;
             evaluation.setUserId(userId);
 
-            model.setEvaluation(evaluation);
+            model.setEvaluation(evaluation, instrument.instruction);
 
-            ItemFragment itemFragment = ItemFragment.newInstance(0,"wadawdawddwa","",false);
+            ItemFragment itemFragment = ItemFragment.newInstance(0,"wadawdawddwa","",false, false);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frameLayout, itemFragment);
             fragmentTransaction.addToBackStack(null);
@@ -124,57 +80,108 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
     }
 
+
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+
+
+    class SaveAndSender extends AsyncTask{
+
+        DatabaseManager databaseManager;
+        Context context;
+        ResultSendJobService.ResultsSender resultSender;
+
+        public SaveAndSender(DatabaseManager databaseManager, ResultSendJobService.ResultsSender resultSender, Context context){
+            this.context = context;
+            this.databaseManager = databaseManager;
+            this.resultSender = resultSender;
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            ResponseRequest responseRequest = databaseManager.insertResponseRequestAsync(model.getEvaluation());
+            try{
+                JSONObject payload = new JSONObject(responseRequest.getPayload());
+                payload.put("request_id_to_delete",responseRequest.getId());
+            }catch (JSONException e){
+
+            }
+            resultSender.execute();
+            return null;
+        }
 
     }
 
     @Override
-    public void OnAllItemsFinished() {
+    public void OnFinishActivityRequest() {
 
-        Evaluation evaluation = model.getEvaluation();
-        evaluation.setFinished(true);
-        DatabaseManager.getInstance(this).insertResponseRequestAsync(evaluation);
+        model.setEvaluationFinished();
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Guardando Datos");
+        progressDialog.setMessage("Por favor espere...");
+        progressDialog.show();
 
-        this.finish();
+        final DatabaseManager databaseManager = DatabaseManager.getInstance(this);
+        ResultSendJobService.ResultsSender resultsSender=new ResultSendJobService.ResultsSender(this, new ResultsSenderListener() {
+            @Override
+            public void OnSendingFinish(int total_sended_count, int errors_count) {
+                WallyOriginalActivity.this.finish();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onProgressUpdate(int progress) {
+
+            }
+        });
+
+        SaveAndSender saveAndSender = new SaveAndSender(databaseManager, resultsSender , this);
+        saveAndSender.execute();
     }
 
 
     @Override
     public void onItemAnswered(int itemId, String answer, int answeredItemIndex) {
 
+        if(model.currentItemIsTheLast()){
+            OnNavigateToThanksRequest();
+            return;
+        }
+
         model.IncrementCurrentItemIndex();
-        ItemFragment itemFragment = ItemFragment.newInstance(0,"", "", false);
+        ItemFragment itemFragment = ItemFragment.newInstance(0,"", "", false, false);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, itemFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-/*
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice("90:2B:D2:4A:86:FE");
-        ConnectThread connectThread = new ConnectThread(bluetoothDevice);
-        connectThread.run();*/
+
     }
 
     @Override
     public void OnItemBack() {
-        //use the backstack transaction
         getSupportFragmentManager().popBackStack();
         model.DecrementCurrentItemIndex();
-
     }
 
     @Override
-    public void OnFinishRequest() {
-
+    public void OnNavigateToThanksRequest() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        AssentFragment assentFragment = new AssentFragment(FINISHING_TEXT, "VOLVER", "FIN");
-        fragmentTransaction.replace(R.id.frameLayout, assentFragment);
+        ItemFragment itemFragment = ItemFragment.newInstance(0,"", "", true, false);
+        fragmentTransaction.replace(R.id.frameLayout, itemFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
+    @Override
+    public void OnRequestPopFragment() {
+
+        getSupportFragmentManager().popBackStack();
+    }
 
     @Override
     public void onBackPressed() {
@@ -185,6 +192,5 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
     protected void onDestroy() {
         MyBluetoothService.GetInstance(this).finish();
         super.onDestroy();
-
     }
 }

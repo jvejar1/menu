@@ -17,7 +17,7 @@ public class WallyOriginalItem implements Serializable {
     private String text;
     private String encoded_image;
     public int pictureId;
-    public int itemTypeId;
+    public Integer itemTypeId;
     public String getDescription() {
         return description;
     }

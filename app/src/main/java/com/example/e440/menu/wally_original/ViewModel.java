@@ -22,18 +22,32 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         return evaluation;
     }
     private Evaluation evaluation;
-    public void setEvaluation(Evaluation evaluation){
+    public String instructionText;
+    public void setEvaluation(Evaluation evaluation, String instructionText){
         this.evaluation = evaluation;
         items = evaluation.itemsList;
+        currentItemIndex = WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM;
+        this.instructionText = instructionText;
         //currentItemIndex = answers.size();
     }
 
-    private int currentItemIndex = 0;
+    public boolean setEvaluationFinished(){
+        this.evaluation.setAsFinished();
+        boolean status= this.evaluation.finished;
+        return status;
+    }
+
+
+    public String getInstructionText(){
+        return instructionText;
+    }
+
+
+    private Integer currentItemIndex;
 
     List<WallyOriginalItem> items;
 
     public ViewModel(){}
-
 
     public void IncrementCurrentItemIndex(){
         currentItemIndex++;
@@ -47,6 +61,10 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         return currentItemIndex >= evaluation.itemWithAnswers.size();
     }
 
+    public boolean currentItemIsTheLast(){
+        return currentItemIndex == evaluation.itemWithAnswers.size() -1 ;
+    }
+
     public WallyOriginalItem GetCurrentItem(){
         return evaluation.itemWithAnswers.get(GetCurrentItemIndex()).getItem();
     }
@@ -55,7 +73,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         return evaluation.itemWithAnswers.size();
     }
 
-    public int GetCurrentItemIndex() {
+    public Integer GetCurrentItemIndex() {
         return currentItemIndex;
     }
 

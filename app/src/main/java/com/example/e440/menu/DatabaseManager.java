@@ -67,20 +67,18 @@ public class DatabaseManager {
         this.testDatabase.daoAccess().insertResponseRequest(responseRequest);
     }
 
-    public void insertResponseRequestAsync(final Evaluation eval){
+    public ResponseRequest insertResponseRequestAsync(final Evaluation eval){
         Log.d("DATABASE MANAGER", "Insert eval");
         Gson gson = new Gson();
         String evalJson = gson.toJson(eval);
-
         final ResponseRequest responseRequest = new ResponseRequest(evalJson, null, false, eval.getStudentId());
-
         responseRequest.finished = eval.isFinished();
         responseRequest.instrumentId = eval.getInstrumentId();
 
         if (eval.isFinished()){
+
             Log.d("DATABASE MANAGER", "Eval finished");
             try{
-                eval.setItemsList(null);
                 evalJson = gson.toJson(eval);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("evaluation", evalJson);
@@ -90,28 +88,20 @@ public class DatabaseManager {
                 Log.d("DATABASE MANAGER", "Faled to create the HTTP json payload");
                 e.printStackTrace();
             }
-
         }
 
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                if (eval.getId() != null){
-                    testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-                    return;
-                }
+        if (eval.getId() != null){
+            testDatabase.daoAccess().updateResponseReQuest(responseRequest);
+        }
 
-                Long theReturnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
-                eval.setId(theReturnedId);
-                Gson gson = new Gson();
-                String evalJson = gson.toJson(eval);
-                responseRequest.setPayload(evalJson);
-                testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-            }
-        };
-        Thread t = new Thread(r);
-        t.start();
+        Long theReturnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
+        eval.setId(theReturnedId);
 
+        String evalJsonStr = gson.toJson(eval);
+        responseRequest.setPayload(evalJsonStr);
+        testDatabase.daoAccess().updateResponseReQuest(responseRequest);
+
+        return responseRequest;
     }
 
 
@@ -167,7 +157,6 @@ public class DatabaseManager {
         this.testDatabase.daoAccess().deleteAllWreactions();
         this.testDatabase.daoAccess().deleteAllWSituations();
         this.testDatabase.daoAccess().deleteAllWally();
-
     }
 
     void cleanCorsi(){

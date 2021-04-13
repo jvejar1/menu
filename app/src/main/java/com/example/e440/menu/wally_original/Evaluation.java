@@ -6,11 +6,38 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
 public class Evaluation implements Serializable {
 
+    public Evaluation(ItemsBank instrument){
+        this.finished = false;
+        this.timestamp =new Timestamp(System.currentTimeMillis());
+        this.instrumentId = instrument.id;
+        this.itemWithAnswers = new ArrayList<>();
+        for (int i=1; i<instrument.items.size(); i++){
+
+            WallyOriginalItem item = instrument.items.get(i);
+
+            if(i != 0 && i != 1 ){
+                item.choiceList = new ArrayList<>(Arrays.asList(new ItemChoice()));
+
+                for (int j = 0;j<3; j++){
+                    ItemChoice itemChoice = new ItemChoice();
+                    itemChoice.text = "text";
+                    itemChoice.order = j+1;
+                    itemChoice.value = j+1;
+                    itemChoice.id = j+1;
+                    item.choiceList.add(itemChoice);
+                }
+            }
+            this.itemWithAnswers.add(new ItemWithAnswer(item));
+        }
+
+    }
     public long getUserId() {
         return userId;
     }
@@ -41,8 +68,17 @@ public class Evaluation implements Serializable {
         return finished;
     }
 
-    public void setFinished(boolean finished) {
-        this.finished = finished;
+    public void setAsFinished() {
+        this.finished = true;
+        this.itemAnswerList = new ArrayList<>();
+        for (ItemWithAnswer itemWithAnswer:this.itemWithAnswers
+             ) {
+            ItemAnswer itemAnswer = itemWithAnswer.getItemAnswer();
+            this.itemAnswerList.add(itemAnswer);
+        }
+        this.itemWithAnswers =null;
+        this.itemsList = null;
+
     }
 
     @ColumnInfo(name="finished")
@@ -74,14 +110,6 @@ public class Evaluation implements Serializable {
     int serverId;
 
     Timestamp timestamp;
-
-    public List<WallyOriginalItem> getItemsList() {
-        return itemsList;
-    }
-
-    public void setItemsList(List<WallyOriginalItem> itemsList) {
-        this.itemsList = itemsList;
-    }
 
     List<WallyOriginalItem> itemsList;
     List<ItemAnswer> itemAnswerList;

@@ -62,7 +62,7 @@ public class AssentFragment extends Fragment implements View.OnClickListener, Vi
 
         String continueButtonText = getArguments().getString(CONTINUE_BUTTON_TEXT_ARG);
         String cancelButtonText = getArguments().getString(CANCEL_BUTTON_TEXT_ARG);
-        View view = inflater.inflate(R.layout.fragment_assent, container, false);
+        View view = inflater.inflate(R.layout.fragment_item_real, container, false);
         inflatedView = view;
 
         TextView mainTextView = view.findViewById(R.id.itemTextTextView);

@@ -56,7 +56,7 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
         return true;
     }
 
-    static class ResultsSender extends AsyncTask<Object,Integer,Object> {
+    public static class ResultsSender extends AsyncTask<Object,Integer,Object> {
         DatabaseManager databaseManager;
         NetworkManager networkManager;
         int sended_requests;
@@ -64,7 +64,7 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
         int total_requests;
         Context mCtx;
         ResultsSenderListener mCallback;
-        ResultsSender(Context context,ResultsSenderListener listener){
+        public ResultsSender(Context context,ResultsSenderListener listener){
             mCtx=context.getApplicationContext();
             this.databaseManager=DatabaseManager.getInstance(mCtx);
             this.networkManager=NetworkManager.getInstance(mCtx);
