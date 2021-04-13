@@ -21,19 +21,6 @@ public class Evaluation implements Serializable {
         for (int i=1; i<instrument.items.size(); i++){
 
             WallyOriginalItem item = instrument.items.get(i);
-
-            if(i != 0 && i != 1 ){
-                item.choiceList = new ArrayList<>(Arrays.asList(new ItemChoice()));
-
-                for (int j = 0;j<3; j++){
-                    ItemChoice itemChoice = new ItemChoice();
-                    itemChoice.text = "text";
-                    itemChoice.order = j+1;
-                    itemChoice.value = j+1;
-                    itemChoice.id = j+1;
-                    item.choiceList.add(itemChoice);
-                }
-            }
             this.itemWithAnswers.add(new ItemWithAnswer(item));
         }
 
