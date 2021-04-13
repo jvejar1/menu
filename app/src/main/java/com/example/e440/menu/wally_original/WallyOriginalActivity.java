@@ -64,7 +64,6 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
             long userId = CredentialsManager.getInstance(this).getUserId();
 
-            instrument.items = instrument.items.subList(0,3);
             Evaluation evaluation = new Evaluation(instrument);
             evaluation.studentId =  studentId;
             evaluation.setUserId(userId);
