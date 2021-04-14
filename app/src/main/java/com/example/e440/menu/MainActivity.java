@@ -33,6 +33,8 @@ import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -75,7 +77,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener{
 
 
 
@@ -171,12 +173,6 @@ public class MainActivity extends AppCompatActivity
         credentialsManager = CredentialsManager.getInstance(this);
 
 
-
-        //databaseManager.sendAllResults(networkManager);
-
-
-        checkAllTestAreReady();
-
         if (credentialsManager.getToken() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             //  intent.putExtra(EXTRA_MESSAGE, message);
@@ -202,14 +198,8 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==LOGIN_REQUEST){
-
-            if(resultCode== Activity.RESULT_OK){
-                //checkAllTestAreReady();
-            }
-            else{
-                finish();
-            }
+        if(requestCode==LOGIN_REQUEST && resultCode== Activity.RESULT_OK){
+            requestInfoToServer();
         }
 
     }
@@ -217,7 +207,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-
 
         final Handler handler = new Handler(this.getMainLooper()){
 
@@ -820,11 +809,60 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.commit();
 
         }
-       else if (id == R.id.nav_share) {
+       else if (id == R.id.nav_logout) {
 
-        } else if (id == R.id.nav_send) {
+            ProgressBar progressBar = new ProgressBar(this);
+            final AlertDialog.Builder waitDialogBuilder = new AlertDialog.Builder(this);
+            waitDialogBuilder.setTitle("Espere...");
+            waitDialogBuilder.setView(progressBar);
+            waitDialogBuilder.setCancelable(false);
 
+            final AlertDialog waitDialog = waitDialogBuilder.create();
+
+            final ResultSendJobService.ResultsSender resultsSender = new ResultSendJobService.ResultsSender(this, new ResultsSenderListener() {
+                @Override
+                public void OnSendingFinish(int total_sended_count, int errors_count) {
+                    Log.d("ERRORS sending evals", errors_count + "");
+
+                    waitDialog.dismiss();
+                    if (errors_count>0){
+                        return;
+                    }
+
+                    CredentialsManager.getInstance(MainActivity.this).destroyCredentials();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    //  intent.putExtra(EXTRA_MESSAGE, message);
+                    startActivityForResult(intent, LOGIN_REQUEST);
+
+                }
+
+                @Override
+                public void onProgressUpdate(int progress) {
+
+                }
+            });
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Cerrar sesión");
+            builder.setMessage("¿Continuar?");
+            builder.setCancelable(true);
+            builder.setNegativeButton("No", null);
+            builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    resultsSender.execute();
+                    waitDialog.show();
+
+                    return;
+                }
+            });
+
+            builder.show();
+            return true;
         }
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

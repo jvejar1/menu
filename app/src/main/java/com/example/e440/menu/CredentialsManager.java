@@ -25,6 +25,7 @@ public class CredentialsManager {
 
     String getUserName(){
 
+        this.getToken();
         String user_name = this.preferences.getString("user", null);
         return user_name;
     }

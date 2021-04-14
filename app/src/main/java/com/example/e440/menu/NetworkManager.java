@@ -5,6 +5,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Base64;
+import android.util.JsonReader;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -17,6 +20,8 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -100,11 +105,21 @@ public class NetworkManager implements Executor{
 
 
                         JSONObject headers = response.optJSONObject("headers");
-                        token = response.optString("Authorization", null);
+                        token = response.optString("jwt", null);
+
+                        String jsonBase64 = token.split("\\.")[1];
+                        byte[] userDecoded = Base64.decode(jsonBase64, Base64.DEFAULT);
+                        String jsonStr = new String(userDecoded);
+                        Gson gson = new Gson();
+                        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
+                        JsonObject userJson = jsonObject.getAsJsonObject("user");
+                        String userEmail = userJson.get("email").getAsString();
+
+                        CredentialsManager.getInstance(mCtx).saveCredentials(userEmail,null);
+
                         long userId = response.optLong("user_id");
                         CredentialsManager.getInstance(mCtx).saveUserId(userId);
                         CredentialsManager.getInstance(mCtx).saveToken(token);
-                        CredentialsManager.getInstance(mCtx).saveCredentials(username,password);
                         responseListener.onResponse(response);
                     }
                 }, errorListener){
