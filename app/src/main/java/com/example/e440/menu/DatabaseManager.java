@@ -67,8 +67,11 @@ public class DatabaseManager {
         this.testDatabase.daoAccess().insertResponseRequest(responseRequest);
     }
 
-    public ResponseRequest insertResponseRequestAsync(final Evaluation eval){
+    public void insertResponseRequestAsync(final Evaluation eval){
         Log.d("DATABASE MANAGER", "Insert eval");
+        if (eval.getStudentId() == 0){
+            return;
+        }
         Gson gson = new Gson();
         String evalJson = gson.toJson(eval);
         final ResponseRequest responseRequest = new ResponseRequest(evalJson, null, false, eval.getStudentId());
@@ -101,7 +104,7 @@ public class DatabaseManager {
         responseRequest.setPayload(evalJsonStr);
         testDatabase.daoAccess().updateResponseReQuest(responseRequest);
 
-        return responseRequest;
+        return;
     }
 
 

@@ -102,13 +102,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
         @Override
         protected Object doInBackground(Object[] objects) {
-            ResponseRequest responseRequest = databaseManager.insertResponseRequestAsync(model.getEvaluation());
-            try{
-                JSONObject payload = new JSONObject(responseRequest.getPayload());
-                payload.put("request_id_to_delete",responseRequest.getId());
-            }catch (JSONException e){
-
-            }
+            databaseManager.insertResponseRequestAsync(model.getEvaluation());
             resultSender.execute();
             return null;
         }
