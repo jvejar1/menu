@@ -41,13 +41,14 @@ public class NetworkManager implements Executor{
     private static NetworkManager mInstance;
     private RequestQueue mRequestQueue;
     private static Context mCtx;
-
-    public static final String BASE_URL = "http://18.222.87.0:80/";
+    public static final String SERVER_IP = BuildConfig.SERVER_URL;
+    public static final String BASE_URL = SERVER_IP;
 
     private static String token =  "";
 
     private NetworkManager(Context context){
         mCtx = context;
+        token=CredentialsManager.getInstance(mCtx).getToken();
         mRequestQueue = getRequestQueue();
     }
 
@@ -72,18 +73,21 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
+    public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
         String url = BASE_URL + "evaluations";
         makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
     }
 
+    void sendPendingResults(){
+
+    }
 
 
 
     public void login(final String username, final String password, final Response.Listener<JSONObject> responseListener,
                        Response.ErrorListener errorListener) throws JSONException {
 
-        String url = BASE_URL + "login.json";
+        String url = BASE_URL + "users/sign_in.json";
 
         JSONObject payload = new JSONObject();
         payload.put("email", username);
@@ -94,10 +98,13 @@ public class NetworkManager implements Executor{
                     @Override
                     public void onResponse(JSONObject response) {
 
+
                         JSONObject headers = response.optJSONObject("headers");
-                        token = headers.optString("Authorization", null);
-                        CredentialsManager.getInstance(null).saveToken(token);
-                        CredentialsManager.getInstance(null).saveCredentials(username,password);
+                        token = response.optString("Authorization", null);
+                        long userId = response.optLong("user_id");
+                        CredentialsManager.getInstance(mCtx).saveUserId(userId);
+                        CredentialsManager.getInstance(mCtx).saveToken(token);
+                        CredentialsManager.getInstance(mCtx).saveCredentials(username,password);
                         responseListener.onResponse(response);
                     }
                 }, errorListener){
@@ -140,16 +147,18 @@ public class NetworkManager implements Executor{
 
 
     public void getAll(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
-        String url =  BASE_URL + "/get_all";
+
+        long userId = CredentialsManager.getInstance(mCtx).getUserId();
+        String url =  BASE_URL + "/get_all?user_id="+userId;
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    public void fetchSchools(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
-        String url =  BASE_URL + "/schools/get_all";
+    public void fetchCourses(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
+        String url =  BASE_URL + "/schools_and_courses/";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    public void fetchStudentsBySchoolId(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener,int school_id){
+    public void fetchStudentsBySchoolId(Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, long school_id){
         String url =  BASE_URL + "/schools/"+school_id+"/students";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
@@ -168,22 +177,15 @@ public class NetworkManager implements Executor{
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", token);
+                headers.put("Authorization", "Bearer "+token);
                 return headers;
             }
         };
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(20000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mRequestQueue.add(jsonObjectRequest);
     }
-
-
-
-
-
-
-
 
 
 

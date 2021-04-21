@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.wifi.p2p.nsd.WifiP2pServiceInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.ContentFrameLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +17,13 @@ import android.widget.TextView;
  * Created by e440 on 08-05-18.
  */
 
-public class DisplaySituationFragment extends Fragment {
+public class DisplaySituationFragment extends Fragment implements View.OnClickListener{
 
 
     ReturnToWallyTestListener mCallback;
     public interface ReturnToWallyTestListener{
-        void returnToWally();
-
+        void goToWally();
+        void goBackFromSituationDisplaying();
 
     }
     @Override
@@ -56,19 +54,22 @@ public class DisplaySituationFragment extends Fragment {
 
         SituationLoader situationLoader=new SituationLoader();
         situationLoader.execute(wsituation_id);
-
-
-
+        Button back_button=inflatedView.findViewById(R.id.backButton);
+        back_button.setOnClickListener(this);
         Button backToTestButton=inflatedView.findViewById(R.id.backToWallyTestButton);
-        backToTestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                mCallback.returnToWally();
-
-            }
-        });
+        backToTestButton.setOnClickListener(this);
         return inflatedView;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.backButton){
+
+            mCallback.goBackFromSituationDisplaying();
+        }
+        else if(view.getId()==R.id.backToWallyTestButton){
+            mCallback.goToWally();
+        }
     }
 
     public class SituationLoader extends AsyncTask<Long,Void,WSituation>{

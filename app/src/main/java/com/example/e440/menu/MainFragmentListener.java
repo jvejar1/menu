@@ -1,5 +1,6 @@
 package com.example.e440.menu;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import org.json.JSONArray;
@@ -12,4 +13,5 @@ import org.json.JSONObject;
 public interface MainFragmentListener {
     void backFromPractice();
     void backFromTest(JSONObject jo);
+    void goBackFromMainFragment();
 }

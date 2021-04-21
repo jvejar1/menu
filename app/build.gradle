@@ -1,26 +1,47 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.example.e440.menu"
         minSdkVersion 23
-        targetSdkVersion 26
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            def DEFAULT_SERVER_URL = 'http://192.168.50.137:3000/'
+            def SERVER_URL = System.getenv('SELB_SERVER_URL')
+
+            if (!SERVER_URL) {
+
+                SERVER_URL = DEFAULT_SERVER_URL
+            }
+            buildConfigField "String", "SERVER_URL", "\"$SERVER_URL\""
+            println "server url: $SERVER_URL"
         }
         debug {
             debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
+            def DEFAULT_SERVER_URL = 'http://192.168.50.137:3000/'
+            def SERVER_URL = System.getenv('SELB_SERVER_URL')
+            def SERVER_URL1 = "$System.env.SELB_SERVER_URL"
+            if (!SERVER_URL) {
+
+                SERVER_URL = DEFAULT_SERVER_URL
+            }
+            buildConfigField "String", "SERVER_URL", "\"$SERVER_URL\""
+            println "server url: $SERVER_URL"
 
         }
     }
@@ -29,19 +50,36 @@ android {
 }
 
 dependencies {
-    compile 'com.github.bumptech.glide:glide:3.5.2'
-    compile 'com.android.support:support-v4:22.0.0'
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    api 'com.github.bumptech.glide:glide:3.5.2'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'android.arch.persistence.room:runtime:1.0.0'
+    implementation 'com.google.android.gms:play-services-plus:17.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
-    compile 'com.google.code.gson:gson:2.6.2'
+    api 'com.google.code.gson:gson:2.6.2'
     implementation 'com.android.volley:volley:1.1.0'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:appcompat-v7:29.0.0'
+    implementation 'com.android.support:support-v4:29.0.0'
+    implementation 'com.android.support:design:29.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+
+
+    //viewmodel
+
+    def lifecycle_version = "2.2.0"
+    def arch_version = "2.1.0"
+
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+
 }

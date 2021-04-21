@@ -1,0 +1,63 @@
+The application has support for 7 inch. Tablet (or smartphone) with Android 6 or later. If you don’t have one with these requirements, please tell us so we can search for a solution. 
+
+Download and install the .apk file in the tablet by accessing the following link: https://drive.google.com/file/d/1ry5uMuKkpvqES887i-jdaCwVTpt4o5kM/view?usp=sharing
+
+
+Open the application and login using ‘selbuser1000@gmail.com’ and ‘selbuser’ as the username and the password, respectively.
+
+In the first dialog, click OK to download important data.
+
+Go to ‘Agregar alumno’ to fetch the children info from the server (with the scholar info). Select ‘French school’ from the list and click the button. A message will indicate the number of downloaded students.
+
+
+Go to ‘Mis alumnos’ to search for individuals and thus begin the instrument evaluation with each child.
+
+You can filter the individuals given the scholar information (School and age groups. For instance: ‘KinderGarden from Paris School’).
+
+
+
+Select an individual (a participant of the study) and begin an instrument evaluation by selecting it in the dialog that appears from the first click.
+
+
+
+Some information for the instruments. Each instrument can include an item of instruction so that the evaluator say some statemtent or instruction to begin the evaluation, and each screen includes two navigation buttons so you can move to the next or previous instrument item:
+
+ACES instrument: Each item has four (4) alternatives (one for each feeling), each one mapped from 1 to 4 to do statistic analysis, with only one of them being the correct answer (scored with 1 when correct, and 0 in another case).
+
+
+The codes for the alternatives (feelings) are here:
+
+1. Enojado
+2. Feliz
+3. Triste
+4. Asustado
+
+
+WALLY instrument: Each item is composed of a screen describing the challenging situation and then two questions or sub-items. The first question measures the feeling that raises in child when facing social problem (from 1 to 4). The second measures the subsequent behavior or reaction from the children (from 1 to 4). 
+
+The codes for the feeling answers:
+
+1. Feliz
+2. Triste
+3. Enojado
+4. Solo bien
+
+
+The codes for the behavior reaction answers:
+
+Prosocial
+Agresiva
+Desregulada
+Evasiva
+
+
+When finishing an evaluation, the application will try to send the fresh data to the server, so you should connect the tablet to internet.
+
+To see reports of the evaluations, go to our Web interface and login with the same credentials used in the mobile application: http://159.65.65.75/
+
+
+In the first selection list from left to right, select ‘French Sample’ (a group to which you are enrolled in our system) and click ‘Aces’ or ‘Wally’ instrument button to download the CSV (Comma Separated Values) file which has the table of answers and scores. You can open it with MS Excel or similar.
+The system will export a report that, for each child, the responses given in each evaluation. The system support one or more evaluation stages so the data are stacked horizontally in the report to you see evolution in time of the measured variables. ACES report includes a 'total_score' column for each evaluation, indicating the correctly answered items (each item has a correct answer in this case. As the 'total_score' column, the system could report some other 'sum' or 'average' variable calculated with the given answers to the items).
+
+Your group (French Sample 1) are configured to have one stage of evaluation open between March-April.
+

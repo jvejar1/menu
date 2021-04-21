@@ -2,11 +2,7 @@ package com.example.e440.menu;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.widget.Toast;
 
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 
@@ -24,6 +20,13 @@ class Utilities {
             }
 
     }
+
+    final static String WALLY_NAME="wally";
+    final static String ACE_NAME="ace";
+    final static String CORSI_NAME="corsi";
+    final static String FONOTEST_NAME="fonotest";
+    final static String HNF_NAME="hnf";
+    final static String[] TEST_NAMES={WALLY_NAME,ACE_NAME,CORSI_NAME,FONOTEST_NAME,HNF_NAME};
 
     static Bitmap convertBytesArrayToBitmap(byte[] ba){
         Bitmap bm = BitmapFactory.decodeByteArray(ba, 0, ba.length);

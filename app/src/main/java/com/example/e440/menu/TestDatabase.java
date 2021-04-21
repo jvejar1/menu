@@ -1,7 +1,8 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
+
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
@@ -12,8 +13,8 @@ import com.example.e440.menu.fonotest.Item;
 
 
 @Database(entities = {Acase.class,Ace.class,Afeeling.class,Student.class,Wally.class,WSituation.class,
-                        WReaction.class,WFeeling.class,Csequence.class,Csquare.class,HnfTest.class,HnfFigure.class,
-        FonoTest.class,Item.class,Corsi.class,ResponseRequest.class,HnfSet.class,School.class}, version = 1, exportSchema = false)
+                        WReaction.class,WFeeling.class,Csequence.class,HnfTest.class,HnfFigure.class,
+        FonoTest.class,Item.class,Corsi.class,ResponseRequest.class,HnfSet.class,Course.class}, version = 5, exportSchema = false)
 public abstract class TestDatabase extends RoomDatabase {
     public abstract DaoAccess daoAccess() ;
 }

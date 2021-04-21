@@ -1,7 +1,7 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 12-05-18.
@@ -41,15 +41,36 @@ public class Csequence {
         this.ordered = ordered;
     }
 
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     private int id;
     private int server_id;
     private int index;
     private boolean ordered;
 
-    public Csequence(int server_id, int index, boolean ordered) {
+    public boolean isExample() {
+        return example;
+    }
+
+    public void setExample(boolean example) {
+        this.example = example;
+    }
+
+    public String getCsequence() {
+        return csequence;
+    }
+
+    public void setCsequence(String csequence) {
+        this.csequence = csequence;
+    }
+
+    private boolean example;
+    private String csequence;
+
+    public Csequence(int server_id, int index, boolean ordered,boolean example, String csequence) {
         this.server_id = server_id;
         this.index = index;
         this.ordered = ordered;
+        this.example=example;
+        this.csequence=csequence;
     }
 }

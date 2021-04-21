@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+
+<LinearLayout
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layoutDirection="ltr"
+
+    android:paddingTop="7dp"
+    android:gravity="center_vertical"
+    >
+    <View
+        android:layout_width="20dp"
+        android:layout_height="20dp"></View>
+    <Spinner
+        android:id="@+id/schoolsNamesSpinner"
+        android:layout_width="276dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+    android:layout_width="30dp"
+    android:layout_height="0dp"></View>
+
+    <Spinner
+        android:id="@+id/coursesSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="37dp"
+        app:layout_constraintStart_toEndOf="@+id/schoolsNamesSpinner"
+        app:layout_constraintTop_toTopOf="@+id/schoolsNamesSpinner" />
+
+    <View android:layout_width="30dp" android:layout_height="0dp"></View>
+    <TextView
+
+        android:gravity="center_vertical"
+        android:id="@+id/studentsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total alumnos"
+        android:textColor="@color/futuristic_blue"
+        app:layout_constraintBottom_toTopOf="@+id/view5" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/futuristic_blue" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/studentsRecycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="vertical"
+        tools:layout_editor_absoluteX="0dp" />
+
+</LinearLayout>

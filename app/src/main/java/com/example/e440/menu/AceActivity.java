@@ -2,20 +2,25 @@ package com.example.e440.menu;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class AceActivity extends AppCompatActivity implements InstructionFragment.backFromInstructionListener,MainFragmentListener{
+public class AceActivity extends BaseActivity implements InstructionFragment.backFromInstructionListener{
 
+
+    @Override
+    public void goBackFromMainFragment() {
+
+    }
 
     @Override
     public void backFromTest(JSONObject payload) {
         databaseManager=DatabaseManager.getInstance(getApplicationContext());
-        ResponseRequest responseRequest=new ResponseRequest(payload.toString(),"ace");
-        databaseManager.insertRequest(payload,student_server_id,"ace",0);
+        this.insertRequest(payload,"ace",0);
         finish();
     }
 
@@ -33,18 +38,18 @@ public class AceActivity extends AppCompatActivity implements InstructionFragmen
     }
 
     DatabaseManager databaseManager;
-    int student_server_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ace);
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
+
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         InstructionFragment instructionFragment= new InstructionFragment();
-        Intent intent=getIntent();
-        Bundle b=intent.getExtras();
-        student_server_id=b.getInt("student_server_id");
         Bundle bundle = new Bundle();
-        bundle.putString("text","“Ahora voy a mostrarte algunas imágenes de niños y niñas," +
+        bundle.putString("text","“Ahora voy a mostrarte algunas imágenes de niños y niñas " +
                 "y quiero que tú me digas cómo se siente cada uno. Ella/Él se " +
                 "siente ¿feliz, triste, enojada/o, o asustada/o?. ¿Lo has entendido?... (espere la respuesta del niño) Comencemos.”");
 
@@ -52,4 +57,5 @@ public class AceActivity extends AppCompatActivity implements InstructionFragmen
         fragmentTransaction.replace(R.id.fragment_place,instructionFragment);
         fragmentTransaction.commit();
     }
+
 }

@@ -1,38 +1,36 @@
 package com.example.e440.menu;
 
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FonoTestActivity extends AppCompatActivity implements MainFragmentListener{
+public class FonoTestActivity extends BaseActivity{
     @Override
     public void backFromTest(JSONObject jo) {
         getSupportFragmentManager().popBackStack();
-        DatabaseManager.getInstance(getApplicationContext()).insertRequest(jo,student_id,"fonotest",0);
+        this.insertRequest(jo,"fonotest",0);
         finish();
     }
+
     @Override
-    public void backFromPractice() {
+    public void goBackFromMainFragment() {
 
     }
 
-    int student_id;
-    int[] fgroup_ids;
-    int item_id_index;
-    int[] item_ids;
+    @Override
+    public void backFromPractice() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fono_test);
-        Intent intent=getIntent();
-        Bundle b=intent.getExtras();
-        student_id=b.getInt(Student.EXTRA_STUDENT_SERVER_ID);
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
         start_main_fragment();
     }
     void start_main_fragment(){
@@ -42,13 +40,6 @@ public class FonoTestActivity extends AppCompatActivity implements MainFragmentL
         fragmentTransaction.commit();
     }
 
-    void intelligence(int group_id_index,int item_id_index){
-        if(group_id_index==fgroup_ids.length) {
-            //TODO:FIISH
-            return;
-        }
-
-    }
 
 
 }

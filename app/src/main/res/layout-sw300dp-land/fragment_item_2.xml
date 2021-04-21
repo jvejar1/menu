@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".wally_original.ItemFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:id="@+id/actions"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10px"
+            android:layout_marginRight="15px">
+
+            <ImageView
+                android:id="@+id/bluetoothLogoImageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="10px"
+                android:layout_toLeftOf="@id/finishButton"
+                android:alpha="0.6"
+                android:src="@drawable/bluetooth"></ImageView>
+
+            <Button
+                android:id="@+id/finishButton"
+
+                android:layout_width="40px"
+                android:layout_height="40px"
+                android:layout_alignParentRight="true"
+                android:background="@color/colorTransparent"
+                android:text="x"
+                android:textColor="@color/defaultBlack"
+                android:textSize="30px" />
+
+
+        </RelativeLayout>
+
+
+        <TextView
+
+            android:id="@+id/wallyOriginalItemTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/frameLayout3"
+
+            android:layout_alignTop="@id/wallyOriginalImageView"
+            android:layout_marginHorizontal="20px"
+            android:layout_toLeftOf="@id/wallyOriginalImageView"
+            android:gravity="center_vertical"
+            android:isScrollContainer="true"
+
+            android:text="Supongamos que tu hermana comenzó a molestarte y tú comenzaste a molestarla a ella también, luego tu mamá/papá te manda a tu pieza ¿Qué harías?"
+            android:textAlignment="center"
+
+            android:textColor="@color/defaultBlack"
+            app:autoSizeMaxTextSize="35sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            app:lineHeight="35px" />
+
+        <ImageView
+            android:id="@+id/wallyOriginalImageView"
+            android:layout_width="290dp"
+            android:layout_height="match_parent"
+            android:layout_above="@id/frameLayout3"
+            android:layout_below="@id/actions"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10px"
+            android:layout_marginRight="20px"
+            android:maxHeight="220dp"
+            android:minWidth="700dp"
+            android:minHeight="400dp" />
+
+        <FrameLayout
+            android:id="@+id/frameLayout3"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/wallyOriginalAnswerEditText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp">
+
+            <Button
+                android:id="@+id/wallyOriginalResetChronometerButton"
+                android:layout_width="60px"
+                android:layout_height="60px"
+                android:layout_gravity="left|center_vertical"
+                android:background="@drawable/selector_button"
+                android:paddingTop="0px"
+                android:text="\u21BA"
+                android:textSize="40px" />
+
+            <Button
+                android:id="@+id/wallyOriginalStartChronometerButton"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:textColor="@color/defaultBlack"
+                android:paddingLeft="5px"
+                android:paddingBottom="5px"
+                android:layout_gravity="center"
+                android:background="@drawable/selector_button"
+                android:focusableInTouchMode="true"
+                android:text="\u25B6"
+                android:textSize="40px" />
+
+            <Button
+                android:id="@+id/wallyOriginalStopChronometerButton"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:background="@drawable/selector_button"
+                android:paddingLeft="0px"
+                android:paddingBottom="0px"
+                android:paddingRight="5px"
+                android:textColor="@color/defaultBlack"
+                android:text=" \u25A0"
+                android:textSize="30px"
+                android:visibility="invisible" />
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="right|center_vertical"
+                android:textColor="@color/defaultBlack"
+                android:textSize="30dp"
+                tools:layout_editor_absoluteX="300dp" />
+
+
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/frameLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="80px"
+            android:layout_alignParentBottom="true"
+            android:background="@color/defaultBlack">
+
+            <Button
+                android:id="@+id/itemNextButton"
+                android:layout_width="80px"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|center_vertical"
+                android:background="@color/colorTransparent"
+
+                android:paddingLeft="0dp"
+                android:paddingTop="0px"
+                android:paddingRight="0dp"
+                android:paddingBottom="0px"
+                android:text=">"
+                android:textColor="@color/button_selector"
+                android:textSize="40px">
+
+            </Button>
+
+            <Button
+                android:id="@+id/itemFragmentBackButton"
+                android:layout_width="80px"
+                android:layout_height="match_parent"
+                android:background="@color/colorTransparent"
+                android:text="\u003C"
+                android:textColor="@color/colorWhite"
+                android:textSize="40px"
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="110dp">
+
+            </Button>
+
+
+            <TextView
+                android:id="@+id/itemIndexInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:text="Item Info"
+                android:textColor="@color/colorWhite"
+                android:textSize="30dp">
+
+            </TextView>
+
+
+        </FrameLayout>
+
+
+        <EditText
+            android:id="@+id/wallyOriginalAnswerEditText"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_above="@id/frameLayout2"
+
+            android:layout_marginHorizontal="20px"
+            android:paddingLeft="10px"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/edit_text_selector"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="Respuesta del alumno..."
+            android:imeOptions="actionNext"
+            android:inputType="textImeMultiLine"
+            android:nextFocusForward="@+id/itemNextButton"
+            android:textColor="@color/defaultBlack"
+            android:textColorHint="@color/black_overlay"
+            android:textSize="25dp"
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.505"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </RelativeLayout>
+
+</FrameLayout>
+
