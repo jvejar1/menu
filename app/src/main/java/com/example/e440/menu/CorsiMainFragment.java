@@ -1,8 +1,10 @@
 package com.example.e440.menu;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -105,11 +107,14 @@ public class CorsiMainFragment extends Fragment{
     private HashMap<Integer,String> response_string_by_cequence_server_id=new HashMap<>(); //{1:'1-2-4-2'}
     private ArrayList<Integer> csquares=new ArrayList<>();
     int mode;
+    AlertDialog skip_seq_alert_dialog;
     long last_time;
     DatabaseManager databaseManager;
     private NextSequenceDisplayer dns;
     int score;
+    int last_csequence_lenght;
     int total_incorrects=0;
+    Button skip_button;
     JSONArray results;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -126,6 +131,79 @@ public class CorsiMainFragment extends Fragment{
         new DataLoader().execute();
         mediaPlayer=MediaPlayer.create(getContext(),R.raw.go);
         mediaPlayer=MediaPlayer.create(getContext(),R.raw.go);
+        skip_button=inflatedView.findViewById(R.id.corsiSkipButton);
+        skip_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("¿Está seguro de saltar la secuencia actual?");
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        return;
+                    }
+                });
+                builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int current_csequence_server_id=csequences[current_sequence_index].getServer_id();
+                        String response_string="";
+                        if (response_string_by_cequence_server_id.containsKey(current_csequence_server_id)){
+                            response_string=response_string_by_cequence_server_id.get(current_csequence_server_id);
+                        }
+                        else{
+                            response_string_by_cequence_server_id.put(current_csequence_server_id,response_string);
+                        }
+
+                        score=0;
+                        long current_time=System.nanoTime();
+                        float delta_time=(((current_time-last_time)/(float)1000000)/1000);
+                        JSONObject jsonObject=new JSONObject();
+                        try {
+                            jsonObject.put("time",delta_time);
+                            jsonObject.put("csequence_id",current_csequence_server_id);
+                            jsonObject.put("score", score);
+                            jsonObject.put("response_string",response_string_by_cequence_server_id.get(current_csequence_server_id));
+                            results.put(jsonObject);
+                        }
+
+                        catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+                        //check if the test must be terminated caused two wrong sequences
+                        if(score==0){
+                            total_incorrects++;
+                        }
+
+                        if(current_sequence_index%2!=0 && !isInPracticeMode() && total_incorrects==2){
+
+                            //TODO: finish in the middle
+                            int a =1;
+                            myHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(),"Test finalizado debido a 2 errores",Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                            mCallback.prepareInTheMiddleFinalization();
+                            finish();
+                        }
+                        else if(current_sequence_index%2!=0 && !isInPracticeMode()){
+                            total_incorrects=0;
+                        }
+
+                        current_sequence_index++;
+                        dns = new NextSequenceDisplayer();
+                        dns.execute();
+                    }
+                });
+                skip_seq_alert_dialog=builder.show();
+
+            }
+        });
 
         return inflatedView;
     }
@@ -206,11 +284,18 @@ public class CorsiMainFragment extends Fragment{
                 b.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view) {
+                                             if(skip_seq_alert_dialog!=null){
+                                                 skip_seq_alert_dialog.dismiss();
+                                             }
                                              int pressed_button_index=button_index_by_button_id.get(view.getId());
+                                             if(current_sequence_index>=csequences.length){
+
+                                                 return;
+                                             }
+
                                              int current_csequence_server_id=csequences[current_sequence_index].getServer_id();
 
                                              if (response_string_by_cequence_server_id.containsKey(current_csequence_server_id)){
-
                                                 response_string_by_cequence_server_id.put(current_csequence_server_id,response_string_by_cequence_server_id.get(current_csequence_server_id)+"-"+pressed_button_index);
                                              }
                                              else{
@@ -224,7 +309,6 @@ public class CorsiMainFragment extends Fragment{
                 );
 
             }
-
             dns.execute();
         }
     }
@@ -236,11 +320,18 @@ public class CorsiMainFragment extends Fragment{
         protected Integer doInBackground(Integer... integers) {
             int button_id=integers[0];
             //save the response...
+            if(current_sequence_index>=csequences.length){
+                return null;
+            }
             Csequence current_csequence=csequences[current_sequence_index];
             int button_index=button_index_by_button_id.get(button_id);
             boolean correct=false;
             int csquares_lenght=csquares.size();
             if(mode==CorsiActivity.ORDERED_TEST || mode==CorsiActivity.ORDERED_PRACTICE) {
+                if(getNumberSquareAtPosition(current_index_in_sequence)==-1){
+
+                    return null;
+                }
                 if (button_index == getNumberSquareAtPosition(current_index_in_sequence)) {
                     corrects_by_index.put(current_sequence_index, corrects_by_index.get(current_sequence_index) + 1);
                     correct=true;
@@ -257,6 +348,10 @@ public class CorsiMainFragment extends Fragment{
 
             else if(mode==CorsiActivity.REVERSED_TEST || mode==CorsiActivity.REVERSED_PRACTICE){
 
+                if(getNumberAtPositionInStrRevSeq(current_index_in_sequence)==-1){
+
+                    return null;
+                }
                 if (button_index == getNumberAtPositionInStrRevSeq(current_index_in_sequence)) {
                     corrects_by_index.put(current_sequence_index, corrects_by_index.get(current_sequence_index) + 1);
                     correct=true;
@@ -299,27 +394,32 @@ public class CorsiMainFragment extends Fragment{
                 //check if the test must be terminated caused two wrong sequences
                 if(score==0){
                     total_incorrects++;
-
-
                 }
 
-                if(total_incorrects==2 && !isInPracticeMode()){
+                if(current_sequence_index%2!=0 && !isInPracticeMode() && total_incorrects==2){
 
-                    myHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(),"Test finalizado debido a 2 errores",Toast.LENGTH_LONG).show();
+                        //TODO: finish in the middle
+                        int a =1;
+                        myHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(),"Test finalizado debido a 2 errores",Toast.LENGTH_LONG).show();
 
-                        }
-                    });
+                            }
+                        });
 
-                    finish();
+                        mCallback.prepareInTheMiddleFinalization();
+                        finish();
+                        return null;
                 }
-                else {
-                    current_sequence_index++;
-                    dns = new NextSequenceDisplayer();
-                    dns.execute();
+                else if(current_sequence_index%2!=0 && !isInPracticeMode()){
+                    total_incorrects=0;
                 }
+
+                current_sequence_index++;
+                dns = new NextSequenceDisplayer();
+                dns.execute();
+
             }
 
 
@@ -329,7 +429,7 @@ public class CorsiMainFragment extends Fragment{
 
     Integer getNumberSquareAtPosition(int position){
         if(position>= csquares.size()){
-            return null;
+            return -1;
         }
         int csquare=csquares.get(position);
 
@@ -339,7 +439,11 @@ public class CorsiMainFragment extends Fragment{
     }
 
     Integer getNumberAtPositionInStrRevSeq(int position){
+        if(csquares.size()-1-position>=csquares.size()){
+            return -1;
+        }
         int csquare=csquares.get(csquares.size()-1-position);
+
         return csquare;
 
     }
@@ -389,7 +493,15 @@ public class CorsiMainFragment extends Fragment{
         protected Integer doInBackground(Integer... integers) {
 
             //disable buttons
-
+            if(skip_seq_alert_dialog!=null){
+                skip_seq_alert_dialog.dismiss();
+            }
+            skip_button.post(new Runnable() {
+                @Override
+                public void run() {
+                    skip_button.setVisibility(View.INVISIBLE);
+                }
+            });
             for (int id:button_index_by_button_id.keySet()
                  ) {
 
@@ -459,8 +571,9 @@ public class CorsiMainFragment extends Fragment{
                 public void run() {
                     mediaPlayer.start();
                     last_time=System.nanoTime();
+                    skip_button.setVisibility(View.VISIBLE);
                 }
-            },700*counter);
+            },700*counter-1000);
 
 
 
@@ -493,6 +606,10 @@ public class CorsiMainFragment extends Fragment{
     @Override
     public void onDestroy() {
 
+        myHandler.removeCallbacksAndMessages(null);
+        if(skip_seq_alert_dialog!=null){
+            skip_seq_alert_dialog.dismiss();
+        }
         if(dns!=null && dns.getStatus()!=AsyncTask.Status.FINISHED){
             dns.cancel(true);
         }

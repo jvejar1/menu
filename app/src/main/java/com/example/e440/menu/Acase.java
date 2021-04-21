@@ -1,14 +1,17 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 
 /**
  *  Created by e440 on 08-04-18.
  */
 @Entity
 public class Acase {
+    static char MALE_CHAR='M';
+    static char FEMALE_CHAR='F';
     @NonNull
     public int getIndex() {
         return index;
@@ -49,6 +52,16 @@ public class Acase {
     @NonNull
     int server_id;
 
+    public char getSex() {
+        return sex;
+    }
+
+    public void setSex(char sex) {
+        this.sex = sex;
+    }
+
+    char sex;
+
     public String getDescription() {
         return description;
     }
@@ -61,10 +74,11 @@ public class Acase {
     byte[] image_bytes;
     @PrimaryKey(autoGenerate = true)
     private int id;
-    public Acase(@NonNull int index, @NonNull int server_id, byte[] image_bytes,String description) {
+    public Acase(@NonNull int index, @NonNull int server_id, byte[] image_bytes,String description,char sex) {
         this.index = index;
         this.server_id = server_id;
         this.image_bytes = image_bytes;
         this.description=description;
+        this.sex=sex;
     }
 }

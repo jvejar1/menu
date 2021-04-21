@@ -1,0 +1,231 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".wally_original.ItemFragment">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/actions"
+        android:layout_width="150px"
+        android:layout_marginRight="10px"
+        android:layout_marginTop="10px"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        >
+        <ImageView
+            android:layout_centerVertical="true"
+            android:id="@+id/bluetoothLogoImageView"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:alpha="0.6"
+            android:src="@drawable/bluetooth"
+            android:layout_toLeftOf="@id/finishButton"
+            android:layout_marginRight="10px"
+            ></ImageView>
+
+        <Button
+            android:id="@+id/finishButton"
+
+            android:layout_width="50px"
+            android:layout_height="50px"
+            android:layout_alignParentRight="true"
+            android:background="@color/colorTransparent"
+            android:text="x"
+            android:textColor="@color/defaultBlack"
+            android:textSize="30px" />
+
+
+    </RelativeLayout>
+
+    <TextView
+
+        android:id="@+id/wallyOriginalItemTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="170dp"
+
+        android:layout_below="@id/actions"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20px"
+        android:layout_marginTop="5px"
+        android:layout_marginRight="20px"
+        android:isScrollContainer="true"
+        android:lineHeight="57px"
+        android:text="Supongamos que tu hermana comenzó a molestarte y tú comenzaste a molestarla a ella también, luego tu mamá/papá te manda a tu pieza ¿Qué harías?"
+        android:textAlignment="center"
+        android:textColor="@color/defaultBlack"
+        android:textSize="30dp" />
+
+    <ImageView
+        android:id="@+id/wallyOriginalImageView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_below="@id/wallyOriginalItemTextView"
+        android:layout_above="@id/frameLayout3"
+        android:layout_centerHorizontal="true"
+
+        android:layout_marginTop="10px"
+        android:layout_marginBottom="10px"
+        android:layout_marginHorizontal="25px"
+        android:maxHeight="220dp"
+        android:minWidth="700dp"
+        android:minHeight="400dp" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout3"
+        android:layout_above="@id/wallyOriginalAnswerEditText"
+        android:layout_centerHorizontal="true"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15px"
+        >
+
+        <Button
+            android:id="@+id/wallyOriginalResetChronometerButton"
+            android:layout_width="60px"
+            android:layout_height="60px"
+            android:layout_gravity="left|center_vertical"
+            android:background="@drawable/selector_button"
+            android:paddingTop="0px"
+            android:text="\u21BA"
+            android:textSize="40px" />
+
+        <Button
+            android:id="@+id/wallyOriginalStartChronometerButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:textColor="@color/defaultBlack"
+            android:paddingLeft="5px"
+            android:paddingBottom="5px"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_button"
+            android:focusableInTouchMode="true"
+            android:text="\u25B6"
+            android:textSize="40px" />
+
+        <Button
+            android:id="@+id/wallyOriginalStopChronometerButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_button"
+            android:paddingLeft="0px"
+            android:paddingBottom="0px"
+            android:paddingRight="5px"
+            android:textColor="@color/defaultBlack"
+            android:text=" \u25A0"
+            android:textSize="30px"
+            android:visibility="invisible" />
+
+
+        <Chronometer
+            android:textColor="@color/defaultBlack"
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="10px"
+            android:textSize="30dp"
+            tools:layout_editor_absoluteX="300dp"></Chronometer>
+
+
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:background="@color/defaultBlack"
+        android:id="@+id/frameLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/itemNextButton"
+
+            android:layout_width="80px"
+            android:layout_height="match_parent"
+            android:layout_gravity="right|center_vertical"
+
+            android:background="@color/colorTransparent"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:text=">"
+            android:textColor="@color/button_selector"
+            android:textSize="40px">
+
+
+
+        </Button>
+
+        <Button
+            android:id="@+id/itemFragmentBackButton"
+            android:layout_width="80px"
+            android:layout_height="match_parent"
+            android:text="\u003C"
+            android:textSize="40px"
+            android:textColor="@color/colorWhite"
+            android:paddingLeft="16dp"
+            android:paddingRight="0dp"
+            tools:layout_editor_absoluteX="60dp"
+            tools:layout_editor_absoluteY="110dp"
+            android:drawableTint="@color/colorWhite"
+
+            android:background="@color/colorTransparent"
+
+            >
+
+
+        </Button>
+
+
+
+        <TextView
+            android:id="@+id/itemIndexInfo"
+            android:textColor="@color/colorWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:text="Item Info"
+            android:textSize="30dp">
+
+        </TextView>
+
+
+    </FrameLayout>
+
+
+
+
+    <EditText
+        android:layout_above="@id/frameLayout2"
+        android:id="@+id/wallyOriginalAnswerEditText"
+        android:layout_width="match_parent"
+        android:layout_height="81dp"
+        android:paddingLeft="10px"
+
+        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="20px"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:imeOptions="actionNext"
+        android:hint="Respuesta del alumno..."
+        android:inputType="textImeMultiLine"
+        android:nextFocusForward="@+id/itemNextButton"
+
+
+        android:background="@drawable/edit_text_selector"
+        android:textColorHint="@color/black_overlay"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    </RelativeLayout>
+
+</FrameLayout>
+

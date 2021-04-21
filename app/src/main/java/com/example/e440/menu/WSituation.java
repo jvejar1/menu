@@ -1,15 +1,17 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 /**
  * Created by e440 on 07-05-18.
  */
 @Entity
 public class WSituation {
+    static String WREACTION_RESPONSE_EXTRA="wreaction";
+    static String WFEELING_RESPONSE_EXTRA="wfeeling";
     @NonNull
     @PrimaryKey(autoGenerate = true)
     int id;

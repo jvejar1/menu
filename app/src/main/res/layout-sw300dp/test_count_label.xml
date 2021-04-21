@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="75dp"
+    android:layout_height="30dp"
+    android:background="@drawable/pill"
+    android:backgroundTint="@color/defaultBlack"
+    >
+
+
+    <TextView
+        android:id="@+id/textView19"
+        android:layout_width="24dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="16dp"
+        android:text="W"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView25"
+        android:layout_width="26dp"
+        android:layout_height="22dp"
+        android:layout_marginEnd="8dp"
+        android:text="25"
+        android:textAlignment="center"
+        android:textColor="#7A7A7A"
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView19"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

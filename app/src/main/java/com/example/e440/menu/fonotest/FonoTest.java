@@ -1,14 +1,14 @@
 package com.example.e440.menu.fonotest;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 29-05-18.
  */
 @Entity
 public class FonoTest {
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     int id;
 
     public FonoTest(int server_id, boolean correct) {

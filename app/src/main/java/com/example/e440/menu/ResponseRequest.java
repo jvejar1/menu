@@ -1,10 +1,7 @@
 package com.example.e440.menu;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.os.AsyncTask;
-
-import java.sql.Timestamp;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by e440 on 03-06-18.
@@ -39,13 +36,46 @@ public class ResponseRequest {
         this.test_name = test_name;
     }
 
-    public ResponseRequest(String payload, String test_name) {
+    public ResponseRequest(String payload, String test_name, boolean saved, Long student_server_id) {
         this.payload = payload;
         this.test_name = test_name;
+        this.saved =saved;
+        this.student_server_id = student_server_id;
     }
 
 
     String payload;
     String test_name;
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    boolean finished;
+    long instrumentId;
+
+
+    public Long getStudent_server_id() {
+        return student_server_id;
+    }
+
+    public void setStudent_server_id(Long student_server_id) {
+        this.student_server_id = student_server_id;
+    }
+
+    Long student_server_id;
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
+
+    boolean saved;
 
 }

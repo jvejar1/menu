@@ -62,6 +62,10 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
     private HashMap<Integer,Boolean> correct_by_index=new HashMap<>();
     private DatabaseManager databaseManager;
     private int total_time;
+    private int omitted=0;
+    private int errors=0;
+    private int corrects=0;
+    long initial_time;
     Handler uiHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -92,6 +96,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
 
 
                         correct_by_index.put(current_hf_index,false);
+                        omitted++;
                         answered_on_time_by_index.put(current_hf_index,false);
                         answer_time_by_index.put(current_hf_index,FIGURE_TIME);
                         current_hf_index++;
@@ -111,6 +116,8 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
     HnfFigure[] hnfFigure_array;
     HnfTest hnfTest;
     int current_hf_index;
+    Button left_button;
+    Button right_button;
     int score=0;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -118,8 +125,8 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
         inflatedView = inflater.inflate(R.layout.hnf_main_fragment, container, false);
         mode=getArguments().getInt("mode",-1);
         current_hf_index=0;
-        Button left_button=inflatedView.findViewById(R.id.hnfLeftButton);
-        Button right_button=inflatedView.findViewById(R.id.hnfRightButton);
+        left_button=inflatedView.findViewById(R.id.hnfLeftButton);
+        right_button=inflatedView.findViewById(R.id.hnfRightButton);
         left_button.setOnClickListener(this);
         right_button.setOnClickListener(this);
 
@@ -176,6 +183,7 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            initial_time=System.nanoTime();
             display_hnfFigure();
 
         }
@@ -184,6 +192,9 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v){ processButtonClick(v.getId());}
 
     void processButtonClick(int button_id){
+        if(current_hf_index>=hnfFigure_array.length){
+            return;
+        }
         int button_position=(button_id==R.id.hnfLeftButton)?HnfFigure.LEFT:HnfFigure.RIGHT;
         HnfFigure current_hf_figure=hnfFigure_array[current_hf_index];
         boolean correct=(current_hf_figure.getFigure()==HnfFigure.HEART &&
@@ -199,11 +210,18 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                     uiHandler.removeMessages(TIME_EXCEDEED);
                     correct_by_index.put(current_hf_index,correct);
                     answered_on_time_by_index.put(current_hf_index,true);
-                    score++;
-                    answer_time_by_index.put(current_hf_index, (System.currentTimeMillis() - start_time));
+                                        answer_time_by_index.put(current_hf_index, (System.currentTimeMillis() - start_time));
                     current_hf_index++;
-                    display_hnfFigure();
+                
 
+
+                    if(correct) {
+                        score++;
+
+                    }else {
+                      errors++;
+                    }
+                    display_hnfFigure();
                 }
             }
             finally {
@@ -232,6 +250,9 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
             //TODO: Finish fragment
 
             if(isInTestMode()){
+                long current_time=System.nanoTime();
+                float delta_time=(((current_time-initial_time)/(float)1000000)/1000);
+
                 JSONArray results=new JSONArray();
                 int index=0;
                 /*for (HnfFigure figure:hnfFigure_array
@@ -248,6 +269,10 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
                 JSONObject jsonObject=new JSONObject();
                 try {
                     jsonObject.put("score", score);
+                    jsonObject.put("omitted",omitted);
+                    jsonObject.put("errors",errors);
+                    jsonObject.put("delta_time",delta_time);
+                    jsonObject.put("test_id",hnfTest.getServer_id());
                 }
 
                 catch (JSONException e ){
@@ -279,9 +304,18 @@ public class HnfMainFragment extends Fragment implements View.OnClickListener{
         msg.what=DISPLAY_FIGURE;
         msg.setData(bundle);
         uiHandler.sendMessageDelayed(msg,BLANK_TIME);
-
+        left_button.setEnabled(false);
+        right_button.setEnabled(false);
+        uiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                left_button.setEnabled(true);
+                right_button.setEnabled(true);
+            }
+        },BLANK_TIME);
         if(isInTestMode()){
             uiHandler.sendEmptyMessageDelayed(TIME_EXCEDEED,FIGURE_TIME+BLANK_TIME);
+
         }
 
 

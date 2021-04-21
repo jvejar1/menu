@@ -1,12 +1,9 @@
 package com.example.e440.menu;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +16,10 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
         return;
     }
 
+    @Override
+    public void goBackFromMainFragment() {
 
+    }
 
     @Override
     public void backFromPractice() {
@@ -29,11 +29,15 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
     @Override
     public void backFromTest(JSONObject jo) {
         //TODO:PROCESS JSON_OBJECT
-        int score=jo.optInt("score");
+
+        //int score=jo.optInt("score");
+
+        results_array.put(jo);
         if (current_mode==HnfTest.HEARTS_AND_FLOWERS_TEST_MODE){
 
+            //Try add the array to the json
             try{
-                result.put("hnf_score",score);
+                result.put("results_array",results_array);
                 result.put("test_id",hnfSet.getServer_id());
             }
 
@@ -41,45 +45,50 @@ public class HnfActivity extends BaseActivity implements MainFragmentListener,In
                 e.printStackTrace();
             }
 
-            DatabaseManager.getInstance(getApplicationContext()).insertRequest(result,student_server_id,"hnf",0);
+            this.insertRequest(result,"hnf",0);
             finish();
 
         }
 
         else {
 
-            try{
-                if(current_mode==HnfTest.HEARTS_TEST_MODE){
-
-                    result.put("hearts_score",score);
-
-                }
-                else{
-
-                    result.put("flowers_score",score);
-                }
-            }
-
-            catch (JSONException e){
-                e.printStackTrace();
-            }
+//            try{
+//                if(current_mode==HnfTest.HEARTS_TEST_MODE){
+//
+//                    result.put("hearts_score",score);
+//
+//                }
+//                else{
+//
+//                    result.put("flowers_score",score);
+//                }
+//            }
+//
+//            catch (JSONException e){
+//                e.printStackTrace();
+//            }
             current_mode += 1;
+
+
             startInstruction();
         }
     }
     JSONObject result;
+    JSONArray results_array;
     private int current_mode;
     private HnfSet hnfSet;
-    int student_server_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hnf);
 
-        Bundle extras= getIntent().getExtras();
-        student_server_id=extras.getInt(Student.EXTRA_STUDENT_SERVER_ID);
+
+        TextView studentInfo = findViewById(R.id.studentInfoTextView);
+        studentInfo.setText(studentFullName);
+
         current_mode=0;
         result=new JSONObject();
+        results_array=new JSONArray();
         AsyncTask asyncTask =new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
