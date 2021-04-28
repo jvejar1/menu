@@ -28,7 +28,6 @@
             android:windowSoftInputMode="adjustResize"
             />
 
-        <service android:name=".ResultSendService" />
         <service
             android:name=".ResultSendJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -49,12 +48,7 @@
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/title_activity_login" />
-        <activity
-            android:name=".FullscreenActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen"
-            android:screenOrientation="portrait"
-            android:theme="@style/FullscreenTheme" />
+
         <activity
             android:name=".WallyActivity"
             android:screenOrientation="landscape"
