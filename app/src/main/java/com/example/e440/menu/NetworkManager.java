@@ -105,19 +105,18 @@ public class NetworkManager implements Executor{
 
 
                         JSONObject headers = response.optJSONObject("headers");
-                        token = response.optString("jwt", null);
+                        token = response.optString("Authorization", null);
 
                         String jsonBase64 = token.split("\\.")[1];
-                        byte[] userDecoded = Base64.decode(jsonBase64, Base64.DEFAULT);
-                        String jsonStr = new String(userDecoded);
+                        byte[] tokenPayload= Base64.decode(jsonBase64, Base64.DEFAULT);
+                        String jsonStr = new String(tokenPayload);
                         Gson gson = new Gson();
-                        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
-                        JsonObject userJson = jsonObject.getAsJsonObject("user");
+                        JsonObject tokenPayloadJson = gson.fromJson(jsonStr, JsonObject.class);
+                        JsonObject userJson = tokenPayloadJson.getAsJsonObject("user");
                         String userEmail = userJson.get("email").getAsString();
+                        long userId = response.optLong("user_id");
 
                         CredentialsManager.getInstance(mCtx).saveCredentials(userEmail,null);
-
-                        long userId = response.optLong("user_id");
                         CredentialsManager.getInstance(mCtx).saveUserId(userId);
                         CredentialsManager.getInstance(mCtx).saveToken(token);
                         responseListener.onResponse(response);
