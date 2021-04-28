@@ -23,7 +23,6 @@ import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
 import com.example.e440.menu.ResponseRequest;
 import com.example.e440.menu.ResultSendJobService;
-import com.example.e440.menu.ResultSendService;
 import com.example.e440.menu.ResultsSenderListener;
 import com.example.e440.menu.Student;
 import com.google.gson.JsonIOException;
