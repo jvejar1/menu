@@ -78,7 +78,7 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-    public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
+        public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
         String url = BASE_URL + "evaluations";
         makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
     }
@@ -106,6 +106,7 @@ public class NetworkManager implements Executor{
 
                         JSONObject headers = response.optJSONObject("headers");
                         token = response.optString("Authorization", null);
+                        long userId = response.optLong("user_id");
 
                         String jsonBase64 = token.split("\\.")[1];
                         byte[] tokenPayload= Base64.decode(jsonBase64, Base64.DEFAULT);
@@ -114,7 +115,8 @@ public class NetworkManager implements Executor{
                         JsonObject tokenPayloadJson = gson.fromJson(jsonStr, JsonObject.class);
                         JsonObject userJson = tokenPayloadJson.getAsJsonObject("user");
                         String userEmail = userJson.get("email").getAsString();
-                        long userId = response.optLong("user_id");
+                        long userIdInPayload = response.optLong("user_id");
+
 
                         CredentialsManager.getInstance(mCtx).saveCredentials(userEmail,null);
                         CredentialsManager.getInstance(mCtx).saveUserId(userId);

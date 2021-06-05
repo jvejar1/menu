@@ -58,6 +58,7 @@ public class InstrumentsManager {
         return this.instruments;
     }
 
+
     public void LoadFromFile(){
         try {
             FileInputStream fileIn = new FileInputStream(context.getFilesDir() + "/instruments.ser");

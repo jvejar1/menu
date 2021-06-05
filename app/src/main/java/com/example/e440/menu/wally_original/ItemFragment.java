@@ -6,7 +6,11 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.text.LineBreaker;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
@@ -21,6 +25,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,6 +34,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.e440.menu.DatabaseManager;
@@ -41,6 +48,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,7 +131,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = new ViewModelProvider(requireActivity()).get(ViewModel.class);
 
 
         if(savedInstanceState!=null) {
@@ -180,7 +188,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
         bluetoothLogoImageView.setOnClickListener(this.bluetoothLogoClickListener);
         TextView itemTextTextView = inflatedView.findViewById(R.id.itemTextTextView);
-        Context ctx = getContext();
+        final Context ctx = getContext();
         if(isFinishItem){
             backButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -203,7 +211,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
         }
 
-        else if (model.GetCurrentItemIndex().equals(WallyOriginalActivity.SpecialItemIndex.INSTRUCTION_ITEM))
+        else if (model.getCurrentItemIndex().equals(WallyOriginalActivity.SpecialItemIndex.INSTRUCTION_ITEM))
         {
           TextView textView = inflatedView.findViewById(R.id.itemTextTextView);
           textView.setText(model.getInstructionText());
@@ -214,7 +222,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
               }
           };
         }
-        else if(model.GetCurrentItemIndex().equals(WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM)){
+        else if(model.getCurrentItemIndex().equals(WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM)){
 
             backButton.setVisibility(View.GONE);
             FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
@@ -296,8 +304,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         }
         else{
 
-            WallyOriginalItem item = model.GetCurrentItem();
-            itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+            final WallyOriginalItem item = model.GetCurrentItem();
+            itemAnswer = model.generateAnswerForView(model.getCurrentItemIndex());
             TextView textView = inflatedView.findViewById(R.id.itemTextTextView);
             ImageView imageView =  inflatedView.findViewById(R.id.wallyOriginalImageView);
             if (item.itemTypeId == null){
@@ -335,10 +343,9 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 frameLayout.addView(editText);
 
                 answerEditText = inflatedView.findViewById(R.id.wallyOriginalAnswerEditText);
-                final ItemAnswer itemAnswer = model.getAnswer(model.GetCurrentItemIndex());
+                final ItemAnswer itemAnswer = model.getAnswer(model.getCurrentItemIndex());
 
                 answerEditText.setText(itemAnswer.getAnswer());
-                //listeners
                 answerEditText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -348,7 +355,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                        model.getAnswer(model.GetCurrentItemIndex()).setAnswer(s.toString());
+                        model.getAnswer(model.
+                                getCurrentItemIndex()).setAnswer(s.toString());
                         if(chronometerIsRunning){
                             Chronometer chron = inflatedView.findViewById(R.id.chronometer);
                             chron.stop();
@@ -379,12 +387,12 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                             builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     // User clicked OK button
-                                    ItemAnswer answer = model.getAnswer(model.GetCurrentItemIndex());
+                                    ItemAnswer answer = model.getAnswer(model.getCurrentItemIndex());
                                     if (answer.getAnswer().endsWith("\n")){
                                         answer.answer = answer.getAnswer().substring(0, answer.getAnswer().length()-1);
                                     }
 
-                                    mListener.onItemAnswered(id, "", model.GetCurrentItemIndex());
+                                    mListener.onItemAnswered(id, "", model.getCurrentItemIndex());
                                 }
                             });
                             builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -434,18 +442,159 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                     //stopChronButton.setVisibility(View.VISIBLE);
                 }
                 //frameLayout.addView(gridLayout);
-            }else if (item.itemTypeId == 2){
-                //instruction without input
+            }
+            else if (item.getItemTypeId().equals(100)){
+                inflatedView = inflater.inflate(R.layout.instruction_fragment, container, false);
+                TextView instructionTextView = inflatedView.findViewById(R.id.instructionTextView);
+                instructionTextView.setText(item.getText());
+                Button btnNavNext=inflatedView.findViewById(R.id.startButton);
+                btnNavNext.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onItemAnswered(0,"",0);
 
-                FrameLayout frameLayout = inflatedView.findViewById(R.id.answerFrameLayout);
+                    }
+                });
+                return inflatedView;
+            }
+            else if (item.getItemTypeId().equals(102)){
+                inflatedView = inflater.inflate(R.layout.fragment_item_101, container, false);
 
-                LinearLayout linearLayout = new LinearLayout(ctx);
-                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                //get the file bytes
+                String parentPath = ctx.getFilesDir().getAbsolutePath();
+                String imgAbsPath;
+                if (item.getImagePath().contains(parentPath)){
+                    imgAbsPath = item.getImagePath();
+                }else{
+                    imgAbsPath = parentPath.concat("/"+item.getImagePath());
+                }
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.weight = 1;
-                layoutParams.leftMargin = 10;
-                layoutParams.rightMargin = 10;
+                ImageView itemImgVw = inflatedView.findViewById(R.id.itemImageView);
+                Bitmap bm = BitmapFactory.decodeFile(imgAbsPath);
+                itemImgVw.setImageBitmap(bm);
+
+                TextView instructionTextView = inflatedView.findViewById(R.id.itemTextTextView);
+                instructionTextView.setText(item.getText());
+                Button btnNavNext=inflatedView.findViewById(R.id.nav_next_btn);
+                btnNavNext.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onItemAnswered(0,"",0);
+
+                    }
+                });
+                return inflatedView;
+            }
+
+            else if (item.itemTypeId == 2){
+                inflatedView = inflater.inflate(R.layout.fragment_item_generic, container, false);
+
+                String itemText = item.getDescription();
+                TextView tv = inflatedView.findViewById(R.id.itemTextTextView);
+                tv.setText(itemText);
+                LinearLayout choicesLayout = inflatedView.findViewById(R.id.choicesLayout);
+                Button navPrevBtn = inflatedView.findViewById(R.id.nav_prev_btn);
+                navPrevBtn.setOnClickListener(this.backButtonClickListener);
+                Button navNextBtn = inflatedView.findViewById(R.id.nav_next_btn);
+                navNextBtn.setVisibility(View.INVISIBLE);
+                navNextBtn.setOnClickListener(this.nextButtonListener);
+                final List<ItemChoice> choices = item.getChoices();
+                final int itemIdx = model.getCurrentItemIndex();
+                final ArrayList<LinearLayout> choiceLayouts = new ArrayList<LinearLayout>();
+                final Handler h = new Handler();
+                for(int i=0; i<item.choices.size(); i++) {
+                    ItemChoice choice = choices.get(i);
+                    final int choiceIdx = i;
+                    final LinearLayout linearLayout = new LinearLayout(ctx);
+                    model.getChoiceSelectedFlag(itemIdx, choiceIdx).observe(ItemFragment.this, new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(Boolean aBoolean) {
+                            if (aBoolean){
+                                linearLayout.setBackgroundColor(Color.GRAY);
+                            }else{
+                                linearLayout.setBackgroundColor(Color.TRANSPARENT);
+                            }
+                        }
+                    });
+
+                    View.OnClickListener choiceClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view){
+                            model.userTouchesChoice(itemIdx,choiceIdx);
+                            long delayMillisNextItem =500;
+                            h.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mListener.onItemAnswered(0,"",0);
+                                }
+                            }, delayMillisNextItem);
+                        }
+                    };
+
+                    linearLayout.setOnClickListener(choiceClickListener);
+
+                    Bitmap bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.person_icon_2);
+                    File file = new File(ctx.getFilesDir(),choice.getPicturePath());
+                    int fileSize = (int)file.length();
+                    try{
+                        Log.d("Try loading file", String.format("can_read: %s, path: %s, bytes:%d, is_file: %s, is_dir:%s", file.canRead(),file.getAbsolutePath(), fileSize, file.isFile(), file.isDirectory()));
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        bitMap = BitmapFactory.decodeStream(fileInputStream);
+                        fileInputStream.close();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    layoutParams.weight = 1;
+                    layoutParams.rightMargin=4;
+                    layoutParams.leftMargin=4;
+
+                    linearLayout.setId(i);
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    linearLayout.setLayoutParams(layoutParams);
+                    choiceLayouts.add(linearLayout);
+                    choicesLayout.addView(linearLayout);
+
+                    ImageView imageViewChoice = new ImageView(ctx);
+                    imageViewChoice.setCropToPadding(true);
+                    imageViewChoice.setAdjustViewBounds(true);
+                    imageViewChoice.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                    LinearLayout.LayoutParams imgLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    imageViewChoice.setLayoutParams(imgLayoutParams);
+                    linearLayout.addView(imageViewChoice);
+                    imageViewChoice.setImageBitmap(bitMap);
+
+                    String text = String.format("%s", choice.getText());
+                    TextView textViewChoice = new TextView(ctx);
+                    int textSize = 20;
+                    textViewChoice.setTextSize(textSize);
+                    textViewChoice.setPadding(10,10,5,0);
+                    textViewChoice.setTextColor(Color.BLACK);
+                    textViewChoice.setLayoutParams(imgLayoutParams);
+                    textViewChoice.setText(text);
+
+
+                    //choicesLayout.addView(textViewChoice);
+                    linearLayout.addView(textViewChoice);
+                    linearLayout.setVisibility(View.INVISIBLE);
+                    linearLayout.setClickable(false);
+
+                    Long[] showHideProgram = model.getShowHideProgram(itemIdx, choiceIdx);
+                    h.postDelayed(new Runnable() {
+                                                 @Override
+                                                 public void run() {
+                                                     linearLayout.setClickable(true);
+                                                     linearLayout.setVisibility(View.VISIBLE);
+                                                 }
+                                             }
+                            , showHideProgram[0]);
+
+
+
+                }
+
+                return inflatedView;
 
             }else if (item.itemTypeId == 3){
                 //aces
@@ -453,11 +602,11 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 LinearLayout linearLayout = new LinearLayout(ctx);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                final int nChoices = item.choiceList.size();
+                final int nChoices = item.choices.size();
                 final List<Button> buttons = new ArrayList<>();
                 for (int i = 0; i<nChoices; i++){
-                    ItemChoice choice = item.choiceList.get(i);
-                    String choiceText = choice.text;
+                    ItemChoice choice = item.choices.get(i);
+                    String choiceText = choice.getText();
                     Button choiceBtn = new Button(ctx);
                     choiceBtn.setText(choiceText);
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -470,7 +619,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 for (int i = 0; i< nChoices; i++){
                     final Button b  = buttons.get(i);
                     b.setBackgroundResource(R.drawable.ace_default_feeling_button);
-                    ItemChoice choice = item.choiceList.get(i);
+                    ItemChoice choice = item.choices.get(i);
                     final int choiceId = choice.id;
                     if (itemAnswer.answersChoices.contains(choiceId)){
                         b.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
@@ -482,7 +631,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            itemAnswer.answersChoices.clear();
+                            /*itemAnswer.answersChoices.clear();
                             itemAnswer.answersChoices.add(choiceId);
 
                             for (int idxBtn = 0; idxBtn< nChoices; idxBtn++){
@@ -491,7 +640,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                                 otherButton.setBackgroundResource(R.drawable.ace_default_feeling_button);
                             }
 
-                            b.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);
+                            b.setBackgroundResource(R.drawable.ace_highlighted_feeling_button_bg);*/
 
                         }
                     });
@@ -505,7 +654,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             textView.setMovementMethod(new ScrollingMovementMethod());
             textView.setText(item.getText());
 
-            String itemCountInfo = model.GetCurrentItemIndex()+1 + "/" + model.getItemsCount();
+            String itemCountInfo = model.getCurrentItemIndex()+1 + "/" + model.getItemsCount();
 
             TextView itemIndexInfoTextView = inflatedView.findViewById(R.id.itemIndexInfo);
             itemIndexInfoTextView.setText(itemCountInfo);
@@ -695,8 +844,11 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     public void onPause() {
         super.onPause();
         Chronometer chron = inflatedView.findViewById(R.id.chronometer);
-        chron.stop();
-        chronometerIsRunning = false;
+        if (chron!=null){
+            chron.stop();
+            chronometerIsRunning = false;
+
+        }
     }
 
     @Override
@@ -704,6 +856,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
+            model = new ViewModelProvider(requireActivity()).get(ViewModel.class);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");

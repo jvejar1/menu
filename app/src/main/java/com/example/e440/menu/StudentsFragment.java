@@ -201,7 +201,7 @@ public class StudentsFragment extends Fragment {
                 }
 
                 for(int i = 0; i<instruments.size(); i++){
-                   availableItemsStr[colors.length + i] = instruments.get(i).name;
+                   availableItemsStr[colors.length + i] = instruments.get(i).getName();
                 }
                 final Context context = getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);

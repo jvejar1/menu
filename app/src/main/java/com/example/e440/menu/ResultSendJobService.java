@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -137,7 +139,12 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
             for (ResponseRequest responseRequest:responseRequests){
 
                 try {
+
+                    Gson gson = new Gson();
+                    String jsonStr = responseRequest.getPayload();
+                    JsonElement je = gson.fromJson(jsonStr, JsonElement.class);
                     JSONObject payload = new JSONObject(responseRequest.getPayload());
+
                     payload.put("request_id_to_delete",responseRequest.getId());
                     this.networkManager.sendEvaluation(payload, new Response.Listener<JSONObject>() {
                         @Override

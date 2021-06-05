@@ -3,7 +3,10 @@ package com.example.e440.menu.wally_original;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.example.e440.menu.fonotest.Item;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "item")
@@ -12,11 +15,35 @@ public class WallyOriginalItem implements Serializable {
     @PrimaryKey
     private int id;
 
-    public List<ItemChoice> choiceList;
+    public List<ItemChoice> getChoices() {
+        if (this.choices==null){
+            this.choices= new ArrayList<>(0);
+        }
+        return choices;
+    }
+    public ItemChoice getChoice(int which){
+
+        return this.choices.get(which);
+    }
+
+    public void setChoices(List<ItemChoice> choices) {
+        this.choices = choices;
+    }
+
+    public List<ItemChoice> choices;
 
     private String text;
     private String encoded_image;
     public int pictureId;
+
+    public Integer getItemTypeId() {
+        return itemTypeId;
+    }
+
+    public void setItemTypeId(Integer itemTypeId) {
+        this.itemTypeId = itemTypeId;
+    }
+
     public Integer itemTypeId;
     public String getDescription() {
         return description;

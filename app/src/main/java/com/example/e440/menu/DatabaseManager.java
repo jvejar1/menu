@@ -11,6 +11,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.e440.menu.wally_original.Evaluation;
 import com.example.e440.menu.wally_original.ItemsBank;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,37 +75,16 @@ public class DatabaseManager {
             return;
         }
         Gson gson = new Gson();
-        String evalJson = gson.toJson(eval);
-        final ResponseRequest responseRequest = new ResponseRequest(evalJson, null, false, eval.getStudentId());
+        JsonElement evalJO = (gson.toJsonTree(eval,Evaluation.class)).getAsJsonObject();
+        JsonObject payload = new JsonObject();
+        payload.add("evaluation", evalJO);
+
+        final ResponseRequest responseRequest = new ResponseRequest(payload.toString(), null, false, eval.getStudentId());
         responseRequest.finished = eval.isFinished();
         responseRequest.instrumentId = eval.getInstrumentId();
 
-        if (eval.isFinished()){
-
-            Log.d("DATABASE MANAGER", "Eval finished");
-            try{
-                evalJson = gson.toJson(eval);
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("evaluation", evalJson);
-                responseRequest.setPayload(jsonObject.toString());
-
-            }catch( JSONException e){
-                Log.d("DATABASE MANAGER", "Faled to create the HTTP json payload");
-                e.printStackTrace();
-            }
-        }
-
-        if (eval.getId() != null){
-            testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-        }
-
         Long theReturnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
-        eval.setId(theReturnedId);
-
-        String evalJsonStr = gson.toJson(eval);
-        responseRequest.setPayload(evalJsonStr);
         testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-
         return;
     }
 

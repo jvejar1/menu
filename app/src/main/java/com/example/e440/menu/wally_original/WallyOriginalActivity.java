@@ -1,6 +1,5 @@
 package com.example.e440.menu.wally_original;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -11,29 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Database;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.example.e440.menu.CredentialsManager;
 import com.example.e440.menu.DatabaseManager;
 import com.example.e440.menu.EXTRA;
-import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
-import com.example.e440.menu.ResponseRequest;
 import com.example.e440.menu.ResultSendJobService;
 import com.example.e440.menu.ResultsSenderListener;
 import com.example.e440.menu.Student;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
@@ -54,7 +40,6 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         actionBar.hide();
 
         model = new ViewModelProvider(this).get(ViewModel.class);
-
         if( savedInstanceState != null){
 
         }else {
@@ -63,19 +48,22 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
             long userId = CredentialsManager.getInstance(this).getUserId();
 
-            Evaluation evaluation = new Evaluation(instrument);
-            evaluation.studentId =  studentId;
-            evaluation.setUserId(userId);
+            InstrumentsManager instrumentsManager= InstrumentsManager.getInstance(this);
+            model.configure(instrumentIndex,studentId,userId, instrumentsManager);
 
-            model.setEvaluation(evaluation, instrument.instruction);
-
-            ItemFragment itemFragment = ItemFragment.newInstance(0,"wadawdawddwa","",false, false);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frameLayout, itemFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            model.getMustBeginWithTheItems().observe(this, new Observer<Boolean>() {
+                @Override
+                public void onChanged(Boolean aBoolean) {
+                    if (aBoolean){
+                        ItemFragment itemFragment = ItemFragment.newInstance(0,"wadawdawddwa","",false, false);
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frameLayout, itemFragment);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    }
+                }
+            });
         }
-
     }
 
 

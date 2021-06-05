@@ -49,6 +49,7 @@ import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
 import com.example.e440.menu.wally_original.InstrumentsManager;
 import com.example.e440.menu.wally_original.ItemsBank;
+import com.example.e440.menu.wally_original.Picture;
 import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.navigation.NavigationView;
@@ -75,6 +76,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener{
@@ -581,26 +583,30 @@ public class MainActivity extends AppCompatActivity
                     for (int j=0; j<instruments[i].items.size(); j++){
 
                         //download the photo
+                        Integer pictureId =instruments[i].items.get(j).pictureId;
+                        if (!pictureId.equals(null) && !pictureId.equals(0)){
 
-                        byte[] imgBytes = downloadAsByteArray(instruments[i].items.get(j).pictureId,NetworkManager.BASE_URL+"/pictures", "original" );
-                        Context context = MainActivity.this;
+                            byte[] imgBytes = downloadAsByteArray(pictureId,NetworkManager.BASE_URL+"/pictures", "original" );
+                            Context context = MainActivity.this;
 
-                        File file = new File(context.getFilesDir(), "pictures_"+Integer.toString(instruments[i].items.get(j).pictureId)+".jpg");
+                            File file = new File(context.getFilesDir(), "pictures_"+Integer.toString(pictureId)+".jpg");
 
-                        try {
-                            file.createNewFile();
-                            FileOutputStream fOut2 = new FileOutputStream(file);
-                            fOut2.write(imgBytes);
-                            fOut2.close();
-                            instruments[i].items.get(j).setImagePath(file.getPath());
+                            try {
+                                file.createNewFile();
+                                FileOutputStream fOut2 = new FileOutputStream(file);
+                                fOut2.write(imgBytes);
+                                fOut2.close();
+                                instruments[i].items.get(j).setImagePath(file.getPath());
 
-                            //ObjectOutputStream out = new ObjectOutputStream(fOut2);
-                            //out.writeObject(imgBytes);
-                            //out.close();
-                            Log.d("SAVING IMG", "Serialized data to "+ file.getPath());
-                            ;}catch (IOException exc){
-                            exc.printStackTrace();
+                                //ObjectOutputStream out = new ObjectOutputStream(fOut2);
+                                //out.writeObject(imgBytes);
+                                //out.close();
+                                Log.d("SAVING IMG", "Serialized data to "+ file.getPath());
+                                ;}catch (IOException exc){
+                                exc.printStackTrace();
+                            }
                         }
+
                     }
                         //String encoded = Base64.encodeToString(imgBytes, Base64.DEFAULT);
                         //instruments[i].items.get(j).setEncoded_image(encoded);
@@ -623,6 +629,19 @@ public class MainActivity extends AppCompatActivity
             }catch (JsonIOException | JSONException jsonIOException){
 
                 ;
+            }
+
+            try{
+                JSONArray picturesJson = response.getJSONArray("pictures");
+                for(int i=0; i<picturesJson.length(); i++){
+                    JSONObject pictureJsonObj = picturesJson.getJSONObject(i);
+                    Picture picture = gson.fromJson(pictureJsonObj.toString(), Picture.class);
+                    int fileSize = picture.getImageFileSize();
+                    download(picture.url, picture.getFilePath(), fileSize);
+                }
+            }catch(JSONException e){
+
+                e.printStackTrace();
             }
 
 
@@ -727,6 +746,41 @@ public class MainActivity extends AppCompatActivity
 
             }
 
+            public int download(String url,String filePath, int fileSize){
+
+                int buffSize=1024;
+                byte[] buff;
+                int nBytesWritten=0;
+                try {
+                    buff = new byte[buffSize];
+                    String fullPath = String.format("%s/%s", getApplicationContext().getFilesDir(), filePath);
+                    File file=new File(fullPath);
+                    file.getParentFile().mkdirs();
+                    if(file.exists()){
+                        file.delete();
+                    }
+                    file.createNewFile();
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    URL aURL = new URL(url);
+                    InputStream inputStream = aURL.openStream();
+
+                    int nReadedBytes =0;
+                    while ((nReadedBytes=inputStream.read(buff,0,buffSize))!=-1){
+                        fileOutputStream.write(buff,0,nReadedBytes);
+                        nBytesWritten+=nReadedBytes;
+                    }
+                    inputStream.close();
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    buff = null;
+                    Log.d("Download", String.format("Picture image\t path: %s (%d written bytes)", file.getAbsolutePath(), nBytesWritten));
+                } catch (IOException e) {
+                    Log.e("Hub", "Error getting the image from server : " + e.getMessage().toString());
+                }
+
+                return nBytesWritten;
+
+            }
 
             @Override
             protected void onPostExecute (Object result){

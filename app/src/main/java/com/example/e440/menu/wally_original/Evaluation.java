@@ -13,12 +13,23 @@ import java.util.List;
 @Entity
 public class Evaluation implements Serializable {
 
-    public Evaluation(ItemsBank instrument){
+    public Evaluation(ItemsBank instrument, long studentId, long userId){
+
+        this.currentItemIndex = WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM;
+        if (!instrument.items.isEmpty()){
+            Integer itemTypeId = instrument.items.get(0).getItemTypeId();
+            if (itemTypeId!=null && itemTypeId>=100){
+                this.currentItemIndex=0;
+            }
+        }
+
+        this.studentId=studentId;
+        this.userId=userId;
         this.finished = false;
         this.timestamp =new Timestamp(System.currentTimeMillis());
         this.instrumentId = instrument.id;
         this.itemWithAnswers = new ArrayList<>();
-        for (int i=1; i<instrument.items.size(); i++){
+        for (int i=0; i<instrument.items.size(); i++){
 
             WallyOriginalItem item = instrument.items.get(i);
             this.itemWithAnswers.add(new ItemWithAnswer(item));
@@ -34,6 +45,16 @@ public class Evaluation implements Serializable {
     }
 
     long userId;
+
+    public Integer getCurrentItemIndex() {
+        return currentItemIndex;
+    }
+
+    public void setCurrentItemIndex(int currentItemIndex) {
+        this.currentItemIndex = currentItemIndex;
+    }
+
+    public int currentItemIndex;
 
     public Long getId() {
         return id;
