@@ -35,7 +35,7 @@ public class Course {
     int school_id;
 
     public String getSchool_name() {
-        return school_name;
+        return String.format("%s",this.school_name);
     }
 
     public void setSchool_name(String school_name) {
@@ -83,7 +83,7 @@ public class Course {
     }
 
     public String getName() {
-        return school_name+" - " + level+" "+letter;
+        return String.format("%s - %s %s",school_name+" - " + level+" "+letter);
     }
 
     public void setName(String name) {

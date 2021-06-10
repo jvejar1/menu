@@ -134,7 +134,7 @@ public class StudentsFragment extends Fragment {
                     List<int[]> coursesLevelAndLetter = courseLevelAndLetterBySchoolName.get(school_name);
                     for (int[] courseLevelAndLetter : coursesLevelAndLetter ){
                         String courseLevelStr = Student.course_level_by_number.get(courseLevelAndLetter[0]);
-                        char courseLetterStr = Student.course_letter_by_number.get(courseLevelAndLetter[1]);
+                        String courseLetterStr = String.format("%c",Student.course_letter_by_number.get(courseLevelAndLetter[1]));
 
                         String courseFullName = courseLevelStr+ ' ' + courseLetterStr;
                         courseNamesList.add(courseFullName);
