@@ -160,7 +160,7 @@
             android:layout_gravity="bottom"
             android:background="@color/colorTransparent"
             android:layoutDirection="ltr"
-            android:text="Atrás"
+            android:text="@string/nav_prev_btn"
             android:textColor="@color/colorWhite"
             android:textSize="28px"
             android:textStyle="bold"></Button>
@@ -179,9 +179,9 @@
             android:layout_height="match_parent"
             android:layout_gravity="bottom|right"
             android:background="@color/colorTransparent"
-            android:text="Siguiente"
+            android:text="@string/nav_next_btn"
             android:textColor="@color/colorWhite"
-            android:textSize="23dp"
+            android:textSize="16dp"
             android:textStyle="bold">
 
 

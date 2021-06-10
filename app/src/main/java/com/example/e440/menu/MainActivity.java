@@ -819,12 +819,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            return true;
-        }
-
-        else if (id== R.id.action_update){
+        if (id== R.id.action_update){
 
             requestInfoToServer();
             return true;
@@ -867,7 +862,7 @@ public class MainActivity extends AppCompatActivity
 
             ProgressBar progressBar = new ProgressBar(this);
             final AlertDialog.Builder waitDialogBuilder = new AlertDialog.Builder(this);
-            waitDialogBuilder.setTitle("Espere...");
+            waitDialogBuilder.setTitle(R.string.please_wait);
             waitDialogBuilder.setView(progressBar);
             waitDialogBuilder.setCancelable(false);
 
@@ -898,17 +893,14 @@ public class MainActivity extends AppCompatActivity
 
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Cerrar sesión");
-            builder.setMessage("¿Continuar?");
+            builder.setTitle(R.string.nav_logout_confirm);
             builder.setCancelable(true);
-            builder.setNegativeButton("No", null);
-            builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.no, null);
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-
                     resultsSender.execute();
                     waitDialog.show();
-
                     return;
                 }
             });

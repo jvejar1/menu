@@ -7,15 +7,15 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="Inicio" />
+            android:title="@string/nav_summary" />
         <item
             android:id="@+id/nav_my_students"
             android:icon="@drawable/ic_people_black"
-            android:title="Mis alumnos" />
+            android:title="@string/nav_participants" />
         <item
             android:id="@+id/nav_add_student"
             android:icon="@drawable/ic_person_add_black_24dp"
-            android:title="Agregar alumno" />
+            android:title="@string/nav_get_participants" />
 
     </group>
 
@@ -24,7 +24,7 @@
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_close"
-                android:title="Cerrar Sesión" />
+                android:title="@string/nav_logout" />
 
         </menu>
     </item>

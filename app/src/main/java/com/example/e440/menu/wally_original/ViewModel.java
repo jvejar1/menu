@@ -95,7 +95,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         timeProgram[0] = 0L;
         timeProgram[1]=null;
         if (item.getItemTypeId() == 2){
-            timeProgram[0] = 200L*choiceIdx;
+            timeProgram[0] = 2000L*choiceIdx;
         }
         return timeProgram;
     }

@@ -7,8 +7,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.text.LineBreaker;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -25,7 +23,6 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -34,7 +31,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -42,14 +38,10 @@ import com.example.e440.menu.DatabaseManager;
 import com.example.e440.menu.R;
 
 
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,6 +182,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         TextView itemTextTextView = inflatedView.findViewById(R.id.itemTextTextView);
         final Context ctx = getContext();
         if(isFinishItem){
+
             backButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -207,7 +200,7 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             itemTextTextView.setLayoutParams(layoutParams);
             //itemTextTextView.setGravity(Gravity.CENTER_VERTICAL);
-            itemTextTextView.setText("Muchas Gracias");
+            itemTextTextView.setText(R.string.thanks);
 
         }
 
@@ -443,22 +436,35 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                 }
                 //frameLayout.addView(gridLayout);
             }
-            else if (item.getItemTypeId().equals(100)){
-                inflatedView = inflater.inflate(R.layout.instruction_fragment, container, false);
-                TextView instructionTextView = inflatedView.findViewById(R.id.instructionTextView);
+            else if (item.getItemTypeId().equals(101)){
+                inflatedView = inflater.inflate(R.layout.fragment_item_101, container, false);
+                TextView instructionTextView = inflatedView.findViewById(R.id.itemTextTextView);
                 instructionTextView.setText(item.getText());
-                Button btnNavNext=inflatedView.findViewById(R.id.startButton);
+                Button btnNavNext=inflatedView.findViewById(R.id.nav_next_btn);
                 btnNavNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         mListener.onItemAnswered(0,"",0);
-
                     }
                 });
+
+                if (model.getCurrentItemIndex() == 0){
+                    Button navBackBtn = inflatedView.findViewById(R.id.nav_prev_btn);
+                    navBackBtn.setVisibility(View.INVISIBLE);
+                }else{
+                    Button navBackBtn = inflatedView.findViewById(R.id.nav_prev_btn);
+                    navBackBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mListener.OnItemBack();
+                        }
+                    });
+                }
+
                 return inflatedView;
             }
             else if (item.getItemTypeId().equals(102)){
-                inflatedView = inflater.inflate(R.layout.fragment_item_101, container, false);
+                inflatedView = inflater.inflate(R.layout.fragment_item_102, container, false);
 
                 //get the file bytes
                 String parentPath = ctx.getFilesDir().getAbsolutePath();
@@ -481,6 +487,14 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                     public void onClick(View view) {
                         mListener.onItemAnswered(0,"",0);
 
+                    }
+                });
+
+                Button btnNavPrev = inflatedView.findViewById(R.id.nav_prev_btn);
+                btnNavPrev.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.OnItemBack();
                     }
                 });
                 return inflatedView;

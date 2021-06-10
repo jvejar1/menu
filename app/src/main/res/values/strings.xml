@@ -28,4 +28,40 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_next_btn">Continuar</string>
+    <string name="thanks">Muchas Gracias</string>
+    <string name="email">Email</string>
+
+    <string name="password">Constraseña</string>
+    <string name="login_btn">Iniciar Sesión</string>
+    <string name="nav_prev_btn">Volver</string>
+    <string name="schools">Colegios</string>
+    <string name="school">Colegio</string>
+    <string name="course">Cursos</string>
+
+    <string name="participants_total">Total: %d</string>
+
+    <string name="summary_evaluations">Evaluaciones</string>
+
+    <string name="summary_total">Total</string>
+    <string name="summary_evaluations_done">Total realizadas</string>
+    <string name="summary_evaluations_sent">Total enviadas</string>
+    <string name="summary_evaluations_to_send">Total por enviar</string>
+    <string name="summary_send">Enviar</string>
+    <string name="summary_task">Instrumento</string>
+
+    <string name="nav_summary">Resumen</string>
+    <string name="nav_get_participants">Obtener alumnos</string>
+    <string name="nav_participants">Alumnos</string>
+    <string name="nav_logout">Cerrar Sesión</string>
+
+    <string name="nav_logout_confirm">¿Cerrar sesión?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="please_wait">Espere por favor</string>
+    <string name="get_participants">Obtener participantes</string>
+
+    <string name="get_participants_btn">Obtener</string>
+
+    <string name="menu_update">Actualizar</string>
 </resources>

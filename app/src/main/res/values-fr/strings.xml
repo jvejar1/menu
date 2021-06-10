@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_next_btn">Continu</string>
+
+    <string name="email">Adresse email</string>
+    <string name="password">Mot de passe</string>
+    <string name="login_btn">Connexion</string>
+    <string name="nav_prev_btn">Volver</string>
+    <string name="thanks">Merci beaucoup</string>
+    <string name="schools">Écoles</string>
+    <string name="school">École</string>
+    <string name="course">Cours</string>
+    <string name="participants_total">Total: %d</string>
+
+    <string name="summary_total">Total</string>
+    <string name="summary_evaluations">Évaluations</string>
+    <string name="summary_evaluations_done">Total réalisé</string>
+    <string name="summary_evaluations_sent">Total envoyé au serveur</string>
+    <string name="summary_evaluations_to_send">Total à envoyer</string>
+    <string name="summary_send">Envoyer</string>
+    <string name="summary_task">Tâche</string>
+
+    <string name="nav_summary">Résumé</string>
+    <string name="nav_get_participants">Obtenir des Participants</string>
+    <string name="nav_participants">Participants</string>
+    <string name="nav_logout">Se déconnecter</string>
+
+    <string name="nav_logout_confirm">Se déconnecter ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="please_wait">S\'il-vous-plaît attendez </string>
+
+    <string name="get_participants">Obtenir des Participants</string>
+    <string name="get_participants_btn">Obtenir</string>
+
+    <string name="menu_update">Actualiser</string>
+</resources>

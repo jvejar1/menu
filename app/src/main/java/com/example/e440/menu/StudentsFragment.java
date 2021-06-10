@@ -363,8 +363,9 @@ public class StudentsFragment extends Fragment {
        //     studentsListView.requestLayout();
           //  ((BaseAdapter) studentsListView.getAdapter()).notifyDataSetChanged();
             studentsAdapter.notifyDataSetChanged();
-
-            students_count_text_view.setText("Mostrando "+studentList.size()+" alumnos");
+            String totalFormat = getString(R.string.participants_total);
+            String totalParticipants = String.format(totalFormat, studentList.size());
+            students_count_text_view.setText(totalParticipants);
 
         }
     }
