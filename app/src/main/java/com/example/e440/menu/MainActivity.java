@@ -200,8 +200,12 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==LOGIN_REQUEST && resultCode== Activity.RESULT_OK){
-            requestInfoToServer();
+        if(requestCode==LOGIN_REQUEST){
+            if ( resultCode== Activity.RESULT_OK){
+                requestInfoToServer();
+            }else{
+                this.finish();
+            }
         }
 
     }

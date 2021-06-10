@@ -29,7 +29,12 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = getIntent();
         networkManager= NetworkManager.getInstance(this);
         mProgressBar=findViewById(R.id.loginProgressBar);
-
+        CredentialsManager credentialsManager = CredentialsManager.getInstance(this);
+        if(credentialsManager.getToken()!= null){
+            Intent returnIntent = new Intent();
+            setResult(Activity.RESULT_OK,returnIntent);
+            finish();
+        }
     }
 
     public void returnToMain(){
