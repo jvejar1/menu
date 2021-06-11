@@ -581,11 +581,12 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
 
                     String text = String.format("%s", choice.getText());
                     TextView textViewChoice = new TextView(ctx);
-                    int textSize = 20;
+                    int textSize = 22;
                     textViewChoice.setTextSize(textSize);
                     textViewChoice.setPadding(10,10,5,0);
                     textViewChoice.setTextColor(Color.BLACK);
                     textViewChoice.setLayoutParams(imgLayoutParams);
+                    textViewChoice.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                     textViewChoice.setText(text);
 
 
