@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -13,13 +15,22 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.e440.menu.CredentialsManager;
 import com.example.e440.menu.DatabaseManager;
 import com.example.e440.menu.EXTRA;
+import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
+import com.example.e440.menu.ResponseRequest;
 import com.example.e440.menu.ResultSendJobService;
 import com.example.e440.menu.ResultsSenderListener;
 import com.example.e440.menu.Student;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
@@ -66,62 +77,64 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         }
     }
 
-
-
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
     }
 
-
-
-    class SaveAndSender extends AsyncTask{
-
-        DatabaseManager databaseManager;
-        Context context;
-        ResultSendJobService.ResultsSender resultSender;
-
-        public SaveAndSender(DatabaseManager databaseManager, ResultSendJobService.ResultsSender resultSender, Context context){
-            this.context = context;
-            this.databaseManager = databaseManager;
-            this.resultSender = resultSender;
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            databaseManager.insertResponseRequestAsync(model.getEvaluation());
-            resultSender.execute();
-            return null;
-        }
-
-    }
-
     @Override
-    public void OnFinishActivityRequest() {
-
-        model.setEvaluationFinished();
+    public void OnRequestSaveSendAndClose(Evaluation evaluation, Long studentServerId) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Guardando Datos");
         progressDialog.setMessage("Por favor espere...");
         progressDialog.show();
 
-        final DatabaseManager databaseManager = DatabaseManager.getInstance(this);
-        ResultSendJobService.ResultsSender resultsSender=new ResultSendJobService.ResultsSender(this, new ResultsSenderListener() {
+        final DatabaseManager databaseManager = DatabaseManager.getInstance(getApplicationContext());
+        final NetworkManager networkManager = NetworkManager.getInstance(getApplicationContext());
+        Gson gson = new Gson();
+        JsonElement jsonElement = (gson.toJsonTree(evaluation,Evaluation.class)).getAsJsonObject();
+        final JSONObject payload = new JSONObject();
+        try{
+            String evaluationStr = gson.toJson(jsonElement);
+            JSONObject evalJSONObject = new JSONObject(evaluationStr);
+            payload.put("evaluation", evalJSONObject);
+        }catch (JSONException jsonException){
+            jsonException.printStackTrace();
+        }
+        ResponseRequest responseRequest = new ResponseRequest(payload.toString(), null, false, studentServerId, true, evaluation.getInstrumentId());
+        final Handler handler = new Handler(getMainLooper());
+        databaseManager.insertResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
             @Override
-            public void OnSendingFinish(int total_sended_count, int errors_count) {
-                WallyOriginalActivity.this.finish();
-                progressDialog.dismiss();
+            public void onResult(final ResponseRequest responseRequest) {
+                networkManager.sendEvaluation(payload, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if (networkManager.responseCodeIsOKorCreated(response)){
+                            Log.d("Wally original activity", String.format("Success network response when sending evaluation"));
+                            responseRequest.setSaved(true);
+                            databaseManager.updateResponseRequestAsync(responseRequest, handler, new DatabaseManager.QueryResultListener() {
+                                @Override
+                                public void onResult(ResponseRequest responseRequest) {
+                                    progressDialog.dismiss();
+                                    WallyOriginalActivity.this.finish();
+                                }
+                            });
+                        }else{
+                            progressDialog.dismiss();
+                            WallyOriginalActivity.this.finish();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(final VolleyError error) {
+                        Log.d("Wally original activity", String.format("Volley error: %s", error.getMessage()));
+                        progressDialog.dismiss();
+                        WallyOriginalActivity.this.finish();
+                    }
+                });
             }
-
-            @Override
-            public void onProgressUpdate(int progress) {
-
-            }
-        });
-
-        SaveAndSender saveAndSender = new SaveAndSender(databaseManager, resultsSender , this);
-        saveAndSender.execute();
+        }, handler);
     }
 
 

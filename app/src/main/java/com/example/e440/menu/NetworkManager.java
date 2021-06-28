@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.HttpResponse;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -31,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpRetryException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -42,7 +44,7 @@ public class NetworkManager implements Executor{
         t.start();
 
     }
-
+    private static String DEBUG_TAG="Network Manager";
     private static NetworkManager mInstance;
     private RequestQueue mRequestQueue;
     private static Context mCtx;
@@ -78,7 +80,7 @@ public class NetworkManager implements Executor{
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
 
-        public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
+    public void sendEvaluation(JSONObject payload,Response.Listener<JSONObject> listener,Response.ErrorListener errorListener){
         String url = BASE_URL + "evaluations";
         makeApiCall(Request.Method.POST,url,payload,listener,errorListener);
     }
@@ -185,7 +187,12 @@ public class NetworkManager implements Executor{
         String url = BASE_URL + "/aces/get_current_test_data";
         makeApiCall(Request.Method.GET, url, null,listener, errorListener);
     }
-
+    public boolean responseCodeIsOKorCreated(JSONObject response){
+        JSONObject headers= response.optJSONObject("headers");
+        int status=headers.optInt("status");
+        Log.d(DEBUG_TAG, String.format("checking response status code: %d",status));
+        return status == HttpURLConnection.HTTP_OK || status==HttpURLConnection.HTTP_CREATED;
+    }
     private void makeApiCall(int method, String url, JSONObject payload, Response.Listener<JSONObject> listener,
                              Response.ErrorListener errorListener){
         JsonObjectArrayRequest jsonObjectRequest = new JsonObjectArrayRequest

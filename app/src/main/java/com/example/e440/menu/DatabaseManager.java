@@ -2,24 +2,25 @@ package com.example.e440.menu;
 
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
+import androidx.room.Dao;
 import androidx.room.Room;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.e440.menu.wally_original.Evaluation;
 import com.example.e440.menu.wally_original.ItemsBank;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Executor;
 
 
 /**
@@ -27,9 +28,14 @@ import java.util.List;
  */
 
 public class DatabaseManager {
+    static String DEBUG_TAG="Database Manager";
     static final String DATABASE_NAME = "TestDatabase";
     static DatabaseManager databaseManager;
     TestDatabase testDatabase;
+
+    public DaoAccess getDao(){
+        return this.testDatabase.daoAccess();
+    }
     public static synchronized DatabaseManager getInstance(Context context){
         if (databaseManager==null){
 
@@ -69,66 +75,55 @@ public class DatabaseManager {
         this.testDatabase.daoAccess().insertResponseRequest(responseRequest);
     }
 
-    public void insertResponseRequestAsync(final Evaluation eval){
-        Log.d("DATABASE MANAGER", "Insert eval");
-        if (eval.getStudentId() == 0){
-            return;
-        }
-        Gson gson = new Gson();
-        JsonElement evalJO = (gson.toJsonTree(eval,Evaluation.class)).getAsJsonObject();
-        JsonObject payload = new JsonObject();
-        payload.add("evaluation", evalJO);
-
-        final ResponseRequest responseRequest = new ResponseRequest(payload.toString(), null, false, eval.getStudentId());
-        responseRequest.finished = eval.isFinished();
-        responseRequest.instrumentId = eval.getInstrumentId();
-
-        Long theReturnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
-        testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-        return;
-    }
-
-
-
-    public Evaluation checkIfCanContinueAnEvaluation(long studentId, ItemsBank instrument){
-
-        ResponseRequest[] result = this.testDatabase.daoAccess().loadContinuableEvaluationInAJsonString(studentId, instrument.id);
-        if (result.length == 0){
-
-            return null;
-        }
-        ResponseRequest theFirst = result[0];
-
-        long id =theFirst.getId();
-        String evalAsStr = theFirst.payload;
-
-        Gson gson = new Gson();
-        gson.toJson(evalAsStr);
-        Evaluation evaluation  = gson.fromJson(evalAsStr, Evaluation.class);
-        evaluation.setId( id);
-
-        return evaluation;
-
-    }
-
-    public void Update(final Evaluation e){
-
-        Runnable r = new Runnable() {
+    public void updateResponseRequestAsync(final ResponseRequest responseRequest, final Handler handler, final QueryResultListener queryResultListener){
+        QueryExecutor queryExecutor = new QueryExecutor();
+        queryExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                int updated = testDatabase.daoAccess().updateResponseRequest(e.getId(), true);
+                testDatabase.daoAccess().updateResponseReQuest(responseRequest);
+                Log.d(DEBUG_TAG, String.format("Updated ResponseRequest set saved to: %b", responseRequest.getSaved()));
 
-                if (updated == 0){
-
-                    insertResponseRequestAsync(e);
-                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        queryResultListener.onResult(responseRequest);
+                    }
+                });
             }
-        };
-        Thread t = new Thread(r);
-        t.start();
-
+        });
     }
 
+    public interface QueryResultListener{
+        void onResult(ResponseRequest responseRequest);
+    }
+
+    public class QueryExecutor implements Executor {
+        @Override
+        public void execute(Runnable runnable) {
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+    }
+
+    public void insertResponseRequestAsync(final ResponseRequest responseRequest, final QueryResultListener listener, final Handler handler){
+        QueryExecutor queryExecutor = new QueryExecutor();
+        queryExecutor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Long returnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
+                        Log.d(DEBUG_TAG, String.format("ResponseRequest async inserted in DB returning id %d",returnedId));
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onResult(responseRequest);
+                            }
+                        });
+
+                    }
+                }
+        );
+    }
 
     void cleanAce(){
 

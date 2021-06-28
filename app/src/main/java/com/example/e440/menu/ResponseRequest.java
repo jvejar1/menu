@@ -1,6 +1,7 @@
 package com.example.e440.menu;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -43,6 +44,17 @@ public class ResponseRequest {
         this.student_server_id = student_server_id;
     }
 
+    @Ignore
+    public ResponseRequest(String payload, String test_name, boolean saved, Long student_server_id, boolean finished, long instrumentId) {
+        this.payload = payload;
+        this.test_name = test_name;
+        this.saved =saved;
+        this.student_server_id = student_server_id;
+        this.finished = finished;
+        this.instrumentId = instrumentId;
+    }
+
+
 
     String payload;
     String test_name;
@@ -74,6 +86,9 @@ public class ResponseRequest {
 
     public void setSaved(boolean saved) {
         this.saved = saved;
+    }
+    public boolean getSaved(){
+        return this.saved;
     }
 
     boolean saved;

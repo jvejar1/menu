@@ -36,6 +36,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.e440.menu.DatabaseManager;
 import com.example.e440.menu.R;
+import com.example.e440.menu.ResponseRequest;
 
 
 import java.io.File;
@@ -61,8 +62,8 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
         void onItemAnswered(int itemId, String answer, int itemIndex);
         void OnItemBack();
         void OnNavigateToThanksRequest();
-        void OnFinishActivityRequest();
         void OnRequestPopFragment();
+        void OnRequestSaveSendAndClose(Evaluation evaluation, Long studentServerId);
     }
 
     @Override
@@ -192,7 +193,10 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
             nextButton.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
-                    mListener.OnFinishActivityRequest();
+                    Evaluation evaluation = model.getEvaluation();
+                    evaluation.setAsFinished();
+                    Long studentServerId = evaluation.getStudentId();
+                    mListener.OnRequestSaveSendAndClose(evaluation, studentServerId);
                 }
             });
 
@@ -820,15 +824,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
     View.OnClickListener nextButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
-            if (model.CurrentItemIsThanksItem()) {
-                Evaluation eval = model.getEvaluation();
-                eval.finished = true;
-                //TODO: save data into db and try to send it to the server...
-                DatabaseManager.getInstance((Context)mListener).insertResponseRequestAsync(eval);
-                mListener.OnFinishActivityRequest();
-                return;
-            }
             mListener.onItemAnswered(1,"",2);
 
         }
