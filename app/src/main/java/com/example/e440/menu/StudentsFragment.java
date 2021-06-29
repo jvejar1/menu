@@ -328,13 +328,7 @@ public class StudentsFragment extends Fragment {
 
 
             studentList.clear();
-            Student fake_student=new Student(" ","0 Alumno Prueba","0",(long)0){
-                @Override
-                String getCourseFullName() {
-                    return "";
-                }
-            };
-            studentList.add(fake_student);
+
             for(Student s :students){
 
 

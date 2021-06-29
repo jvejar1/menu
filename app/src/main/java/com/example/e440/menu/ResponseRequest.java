@@ -80,9 +80,6 @@ public class ResponseRequest {
     }
 
     Long student_server_id;
-    public boolean isSaved() {
-        return saved;
-    }
 
     public void setSaved(boolean saved) {
         this.saved = saved;
