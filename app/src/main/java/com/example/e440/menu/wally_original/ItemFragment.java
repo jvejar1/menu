@@ -534,23 +534,6 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                             }
                         }
                     });
-
-                    View.OnClickListener choiceClickListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view){
-                            model.userTouchesChoice(itemIdx,choiceIdx);
-                            long delayMillisNextItem =500;
-                            h.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mListener.onItemAnswered(0,"",0);
-                                }
-                            }, delayMillisNextItem);
-                        }
-                    };
-
-                    linearLayout.setOnClickListener(choiceClickListener);
-
                     Bitmap bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.person_icon_2);
                     File file = new File(ctx.getFilesDir(),choice.getPicturePath());
                     int fileSize = (int)file.length();
@@ -608,9 +591,28 @@ public class ItemFragment extends Fragment implements Chronometer.OnChronometerT
                                                  }
                                              }
                             , showHideProgram[0]);
+                }
 
-
-
+                for (int i=0; i<item.choices.size(); i++){
+                    final int choiceIdx = i;
+                    LinearLayout choiceLayout = choiceLayouts.get(i);
+                    View.OnClickListener choiceClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view){
+                            for (int j=0; j<item.choices.size(); j++){
+                                choiceLayouts.get(j).setClickable(false);
+                            }
+                            model.userTouchesChoice(itemIdx, choiceIdx);
+                            long delayMillisNextItem =500;
+                            h.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mListener.onItemAnswered(0,"",0);
+                                }
+                            }, delayMillisNextItem);
+                        }
+                    };
+                    choiceLayout.setOnClickListener(choiceClickListener);
                 }
 
                 return inflatedView;

@@ -10,16 +10,16 @@ import androidx.room.PrimaryKey;
 @Entity
 public class ResponseRequest {
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     @PrimaryKey(autoGenerate = true)
-    int id;
+    Long id;
 
     public String getPayload() {
         return payload;

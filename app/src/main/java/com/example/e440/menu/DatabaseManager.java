@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.room.Dao;
 import androidx.room.Room;
 import androidx.room.migration.Migration;
@@ -41,8 +42,8 @@ public class DatabaseManager {
 
             databaseManager =new DatabaseManager();
             databaseManager.testDatabase= Room.databaseBuilder(context,
-                    TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS, ADD_STUDENT_SERVER_ID_TO_EVALUATIONS)
-                    .fallbackToDestructiveMigration().build();
+                    TestDatabase.class,DATABASE_NAME).addMigrations(ADD_TEST_COUNTS_TO_STUDENTS, ADD_STUDENT_SERVER_ID_TO_EVALUATIONS).fallbackToDestructiveMigration()
+                    .build();
         }
         return databaseManager;
 
@@ -70,6 +71,7 @@ public class DatabaseManager {
             }
     };
 
+
     public void insertResponseRequest(ResponseRequest responseRequest){
 
         this.testDatabase.daoAccess().insertResponseRequest(responseRequest);
@@ -81,7 +83,7 @@ public class DatabaseManager {
             @Override
             public void run() {
                 testDatabase.daoAccess().updateResponseReQuest(responseRequest);
-                Log.d(DEBUG_TAG, String.format("Updated ResponseRequest set saved to: %b", responseRequest.getSaved()));
+                Log.d(DEBUG_TAG, String.format("Updated ResponseRequest with id(%d) set saved to: %b", responseRequest.getId(),responseRequest.getSaved()));
 
                 handler.post(new Runnable() {
                     @Override
@@ -112,6 +114,7 @@ public class DatabaseManager {
                     @Override
                     public void run() {
                         Long returnedId = testDatabase.daoAccess().insertResponseRequest(responseRequest);
+                        responseRequest.setId(returnedId);
                         Log.d(DEBUG_TAG, String.format("ResponseRequest async inserted in DB returning id %d",returnedId));
                         handler.post(new Runnable() {
                             @Override
