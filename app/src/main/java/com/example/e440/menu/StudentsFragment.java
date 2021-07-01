@@ -44,7 +44,7 @@ public class StudentsFragment extends Fragment {
     DatabaseManager databaseManager;
     OnStudentSelectedListener mCallback;
     public interface OnStudentSelectedListener {
-        public void onStudentSelected(Long student_id);
+
     }
 
     @Override

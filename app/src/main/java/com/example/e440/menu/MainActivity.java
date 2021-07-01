@@ -81,87 +81,25 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,StudentsFragment.OnStudentSelectedListener{
 
-
-
-    AlertDialog needsGetTestInfoAlertDialog;
     CredentialsManager credentialsManager;
     int LOGIN_REQUEST = 1;
-    String STUDENTS_FILENAME = "students.json";
-    final int ACES =0;
-    final int WALLY=1;
-    final int CORSI=2;
-    final int HNF=1;
-    private HashMap<Integer,Boolean> available_tests;
     NetworkManager networkManager;
-    String ACES_PACKAGE_NAME = "com.example.e440.aces";
-    ImageView imgview;
-    FragmentManager fragmentManager;
     ProgressDialog mProgressDialog;
 
     DatabaseManager databaseManager;
 
-    public void onStudentSelected(final Long studentId) {
-        CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Seleccione un test");
-        builder.setItems(colors, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // the user clicked on colors[which]
-                Bundle b=new Bundle();
-                b.putLong(Student.EXTRA_STUDENT_SERVER_ID,studentId);
-                Intent intent;
-                if (which==0){
-                    intent = new Intent(getApplicationContext(), AceActivity.class);
-                }else if(which==1){
-                    intent = new Intent(getApplicationContext(), WallyActivity.class);
-
-                }else if(which==2){
-                    intent = new Intent(getApplicationContext(), CorsiActivity.class);
-                }else if(which==3){
-                    intent = new Intent(getApplicationContext(), HnfActivity.class);
-                }
-                else{
-                    intent = new Intent(getApplicationContext(), FonoTestActivity.class);
-                }
-                intent.putExtras(b);
-                startActivity(intent);
-            }
-        });
-        builder.show();
-        return;
-
-    }
-
     private FusedLocationProviderClient mFusedLocationClient;
 
     protected void onCreate(Bundle savedInstanceState) {
-
-        Configuration configuration = getResources().getConfiguration();
-        int smallestWidthDp  = configuration.smallestScreenWidthDp;
-        Log.d("SELB smallest width", Integer.toString(smallestWidthDp));
-
-        int screenWidthDp = configuration.screenWidthDp;
-        Log.d("SELB screen width", Integer.toString(screenWidthDp));
-
-        DisplayMetrics dm = getApplicationContext().getResources().getDisplayMetrics();
-        Log.d("SELB display metrics h ", Integer.toString(dm.heightPixels));
-
-        Log.d("SELB display metrics w", Integer.toString(dm.widthPixels));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         networkManager = NetworkManager.getInstance(this);
         databaseManager = DatabaseManager.getInstance(this);
 
-
-        imgview = findViewById(R.id.imageView);
-
-        fragmentManager = getFragmentManager();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -173,8 +111,6 @@ public class MainActivity extends AppCompatActivity
         onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
         credentialsManager = CredentialsManager.getInstance(this);
-
-
         if (credentialsManager.getToken() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             //  intent.putExtra(EXTRA_MESSAGE, message);
@@ -210,43 +146,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        final Handler handler = new Handler(this.getMainLooper()){
-
-            };
-
-       /* if(credentialsManager.isFirstRun()){
-
-            Thread db_thread = new Thread(){
-                @Override
-                public void run() {
-                    databaseManager.testDatabase.daoAccess().deleteAllStudents();
-                    databaseManager.cleanAce();
-                    databaseManager.cleanCorsi();
-                    databaseManager.cleanWally();
-                    databaseManager.cleanHnf();
-                    databaseManager.cleanFonotest();
-                    credentialsManager.setAllTestUnready();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkAllTestAreReady();
-                        }
-                    });
-                }
-            };
-            db_thread.start();
-
-        }*/
-
-
-
-    }
-
-
     void checkAllTestAreReady() {
         if (!credentialsManager.AllTestAreReady()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -274,12 +173,9 @@ public class MainActivity extends AppCompatActivity
 
         mProgressDialog = new ProgressDialog(MainActivity.this);
         mProgressDialog.setCancelable(false);
-        // Set progressdialog title
         mProgressDialog.setTitle("Solicitando datos al servidor");
-        // Set progressdialog message
         mProgressDialog.setMessage("Por favor espere...");
         mProgressDialog.setIndeterminate(false);
-        // Show progressdialog
         mProgressDialog.show();
 
         networkManager.getAll(new Response.Listener<JSONObject>() {
@@ -333,7 +229,6 @@ public class MainActivity extends AppCompatActivity
             publishProgress(current_progress);
 
             JSONObject response = jsonObjects[0];
-
             JSONObject fonotest_jo=response.optJSONObject("fonotest");
 
             if (fonotest_jo!=null){
@@ -376,11 +271,6 @@ public class MainActivity extends AppCompatActivity
                     
                     credentialsManager.setTestAvailability(Utilities.FONOTEST_NAME,true);
                 }
-
-
-
-
-
 
             }
             current_progress=20;
@@ -483,18 +373,13 @@ public class MainActivity extends AppCompatActivity
                 if(errors==0){
                     credentialsManager.setTestAvailability(Utilities.ACE_NAME,true);
                 }
-
-
             }
 
             ///// WALLY
             current_progress=80;
             publishProgress(current_progress);
 
-
             JSONObject wally_jo = response.optJSONObject("wally");
-
-
             if(wally_jo!=null){
                 databaseManager.cleanWally();
           //      databaseManager.testDatabase.daoAccess().cleanWally();
@@ -565,28 +450,19 @@ public class MainActivity extends AppCompatActivity
 
 
                 }
-
                 if(errors==0){
-
                     credentialsManager.setTestAvailability(Utilities.WALLY_NAME,true);
                 }
-
-
-
             }
-
 
             ItemsBank[] instruments = null;
             Gson gson = new Gson();
             try{
-
                 JSONArray instrumentsJson = response.getJSONArray("instruments");
                 instruments = gson.fromJson(instrumentsJson.toString(), ItemsBank[].class);
                 for(int i=0; i<instruments.length; i++ ){
 
                     for (int j=0; j<instruments[i].items.size(); j++){
-
-                        //download the photo
                         Integer pictureId =instruments[i].items.get(j).pictureId;
                         if (!pictureId.equals(null) && !pictureId.equals(0)){
 
@@ -602,9 +478,6 @@ public class MainActivity extends AppCompatActivity
                                 fOut2.close();
                                 instruments[i].items.get(j).setImagePath(file.getPath());
 
-                                //ObjectOutputStream out = new ObjectOutputStream(fOut2);
-                                //out.writeObject(imgBytes);
-                                //out.close();
                                 Log.d("SAVING IMG", "Serialized data to "+ file.getPath());
                                 ;}catch (IOException exc){
                                 exc.printStackTrace();
@@ -612,27 +485,16 @@ public class MainActivity extends AppCompatActivity
                         }
 
                     }
-                        //String encoded = Base64.encodeToString(imgBytes, Base64.DEFAULT);
-                        //instruments[i].items.get(j).setEncoded_image(encoded);
-
-                        //if (j==4){break;}
-
                     }
-
-
 
         }
             catch (JSONException exc){
-
-
         }
 
             try{
                 School[] schools = gson.fromJson(response.getJSONArray("schools").toString(), School[].class);
                 Log.println(Log.DEBUG,"downloadedSchools", schools.length + "");
             }catch (JsonIOException | JSONException jsonIOException){
-
-                ;
             }
 
             try{
@@ -647,49 +509,6 @@ public class MainActivity extends AppCompatActivity
 
                 e.printStackTrace();
             }
-
-
-
-/*
-                try {
-                    File file = new File(MainActivity.this.getFilesDir(), "employee.txt");
-
-                    FileOutputStream fOut = openFileOutput("employee.txt",
-                            MODE_PRIVATE);
-                    FileOutputStream fOut2 = new FileOutputStream(file);
-
-
-                    ObjectOutputStream out = new ObjectOutputStream(fOut2);
-                    out.writeObject(instruments[1]);
-                    out.close();
-                    System.out.printf("Serialized data is saved in /tmp/employee.ser");
-                } catch (IOException i) {
-                    i.printStackTrace();
-                }
-
-
-                ItemsBank e = null;
-                try {
-
-                    FileInputStream fileIn = new FileInputStream(MainActivity.this.getFilesDir() + "/employee.txt");
-                    ObjectInputStream in = new ObjectInputStream(fileIn);
-                    e = (ItemsBank) in.readObject();
-                    in.close();
-                    fileIn.close();
-
-                } catch (IOException i) {
-                    i.printStackTrace();
-
-                } catch (ClassNotFoundException c) {
-                    System.out.println("Employee class not found");
-                    c.printStackTrace();
-                }
-*/
-
-
-
-
-
 
             publishProgress(100);
             return instruments;
@@ -796,7 +615,7 @@ public class MainActivity extends AppCompatActivity
 
                 checkAllTestAreReady();
             }
-        }
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -895,7 +714,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.nav_logout_confirm);
             builder.setCancelable(true);
@@ -913,12 +731,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
 }
