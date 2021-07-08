@@ -29,7 +29,7 @@ import java.util.concurrent.Executor;
  */
 
 public class DatabaseManager {
-    static String DEBUG_TAG="Database Manager";
+    static String DEBUG_TAG="DATABASE_MANAGER";
     static final String DATABASE_NAME = "TestDatabase";
     static DatabaseManager databaseManager;
     TestDatabase testDatabase;
@@ -65,17 +65,9 @@ public class DatabaseManager {
     static final Migration ADD_STUDENT_SERVER_ID_TO_EVALUATIONS = new Migration(2, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-
             database.execSQL("ALTER TABLE ResponseRequest ADD COLUMN student_server_id integer default 0 ");
-
             }
     };
-
-
-    public void insertResponseRequest(ResponseRequest responseRequest){
-
-        this.testDatabase.daoAccess().insertResponseRequest(responseRequest);
-    }
 
     public void updateResponseRequestAsync(final ResponseRequest responseRequest, final Handler handler, final QueryResultListener queryResultListener){
         QueryExecutor queryExecutor = new QueryExecutor();

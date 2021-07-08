@@ -121,12 +121,10 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         progressDialog.setMessage("Por favor espere...");
         progressDialog.show();
 
-        EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
         ResponseRequest responseRequest = model.responseRequest;
         responseRequest.setFinished(true);
-        Gson gson = new Gson();
-        String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
-        responseRequest.setPayload(evaluationWrapperStr);
+        String payload = getJsonPayload(model.getEvaluation());
+        responseRequest.setPayload(payload);
         databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
             @Override
             public void onResult(ResponseRequest responseRequest) {
@@ -159,15 +157,19 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         , new Handler(getMainLooper()));
     }
 
+    String getJsonPayload(Evaluation evaluation){
+        EvaluationWrapper evaluationWrapper = new EvaluationWrapper(evaluation);
+        Gson gson = new Gson();
+        String jsonPayload = gson.toJson(evaluationWrapper,evaluationWrapper.getClass());
+        return jsonPayload;
+    }
 
     @Override
     public void onItemAnswered(int itemId, String answer, int answeredItemIndex) {
 
-        EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
         ResponseRequest responseRequest = model.responseRequest;
-        Gson gson = new Gson();
-        String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
-        responseRequest.setPayload(evaluationWrapperStr);
+        String payload = getJsonPayload(model.getEvaluation());
+        responseRequest.setPayload(payload);
         databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
             @Override
             public void onResult(ResponseRequest responseRequest) {
@@ -206,7 +208,6 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
     @Override
     public void OnRequestPopFragment() {
-
         getSupportFragmentManager().popBackStack();
     }
 
@@ -217,15 +218,12 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
     @Override
     protected void onDestroy() {
-        Log.d("LOG", "OnDestroy");
         MyBluetoothService.GetInstance(this).finish();
         ResponseRequest responseRequest = model.responseRequest;
         if (!responseRequest.isFinished()){
             responseRequest.setFinished(true);
-            EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
-            Gson gson = new Gson();
-            String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
-            responseRequest.setPayload(evaluationWrapperStr);
+            String payload = getJsonPayload(model.getEvaluation());
+            responseRequest.setPayload(payload);
             Handler handler = new Handler(getMainLooper());
             databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
                 @Override

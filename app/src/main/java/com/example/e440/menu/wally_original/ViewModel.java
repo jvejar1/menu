@@ -162,32 +162,6 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
         return this.itemWithAnswers.size();
     }
 
-
-    public void SavePersistent(){
-
-        File folder = new File(  "", "evaluations/");
-        folder.mkdirs();
-        String folderPath = folder.getPath();
-        File file = new File(folderPath, "eval.json");
-        try {
-
-            file.createNewFile();
-            FileOutputStream fOut2 = new FileOutputStream(file);
-
-
-            ObjectOutputStream out = new ObjectOutputStream(fOut2);
-            out.writeObject(evaluation);
-            out.close();
-            System.out.printf("Serialized data to "+ folderPath);
-
-            ;}catch (IOException exc){
-            Log.d("Perro", "gato");
-        Log.d("sapo", exc.getMessage());}
-
-
-        //access the persistent layer and save the actual data and next submit it to server
-    }
-
     public ItemAnswer getAnswer(int index){
 
         return this.itemWithAnswers.get(index).getItemAnswer();
