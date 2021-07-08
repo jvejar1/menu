@@ -66,6 +66,16 @@ public class NetworkManager implements Executor{
         return mInstance;
     }
 
+    public JSONObject createJSONObject(String json){
+        JSONObject jsonObject = null;
+        try{
+            jsonObject = new JSONObject(json);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
     private RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the

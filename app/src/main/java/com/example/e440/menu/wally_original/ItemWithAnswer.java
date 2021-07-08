@@ -7,11 +7,9 @@ public class ItemWithAnswer {
     WallyOriginalItem item;
     ItemAnswer itemAnswer;
     List<ItemAnswer> answersHistory;
-    public ItemWithAnswer( WallyOriginalItem item){
+    public ItemWithAnswer( WallyOriginalItem item, ItemAnswer answer){
         this.item = item;
-        this.itemAnswer = new ItemAnswer();
-        this.itemAnswer.itemId = item.getId();
-
+        this.itemAnswer =answer;
         this.answersHistory = new ArrayList<>();
         answersHistory.add(itemAnswer);
     }

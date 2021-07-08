@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -72,7 +74,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener,Resul
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.sendResultsButton){
-            ResultSendJobService.ResultsSender resultsSender=new ResultSendJobService.ResultsSender(getContext(),this);
+            Handler handler = new Handler(Looper.getMainLooper());
+            ResultSendJobService.ResultsSender resultsSender=new ResultSendJobService.ResultsSender(getContext(),this, handler);
             resultsSender.execute();
             view.setEnabled(false);
         }

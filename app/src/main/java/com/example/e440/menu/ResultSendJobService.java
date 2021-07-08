@@ -8,6 +8,9 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Half;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -31,9 +34,10 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         Toast.makeText(this, "JOB STARTINTG", Toast.LENGTH_SHORT).show();
-        mContext=getApplicationContext();
+        mContext=this;
         this.jobParameters=jobParameters;
-        ResultsSender rs=new ResultsSender(this,this);
+        Handler handler = new Handler(getMainLooper());
+        ResultsSender rs=new ResultsSender(this,this, handler);
         rs.execute();
         return true;
     }
@@ -61,16 +65,19 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
     public static class ResultsSender extends AsyncTask<Object,Integer,Object> {
         DatabaseManager databaseManager;
         NetworkManager networkManager;
+        Handler handler;
         int sended_requests;
         int error_resquests;
         int total_requests;
         Context mCtx;
         ResultsSenderListener mCallback;
-        public ResultsSender(Context context,ResultsSenderListener listener){
+        public ResultsSender(Context context,ResultsSenderListener listener, Handler handler){
+            this.handler = handler;
             mCtx=context.getApplicationContext();
             this.databaseManager=DatabaseManager.getInstance(mCtx);
             this.networkManager=NetworkManager.getInstance(mCtx);
             this.sended_requests=0;
+            this.error_resquests=0;
             this.mCallback=listener;
         }
 
@@ -84,15 +91,46 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         @Override
         protected Object doInBackground(Object[] objects) {
-
-            ResponseRequest[] responseRequests=this.databaseManager.testDatabase.daoAccess().fetchNotSavedResponseRequest();
-            return responseRequests;
-
+            databaseManager.fetchRRFinishedAndNotSavedasync(handler, new DatabaseManager.GenericListener<ResponseRequest[]>() {
+                @Override
+                public void onResult(ResponseRequest[] responseRequests) {
+                    total_requests =responseRequests.length;
+                    if (responseRequests.length==0){
+                        mCallback.OnSendingFinish(sended_requests,error_resquests);
+                        return;
+                    }
+                    for (ResponseRequest responseRequest:responseRequests){
+                        JSONObject payload = networkManager.createJSONObject(responseRequest.getPayload());
+                        networkManager.sendEvaluation(payload, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                sended_requests++;
+                                if (networkManager.responseCodeIsOKorCreated(response)){
+                                    responseRequest.setSaved(true);
+                                    databaseManager.updateResponseRequestAsync(responseRequest, handler, responseRequest1 -> {
+                                        check_if_last_request();
+                                    });
+                                }else{
+                                    check_if_last_request();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                System.out.println("volley error"+error.getMessage());
+                                sended_requests++;
+                                error_resquests++;
+                                check_if_last_request();
+                            }
+                        });
+                    }
+                }
+            });
+            return null;
         }
 
         void check_if_last_request(){
@@ -133,77 +171,6 @@ public class ResultSendJobService extends JobService implements ResultsSenderLis
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
-            ResponseRequest[] responseRequests=(ResponseRequest[])o;
-            total_requests =responseRequests.length;
-            int index=0;
-            for (ResponseRequest responseRequest:responseRequests){
-
-                try {
-
-                    Gson gson = new Gson();
-                    String jsonStr = responseRequest.getPayload();
-                    JsonElement je = gson.fromJson(jsonStr, JsonElement.class);
-                    JSONObject payload = new JSONObject(responseRequest.getPayload());
-
-                    payload.put("request_id_to_delete",responseRequest.getId());
-                    this.networkManager.sendEvaluation(payload, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            JSONObject headers= response.optJSONObject("headers");
-                            int status=headers.optInt("status");
-                            boolean request_was_saved=status== HttpURLConnection.HTTP_OK || status==HttpURLConnection.HTTP_CREATED;
-                            if (request_was_saved){
-                                int id_to_delete=response.optInt("request_id_to_delete");
-                                AsyncTask delete_response_request=new AsyncTask() {
-                                    @Override
-                                    protected Object doInBackground(Object[] objects) {
-                                        int id_to_delete=(int)objects[0];
-                                        databaseManager.testDatabase.daoAccess().setEvaluationSavedToTrue(id_to_delete);
-                                        int a =1;
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Object o) {
-                                        super.onPostExecute(o);
-
-
-                                    }
-                                }.execute(id_to_delete);
-                                sended_requests++;
-
-                            }else{
-
-                                sended_requests++;
-                                //TODO: stuffs
-                            }
-                            check_if_last_request();
-
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            System.out.println("volley error"+error.getMessage());
-                            error_resquests++;
-                            sended_requests++;
-                            check_if_last_request();
-                        }
-                    });
-                }
-
-                catch(JSONException e ){
-                    e.printStackTrace();
-
-                }
-
-                index++;
-
-            }
-            if(total_requests==0){
-                mCallback.OnSendingFinish(sended_requests,error_resquests);
-            }
-
-
 
         }
     }

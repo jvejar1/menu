@@ -13,28 +13,13 @@ import java.util.List;
 @Entity
 public class Evaluation implements Serializable {
 
-    public Evaluation(ItemsBank instrument, long studentId, long userId){
-
-        this.currentItemIndex = WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM;
-        if (!instrument.items.isEmpty()){
-            Integer itemTypeId = instrument.items.get(0).getItemTypeId();
-            if (itemTypeId!=null && itemTypeId>=100){
-                this.currentItemIndex=0;
-            }
-        }
-
+    public Evaluation(ItemsBank instrument, long studentId, long userId, List<ItemAnswer> itemAnswers){
         this.studentId=studentId;
         this.userId=userId;
         this.finished = false;
         this.timestamp =new Timestamp(System.currentTimeMillis());
         this.instrumentId = instrument.id;
-        this.itemWithAnswers = new ArrayList<>();
-        for (int i=0; i<instrument.items.size(); i++){
-
-            WallyOriginalItem item = instrument.items.get(i);
-            this.itemWithAnswers.add(new ItemWithAnswer(item));
-        }
-
+        this.itemAnswerList = itemAnswers;
     }
     public long getUserId() {
         return userId;
@@ -45,16 +30,6 @@ public class Evaluation implements Serializable {
     }
 
     long userId;
-
-    public Integer getCurrentItemIndex() {
-        return currentItemIndex;
-    }
-
-    public void setCurrentItemIndex(int currentItemIndex) {
-        this.currentItemIndex = currentItemIndex;
-    }
-
-    public int currentItemIndex;
 
     public Long getId() {
         return id;
@@ -78,15 +53,6 @@ public class Evaluation implements Serializable {
 
     public void setAsFinished() {
         this.finished = true;
-        this.itemAnswerList = new ArrayList<>();
-        for (ItemWithAnswer itemWithAnswer:this.itemWithAnswers
-             ) {
-            ItemAnswer itemAnswer = itemWithAnswer.getItemAnswer();
-            this.itemAnswerList.add(itemAnswer);
-        }
-        this.itemWithAnswers =null;
-        this.itemsList = null;
-
     }
 
     @ColumnInfo(name="finished")
@@ -118,9 +84,9 @@ public class Evaluation implements Serializable {
     int serverId;
 
     Timestamp timestamp;
-
-    List<WallyOriginalItem> itemsList;
     List<ItemAnswer> itemAnswerList;
-    
-    List<ItemWithAnswer> itemWithAnswers;
+
+    public void setItemAnswerList(List<ItemAnswer> itemAnswerList){
+        this.itemAnswerList = itemAnswerList;
+    }
 }

@@ -690,7 +690,7 @@ public class MainActivity extends AppCompatActivity
             waitDialogBuilder.setCancelable(false);
 
             final AlertDialog waitDialog = waitDialogBuilder.create();
-
+            Handler handler = new Handler(getMainLooper());
             final ResultSendJobService.ResultsSender resultsSender = new ResultSendJobService.ResultsSender(this, new ResultsSenderListener() {
                 @Override
                 public void OnSendingFinish(int total_sended_count, int errors_count) {
@@ -712,7 +712,7 @@ public class MainActivity extends AppCompatActivity
                 public void onProgressUpdate(int progress) {
 
                 }
-            });
+            }, handler);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.nav_logout_confirm);

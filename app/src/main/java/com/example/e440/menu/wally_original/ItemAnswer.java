@@ -28,7 +28,8 @@ public class ItemAnswer implements Serializable {
 
     public Long displayTimeStamp;
 
-    public ItemAnswer(){
+    public ItemAnswer(WallyOriginalItem item){
+        this.itemId = item.getId();
         this.answer = "";
         this.latencySeconds = 0;
         answersChoices = new ArrayList<>();

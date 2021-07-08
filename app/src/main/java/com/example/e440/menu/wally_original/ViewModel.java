@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.e440.menu.CredentialsManager;
 import com.example.e440.menu.DatabaseManager;
+import com.example.e440.menu.ResponseRequest;
 import com.example.e440.menu.Student;
 import com.example.e440.menu.fonotest.Item;
 
@@ -38,14 +39,23 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     }
     private Evaluation evaluation;
     public String instructionText;
+    private List<ItemWithAnswer> itemWithAnswers;
+    public int currentItemIndex;
+    public ResponseRequest responseRequest;
+
+    public void setCurrentItemIndex(int currentItemIndex){this.currentItemIndex = currentItemIndex;}
+
+    public void setItemWithAnwers(List<ItemWithAnswer> itemWithAnswers) {
+        this.itemWithAnswers = itemWithAnswers;
+    }
+
     public void setEvaluation(Evaluation evaluation, String instructionText){
         this.evaluation = evaluation;
         this.instructionText = instructionText;
     }
 
-    public void configure(int instrumentIdx, Long studentId, Long userId, InstrumentsManager instrumentsManager){
+    public void configure(int instrumentIdx, Long studentId, Long userId, InstrumentsManager instrumentsManager, Evaluation evaluation){
         ItemsBank instrument = instrumentsManager.getInstruments().get(instrumentIdx);
-        Evaluation evaluation = new Evaluation(instrument, studentId,userId);
         this.evaluation = evaluation;
         this.instructionText = instrument.getInstruction();
         this.mustBeginWithTheItems.postValue(true);
@@ -73,15 +83,15 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
             }
         }
         if (choiceSelectedValues.get(itemIndex) == null){
-            int choicesCount = this.evaluation.itemWithAnswers.get(itemIndex).getChoicesCount();
+            int choicesCount = this.itemWithAnswers.get(itemIndex).getChoicesCount();
             MutableLiveData<Boolean>[] choicesSelected = new MutableLiveData[choicesCount];
             choiceSelectedValues.set(itemIndex, choicesSelected);
         }
         if (choiceSelectedValues.get(itemIndex)[choiceIndex] == null){
             choiceSelectedValues.get(itemIndex)[choiceIndex] = new MutableLiveData<>(false);
         }
-        ItemAnswer answer = this.evaluation.itemWithAnswers.get(itemIndex).getItemAnswer();
-        ItemChoice itemChoice = this.evaluation.itemWithAnswers.get(itemIndex).getChoice(choiceIndex);
+        ItemAnswer answer = this.itemWithAnswers.get(itemIndex).getItemAnswer();
+        ItemChoice itemChoice = this.itemWithAnswers.get(itemIndex).getChoice(choiceIndex);
         if (answer.isThisChoiceSelected(itemChoice)){
             choiceSelectedValues.get(itemIndex)[choiceIndex].postValue(true);
         }
@@ -90,7 +100,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     }
 
     public Long[] getShowHideProgram(int itemIdx, int choiceIdx){
-        WallyOriginalItem item = this.evaluation.itemWithAnswers.get(itemIdx).getItem();
+        WallyOriginalItem item = this.itemWithAnswers.get(itemIdx).getItem();
         Long[] timeProgram = new Long[2];
         timeProgram[0] = 0L;
         timeProgram[1]=null;
@@ -102,9 +112,9 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
 
 
     public boolean userTouchesChoice(int itemIndex,int whichChoiceInsert){
-        ItemWithAnswer itemWithAnswer = this.evaluation.itemWithAnswers.get(itemIndex);
+        ItemWithAnswer itemWithAnswer = this.itemWithAnswers.get(itemIndex);
         boolean inserted = itemWithAnswer.insertChoice(whichChoiceInsert);
-        WallyOriginalItem item = this.evaluation.itemWithAnswers.get(itemIndex).getItem();
+        WallyOriginalItem item = this.itemWithAnswers.get(itemIndex).getItem();
 
         for (ItemChoice itemChoice: item.getChoices()){
             boolean selected = false;
@@ -125,31 +135,31 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     }
 
     public void IncrementCurrentItemIndex(){
-        this.evaluation.currentItemIndex++;
+        this.currentItemIndex++;
     }
 
      public void DecrementCurrentItemIndex(){
-        this.evaluation.currentItemIndex--;
+        this.currentItemIndex--;
     }
 
     public Integer getCurrentItemIndex(){
-        return this.evaluation.getCurrentItemIndex();
+        return this.currentItemIndex;
     }
 
     public boolean CurrentItemIsThanksItem(){
-        return getCurrentItemIndex() >= evaluation.itemWithAnswers.size();
+        return getCurrentItemIndex() >= this.itemWithAnswers.size();
     }
 
     public boolean currentItemIsTheLast(){
-        return getCurrentItemIndex() == evaluation.itemWithAnswers.size() -1 ;
+        return getCurrentItemIndex() == this.itemWithAnswers.size() -1 ;
     }
 
     public WallyOriginalItem GetCurrentItem(){
-        return evaluation.itemWithAnswers.get(getCurrentItemIndex()).getItem();
+        return this.itemWithAnswers.get(getCurrentItemIndex()).getItem();
     }
 
     public int getItemsCount(){
-        return evaluation.itemWithAnswers.size();
+        return this.itemWithAnswers.size();
     }
 
 
@@ -180,11 +190,11 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
 
     public ItemAnswer getAnswer(int index){
 
-        return this.evaluation.itemWithAnswers.get(index).getItemAnswer();
+        return this.itemWithAnswers.get(index).getItemAnswer();
 
     }
     public ItemAnswer generateAnswerForView(int index){
-        ItemAnswer itemAnswer= this.evaluation.itemWithAnswers.get(index).getItemAnswer();
+        ItemAnswer itemAnswer= this.itemWithAnswers.get(index).getItemAnswer();
         Long timestamp = System.currentTimeMillis()/1000;
         itemAnswer.setDisplayTimeStamp(timestamp);
         return itemAnswer;

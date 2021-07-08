@@ -3,6 +3,7 @@ package com.example.e440.menu;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -37,7 +38,7 @@ public interface DaoAccess {
     @Insert
     void insertSchool(Course school);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     Long insertResponseRequest(ResponseRequest responseRequest);
 
     @Update
@@ -51,8 +52,8 @@ public interface DaoAccess {
     @Query("SELECT * FROM ResponseRequest")
     ResponseRequest[] fetchAllResponseRequest();
 
-    @Query("SELECT * FROM ResponseRequest where saved=0")
-    ResponseRequest[] fetchNotSavedResponseRequest();
+    @Query("SELECT * FROM ResponseRequest where saved=0 and finished=1")
+    ResponseRequest[] fetchResponseRequestsNotSavedInServerAndFinished();
 
     @Query("SELECT * FROM ResponseRequest where student_server_id=:StudentId and finished=0 and instrumentId=:InstrumentId limit 1")
     ResponseRequest[] loadContinuableEvaluationInAJsonString(long StudentId, long InstrumentId);

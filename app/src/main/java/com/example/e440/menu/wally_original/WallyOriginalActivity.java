@@ -1,8 +1,11 @@
 package com.example.e440.menu.wally_original;
 
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,11 +23,11 @@ import com.android.volley.VolleyError;
 import com.example.e440.menu.CredentialsManager;
 import com.example.e440.menu.DatabaseManager;
 import com.example.e440.menu.EXTRA;
+import com.example.e440.menu.MainActivity;
 import com.example.e440.menu.NetworkManager;
 import com.example.e440.menu.R;
 import com.example.e440.menu.ResponseRequest;
 import com.example.e440.menu.ResultSendJobService;
-import com.example.e440.menu.ResultsSenderListener;
 import com.example.e440.menu.Student;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -32,10 +35,13 @@ import com.google.gson.JsonElement;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
     ViewModel model;
-
+    DatabaseManager databaseManager;
     interface SpecialItemIndex {
         int INSTRUCTION_ITEM = -1;
         int ASSENT_ITEM = -2;
@@ -51,6 +57,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         actionBar.hide();
 
         model = new ViewModelProvider(this).get(ViewModel.class);
+        databaseManager = DatabaseManager.getInstance(this);
         if( savedInstanceState != null){
 
         }else {
@@ -59,9 +66,30 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
             long userId = CredentialsManager.getInstance(this).getUserId();
 
+            ArrayList<ItemWithAnswer> itemWithAnswers = new ArrayList<>();
+            ArrayList<ItemAnswer> answers = new ArrayList<>();
+            for (int i=0; i<instrument.items.size(); i++){
+                WallyOriginalItem item = instrument.items.get(i);
+                ItemAnswer itemAnswer = new ItemAnswer(item);
+                answers.add(itemAnswer);
+                itemWithAnswers.add(new ItemWithAnswer(item, itemAnswer));
+            }
+            model.setItemWithAnwers(itemWithAnswers);
             InstrumentsManager instrumentsManager= InstrumentsManager.getInstance(this);
-            model.configure(instrumentIndex,studentId,userId, instrumentsManager);
+            Evaluation evaluation = new Evaluation(instrument,studentId,userId,answers);
+            model.configure(instrumentIndex,studentId,userId, instrumentsManager, evaluation);
 
+            int currentItemIndex = WallyOriginalActivity.SpecialItemIndex.ASSENT_ITEM;
+            if (!instrument.items.isEmpty()){
+                Integer itemTypeId = instrument.items.get(0).getItemTypeId();
+                if (itemTypeId!=null && itemTypeId>=100){
+                    currentItemIndex=0;
+                }
+            }
+            model.setCurrentItemIndex(currentItemIndex);
+
+            ResponseRequest responseRequest = new ResponseRequest("",null,false,studentId,false, instrument.id);
+            model.responseRequest = responseRequest;
             model.getMustBeginWithTheItems().observe(this, new Observer<Boolean>() {
                 @Override
                 public void onChanged(Boolean aBoolean) {
@@ -74,6 +102,9 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
                     }
                 }
             });
+
+            Intent intent = new Intent( WallyOriginalActivity.this, ResultSendJobService.class);
+            startService(intent);
         }
     }
 
@@ -90,56 +121,59 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         progressDialog.setMessage("Por favor espere...");
         progressDialog.show();
 
-        final DatabaseManager databaseManager = DatabaseManager.getInstance(getApplicationContext());
-        final NetworkManager networkManager = NetworkManager.getInstance(getApplicationContext());
+        EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
+        ResponseRequest responseRequest = model.responseRequest;
+        responseRequest.setFinished(true);
         Gson gson = new Gson();
-        JsonElement jsonElement = (gson.toJsonTree(evaluation,Evaluation.class)).getAsJsonObject();
-        final JSONObject payload = new JSONObject();
-        try{
-            String evaluationStr = gson.toJson(jsonElement);
-            JSONObject evalJSONObject = new JSONObject(evaluationStr);
-            payload.put("evaluation", evalJSONObject);
-        }catch (JSONException jsonException){
-            jsonException.printStackTrace();
-        }
-        ResponseRequest responseRequest = new ResponseRequest(payload.toString(), null, false, studentServerId, true, evaluation.getInstrumentId());
-        final Handler handler = new Handler(getMainLooper());
-        databaseManager.insertResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
+        String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
+        responseRequest.setPayload(evaluationWrapperStr);
+        databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
             @Override
-            public void onResult(final ResponseRequest responseRequest) {
-                networkManager.sendEvaluation(payload, new Response.Listener<JSONObject>() {
+            public void onResult(ResponseRequest responseRequest) {
+                final Handler handler = new Handler(getMainLooper());
+                databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        if (networkManager.responseCodeIsOKorCreated(response)){
-                            Log.d("Wally original activity", String.format("Success network response when sending evaluation"));
-                            responseRequest.setSaved(true);
-                            databaseManager.updateResponseRequestAsync(responseRequest, handler, new DatabaseManager.QueryResultListener() {
-                                @Override
-                                public void onResult(ResponseRequest responseRequest) {
-                                    progressDialog.dismiss();
-                                    WallyOriginalActivity.this.finish();
-                                }
-                            });
-                        }else{
-                            progressDialog.dismiss();
-                            WallyOriginalActivity.this.finish();
+                    public void onResult(final ResponseRequest responseRequest) {
+                        Context context=getApplicationContext();
+                        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+                        List<JobInfo> pending_jobs=jobScheduler.getAllPendingJobs();
+                        boolean already_scheduled=false;
+                        for (int i=0;i<pending_jobs.size();i++){
+                            JobInfo jobInfo1=pending_jobs.get(i);
+                            if(jobInfo1.getId()==1){
+                                already_scheduled=true;
+                                break;
+                            }
                         }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(final VolleyError error) {
-                        Log.d("Wally original activity", String.format("Volley error: %s", error.getMessage()));
+                        if(!already_scheduled) {
+                            JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(context, ResultSendJobService.class));
+                            JobInfo jobInfo = builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPersisted(true).setBackoffCriteria(100000, JobInfo.BACKOFF_POLICY_LINEAR).build();
+                            jobScheduler.schedule(jobInfo);
+                        }
                         progressDialog.dismiss();
                         WallyOriginalActivity.this.finish();
                     }
-                });
+                }, handler);
             }
-        }, handler);
+        }
+        , new Handler(getMainLooper()));
     }
 
 
     @Override
     public void onItemAnswered(int itemId, String answer, int answeredItemIndex) {
+
+        EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
+        ResponseRequest responseRequest = model.responseRequest;
+        Gson gson = new Gson();
+        String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
+        responseRequest.setPayload(evaluationWrapperStr);
+        databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
+            @Override
+            public void onResult(ResponseRequest responseRequest) {
+                ;
+            }
+        }, new Handler(getMainLooper()));
 
         if(model.currentItemIsTheLast()){
             OnNavigateToThanksRequest();
@@ -183,7 +217,33 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
 
     @Override
     protected void onDestroy() {
+        Log.d("LOG", "OnDestroy");
         MyBluetoothService.GetInstance(this).finish();
+        ResponseRequest responseRequest = model.responseRequest;
+        if (!responseRequest.isFinished()){
+            responseRequest.setFinished(true);
+            EvaluationWrapper evaluationWrapper = new EvaluationWrapper(model.getEvaluation());
+            Gson gson = new Gson();
+            String evaluationWrapperStr = gson.toJson(evaluationWrapper, evaluationWrapper.getClass());
+            responseRequest.setPayload(evaluationWrapperStr);
+            Handler handler = new Handler(getMainLooper());
+            databaseManager.insertOrUpdateResponseRequestAsync(responseRequest, new DatabaseManager.QueryResultListener() {
+                @Override
+                public void onResult(ResponseRequest responseRequest) {
+                }
+            },handler);
+        }
         super.onDestroy();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
 }
