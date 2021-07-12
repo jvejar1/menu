@@ -22,8 +22,10 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.e440.menu.wally_original.InstrumentsManager;
 import com.example.e440.menu.wally_original.ItemsBank;
@@ -52,10 +54,6 @@ public class StudentsFragment extends Fragment {
         super.onAttach(context);
         Activity activity;
         activity=(Activity) context;
-
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
         try {
             mCallback = (OnStudentSelectedListener) activity;
         } catch (ClassCastException e) {
@@ -64,22 +62,21 @@ public class StudentsFragment extends Fragment {
         }
     }
 
-
     TextView students_count_text_view;
     Spinner schools_names_spinner;
     Spinner courseNamesSpinner;
     ArrayList<String> schools_names_list=new ArrayList();
     ArrayList<String> courseNamesList=new ArrayList();
 
-    final static String SCHOOL_SELECTION_TEXT="-- TODOS LOS ALUMNOS --";
     RecyclerView students_recycler_view;
-    List<Student> studentList=new ArrayList<>();
+    ArrayList<Student> studentList=new ArrayList<>();
     StudentsAdapter studentsAdapter;
     ArrayAdapter<String> schools_names_adapter;
     ArrayAdapter<String> courseNamesAdapter;
+    List<StudentRow> studentRows;
     StudentsLoader studentsLoader;
     HashMap<String, List<int[]>> courseLevelAndLetterBySchoolName = new HashMap<>();
-
+    InstrumentsManager instrumentsManager;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,25 +84,9 @@ public class StudentsFragment extends Fragment {
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.students_fragment, container, false);
         databaseManager= DatabaseManager.getInstance(getContext());
-
-//        studentsListView=inflatedView.findViewById(R.id.studentsListView);
-//
-//        studentsListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-//                TextView studentIdTextView=view.findViewById(R.id.studentServerIdTextView);
-//                int student_server_id=Integer.parseInt(studentIdTextView.getText().toString());
-//                mCallback.onStudentSelected(student_server_id);
-//            }
-//        });
-//        Student s1 = new Student("","01 Alumno prueba","0",0,0);
-//        studentList.add(s1);
-//        ListAdapter customAdapter = new ListAdapter(getContext(), R.layout.students_list_item, studentList);
-//        studentsListView.setAdapter(customAdapter);
-//        studentsListView.setClickable(true);
-
+        instrumentsManager = InstrumentsManager.getInstance(getContext());
+        studentRows = new ArrayList<>();
         students_count_text_view=inflatedView.findViewById(R.id.studentsCountTextView);
-
 
         schools_names_spinner=inflatedView.findViewById(R.id.schoolsNamesSpinner);
         schools_names_adapter = new ArrayAdapter<String>(getContext(),
@@ -119,33 +100,21 @@ public class StudentsFragment extends Fragment {
 
                 String school_name=schools_names_list.get(i);
                 studentsLoader=new StudentsLoader();
-                if(school_name==SCHOOL_SELECTION_TEXT){
-                    //studentsLoader.execute((String)null);
+                courseNamesList.clear();
+                courseNamesList = new ArrayList<>();
+                courseNamesAdapter = new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_item, courseNamesList);
+                courseNamesSpinner.setAdapter(courseNamesAdapter);
+                courseNamesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                }else{
-                    //studentsLoader.execute(school_name);
-                    courseNamesList.clear();
-                    courseNamesList = new ArrayList<>();
-                    courseNamesAdapter = new ArrayAdapter<String>(getContext(),
-                            android.R.layout.simple_spinner_item, courseNamesList);
-                    courseNamesSpinner.setAdapter(courseNamesAdapter);
-                    courseNamesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-                    List<int[]> coursesLevelAndLetter = courseLevelAndLetterBySchoolName.get(school_name);
-                    for (int[] courseLevelAndLetter : coursesLevelAndLetter ){
-                        String courseLevelStr = Student.course_level_by_number.get(courseLevelAndLetter[0]);
-                        String courseLetterStr = String.format("%c",Student.course_letter_by_number.get(courseLevelAndLetter[1]));
-
-                        String courseFullName = courseLevelStr+ ' ' + courseLetterStr;
-                        courseNamesList.add(courseFullName);
-
-                    }
-
-                    courseNamesAdapter.notifyDataSetChanged();
-                    //courseNamesSpinner.setSelection(0, true);
-
+                List<int[]> coursesLevelAndLetter = courseLevelAndLetterBySchoolName.get(school_name);
+                for (int[] courseLevelAndLetter : coursesLevelAndLetter ){
+                    String courseLevelStr = Student.course_level_by_number.get(courseLevelAndLetter[0]);
+                    String courseLetterStr = String.format("%c",Student.course_letter_by_number.get(courseLevelAndLetter[1]));
+                    String courseFullName = courseLevelStr+ ' ' + courseLetterStr;
+                    courseNamesList.add(courseFullName);
                 }
-
+                courseNamesAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -159,28 +128,20 @@ public class StudentsFragment extends Fragment {
                 android.R.layout.simple_spinner_item, courseNamesList);
 
         courseNamesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //sc.add(SCHOOL_SELECTION_TEXT);
         courseNamesSpinner.setAdapter(courseNamesAdapter);
-
         courseNamesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int selectedCourseIndex, long l) {
-
                 String schoolName = (String)schools_names_spinner.getSelectedItem();
                 int[] courseLevelAndLetter = courseLevelAndLetterBySchoolName.get(schoolName).get(selectedCourseIndex);
-
                 studentsLoader=new StudentsLoader();
                 studentsLoader.execute(schoolName, courseLevelAndLetter[0], courseLevelAndLetter[1]);
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
             }
         });
-
-
         students_recycler_view=inflatedView.findViewById(R.id.studentsRecycleView);
         students_recycler_view.addOnItemTouchListener(new RecyclerTouchListener(getContext(), students_recycler_view, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -247,7 +208,9 @@ public class StudentsFragment extends Fragment {
 
             }
         }));
-        studentsAdapter=new StudentsAdapter(studentList);
+
+
+        studentsAdapter=new StudentsAdapter(studentRows);
         RecyclerView.LayoutManager mLayoutManager= new LinearLayoutManager(getContext());
         students_recycler_view.setHasFixedSize(true);
         students_recycler_view.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
@@ -271,11 +234,6 @@ public class StudentsFragment extends Fragment {
             studentsLoader.execute(schoolName, courseLevelAndLetter[0], courseLevelAndLetter[1]);
 
         }
-    }
-
-    public void onCourseSelected(AdapterView<?> adapterView, View view, int i, long l){
-
-        return;
     }
 
     class SchoolsNamesLoader extends  AsyncTask{
@@ -321,24 +279,17 @@ public class StudentsFragment extends Fragment {
             Student[] students;
             if(school_name==null){
                 students = databaseManager.testDatabase.daoAccess().fetchAllStudents();
-
             }else{
                 students=databaseManager.testDatabase.daoAccess().fetchStudentsBySchoolAndCourse(school_name, courseLevel, courseLetter);
             }
-
-
             studentList.clear();
-
             for(Student s :students){
-
-
                 //getLocalEvaluationsCounts
                 int acesCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "ace");
                 int wallyCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "wally");
                 int corsiCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "corsi");
                 int hnfCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(), "hnf");
                 int fonotestCount = databaseManager.testDatabase.daoAccess().getTestEvaluationsCountByStudentServerId(s.getServer_id(),"fonotest");
-
 
                 s.aces_count=acesCount;
                 s.wally_count = wallyCount;
@@ -348,6 +299,29 @@ public class StudentsFragment extends Fragment {
 
                 studentList.add(s);
             }
+
+            studentRows.clear();
+            for(Student s: students){
+
+                EvaluationCount[] evaluationCountsInstruments = databaseManager.getDao().getEvaluationsCounts(instrumentsManager.getInstruments(), s);
+                EvaluationCount[] evaluationCounts = new EvaluationCount[5 + evaluationCountsInstruments.length];
+                evaluationCounts[0] = new EvaluationCount("A", s.aces_count);
+                evaluationCounts[1] = new EvaluationCount("W", s.wally_count);
+                evaluationCounts[2] = new EvaluationCount("C", s.corsis_count);
+                evaluationCounts[3] = new EvaluationCount("CF", s.hnf_count);
+                evaluationCounts[4] = new EvaluationCount("F", s.fonotest_count);
+
+                int nNonInstruments = 5;
+                int iterator = 5;
+                while(iterator<evaluationCounts.length){
+                    evaluationCounts[iterator] = evaluationCountsInstruments[iterator-nNonInstruments];
+                    iterator++;
+                }
+
+                StudentRow studentRow = new StudentRow(s,null, evaluationCounts,null);
+                studentRows.add(studentRow);
+            }
+
             return students;
         }
 

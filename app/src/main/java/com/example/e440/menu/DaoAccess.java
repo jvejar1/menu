@@ -5,10 +5,12 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.example.e440.menu.fonotest.FonoTest;
 import com.example.e440.menu.fonotest.Item;
+import com.example.e440.menu.wally_original.ItemsBank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,21 @@ public interface DaoAccess {
     @Query("SELECT * FROM ResponseRequest where student_server_id=:StudentId and finished=0 and instrumentId=:InstrumentId limit 1")
     ResponseRequest[] loadContinuableEvaluationInAJsonString(long StudentId, long InstrumentId);
 
+    @Transaction
+    public default EvaluationCount[] getEvaluationsCounts(List<ItemsBank> instruments, Student student) {
+        // Anything inside this method runs in a single transaction.
+       EvaluationCount[] evaluationCounts = new EvaluationCount[instruments.size()];
+       for (int i=0; i<instruments.size(); i++){
+           ItemsBank instrument = instruments.get(i);
+           int count = getEvaluationsCount(instrument.id, student.getServer_id());
+           EvaluationCount evaluationsCount = new EvaluationCount(instrument.nameInitials, count);
+           evaluationCounts[i]=evaluationsCount;
+       }
+       return evaluationCounts;
+    }
+
+    @Query("Select count(*) from ResponseRequest where instrumentId=:instrumentId and student_server_id=:studentId")
+    int getEvaluationsCount(int instrumentId, Long studentId);
 
     @Query("SELECT count() FROM ResponseRequest where test_name=:testName")
     int fetchTestEvaluationsCount(String testName);

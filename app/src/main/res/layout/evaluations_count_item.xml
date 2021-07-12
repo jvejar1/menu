@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTintMode="src_in"
+        >
+        <LinearLayout
+       android:orientation="vertical">
+            <TextView
+                android:textStyle="bold"
+                android:minWidth="22dp"
+                android:layout_margin="0px"
+                android:id="@+id/evaluationsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="0"
+                android:textSize="14dp">
+            </TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black_overlay"></View>
+        </LinearLayout>
+        <FrameLayout android:padding="3px"
+            >
+            <TextView
+                android:minWidth="40dp"
+                android:paddingRight="5px"
+                android:paddingLeft="5px"
+                android:layout_gravity="center"
+                android:id="@+id/evaluationsCountText"
+                android:text="CSTfr"
+                android:textSize="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                >
+            </TextView>
+        </FrameLayout>
+
+    </TableRow>
+
+</FrameLayout>
