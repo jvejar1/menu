@@ -6,7 +6,11 @@ import java.util.List;
 public class ItemsBank implements Serializable {
 
     public int id;
-    public String nameInitials="CSTfr";
+    public String nameInitials;
+
+    public String getNameInitials(){
+        return String.format("%s",this.nameInitials);
+    }
 
     public String getName() {
         if (name == null){

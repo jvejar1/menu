@@ -67,7 +67,7 @@ public interface DaoAccess {
        for (int i=0; i<instruments.size(); i++){
            ItemsBank instrument = instruments.get(i);
            int count = getEvaluationsCount(instrument.id, student.getServer_id());
-           EvaluationCount evaluationsCount = new EvaluationCount(instrument.nameInitials, count);
+           EvaluationCount evaluationsCount = new EvaluationCount(instrument.getNameInitials(), count);
            evaluationCounts[i]=evaluationsCount;
        }
        return evaluationCounts;
