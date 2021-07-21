@@ -1,11 +1,14 @@
 package com.example.e440.menu.wally_original;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
 public class ItemsBank implements Serializable {
 
     public int id;
+    @SerializedName(value="nameInitials", alternate={"name_initials"})
     public String nameInitials;
 
     public String getNameInitials(){

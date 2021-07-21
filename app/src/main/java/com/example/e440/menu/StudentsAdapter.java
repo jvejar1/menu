@@ -98,8 +98,8 @@ class CountItemDecoration extends RecyclerView.ItemDecoration{
     @Override
     public void getItemOffsets(Rect outRect, View view,
                                RecyclerView parent, RecyclerView.State state) {
-        outRect.right = space*3;
-        outRect.bottom = space;
+        //outRect.right = space*3;
+        //outRect.bottom = space;
         // Add top margin only for the first item to avoid double space between items
     }
 }
