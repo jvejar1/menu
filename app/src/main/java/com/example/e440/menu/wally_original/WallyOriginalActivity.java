@@ -58,14 +58,18 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         decorView.setSystemUiVisibility(uiOptions);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+        Bundle extras = getIntent().getExtras();
+
+        studentFullName= extras.getString(EXTRA_STUDENT_NAME, "");
+        TextView studentFullNameView = findViewById(R.id.studentFullName);
+        studentFullNameView.setText(studentFullName);
 
         model = new ViewModelProvider(this).get(ViewModel.class);
         databaseManager = DatabaseManager.getInstance(this);
         if( savedInstanceState != null){
 
         }else {
-            Bundle extras = getIntent().getExtras();
-            studentFullName= extras.getString(EXTRA_STUDENT_NAME, "");
+
             int instrumentIndex = getIntent().getExtras().getInt(EXTRA.EXTRA_INSTRUMENT_INDEX);
             final ItemsBank instrument = InstrumentsManager.getInstance(this).getInstruments().get(instrumentIndex);
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
@@ -108,8 +112,7 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
                 }
             });
 
-            TextView studentFullNameView = findViewById(R.id.studentFullName);
-            studentFullNameView.setText(studentFullName);
+
             //Intent intent = new Intent( WallyOriginalActivity.this, ResultSendJobService.class);
             //startService(intent);
         }
