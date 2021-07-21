@@ -12,7 +12,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_alignTop="@+id/itemTextTextView"
 
         ></Button>
 
@@ -24,12 +24,13 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="70dp"
         android:layout_marginLeft="25dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="14dp"
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
         android:gravity="center"
         android:justificationMode="inter_word"
-        android:text="Lorem ipsum dolor Lorem ipsum dolorLorem ipsum dolorLorem ipsum dolorLorem ipsum dolorLorem ipsum dolorLorem ipsum dolor"
+        android:text="Lorem ipsum dolor lorem ipsum dolorLorem ipsum
+        dolorLorem ipsum dolorLorem ipsum dolorLorem ipsum dolorLorem ipsum dolor"
         android:textColor="#000000"
         android:textSize="25sp"
         android:layout_toRightOf="@id/nav_prev_btn"

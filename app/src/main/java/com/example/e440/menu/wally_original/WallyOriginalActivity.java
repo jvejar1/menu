@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -40,8 +41,10 @@ import java.util.List;
 
 public class WallyOriginalActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
+    public static String EXTRA_STUDENT_NAME="student_full_name";
     ViewModel model;
     DatabaseManager databaseManager;
+    String studentFullName;
     interface SpecialItemIndex {
         int INSTRUCTION_ITEM = -1;
         int ASSENT_ITEM = -2;
@@ -61,6 +64,8 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
         if( savedInstanceState != null){
 
         }else {
+            Bundle extras = getIntent().getExtras();
+            studentFullName= extras.getString(EXTRA_STUDENT_NAME, "");
             int instrumentIndex = getIntent().getExtras().getInt(EXTRA.EXTRA_INSTRUMENT_INDEX);
             final ItemsBank instrument = InstrumentsManager.getInstance(this).getInstruments().get(instrumentIndex);
             final Long studentId = getIntent().getExtras().getLong(Student.EXTRA_STUDENT_SERVER_ID);
@@ -103,8 +108,10 @@ public class WallyOriginalActivity extends AppCompatActivity implements ItemFrag
                 }
             });
 
-            Intent intent = new Intent( WallyOriginalActivity.this, ResultSendJobService.class);
-            startService(intent);
+            TextView studentFullNameView = findViewById(R.id.studentFullName);
+            studentFullNameView.setText(studentFullName);
+            //Intent intent = new Intent( WallyOriginalActivity.this, ResultSendJobService.class);
+            //startService(intent);
         }
     }
 

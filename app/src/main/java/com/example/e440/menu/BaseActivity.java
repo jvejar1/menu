@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.e440.menu.wally_original.WallyOriginalActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,7 +55,7 @@ public class BaseActivity extends AppCompatActivity implements MainFragmentListe
         super.onCreate(savedInstanceState);
         Bundle extras=getIntent().getExtras();
         student_server_id=extras.getLong(Student.EXTRA_STUDENT_SERVER_ID);
-        studentFullName=extras.getString("student_full_name");
+        studentFullName=extras.getString(WallyOriginalActivity.EXTRA_STUDENT_NAME);
     }
 
     @Override

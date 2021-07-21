@@ -147,14 +147,11 @@ public class StudentsFragment extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 final Student student = studentList.get(position);
-
                 Toast.makeText(getContext(), student.getLast_name() + " seleccionado!", Toast.LENGTH_SHORT).show();
                 //mCallback.onStudentSelected(student.getServer_id());
 
                 CharSequence colors[] = new CharSequence[] {"Aces", "Wally", "Cubos de Corsi", "Hearts and Flowers","Fonológico"};
                 final List<ItemsBank> instruments = InstrumentsManager.getInstance(getContext()).getInstruments();
-
-
                 CharSequence availableItemsStr[] = new CharSequence[ colors.length + instruments.size()];
 
                 for(int i = 0; i<colors.length; i++){
@@ -173,7 +170,7 @@ public class StudentsFragment extends Fragment {
                         // the user clicked on colors[which]
                         Bundle b=new Bundle();
                         b.putLong(Student.EXTRA_STUDENT_SERVER_ID,student.getServer_id());
-                        b.putString("student_full_name",student.getFullName());
+                        b.putString(WallyOriginalActivity.EXTRA_STUDENT_NAME,student.getFullName());
                         Intent intent;
                         if (which==0){
                             intent = new Intent(context, AceActivity.class);
